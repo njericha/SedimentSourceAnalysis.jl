@@ -15,7 +15,7 @@ include("./estimatekernel.jl")
 
 # Import data
 #include("./dataimport.jl")
-filename = "./sundelldata/20sinks from 3Sources from Sundell et al 2022.xlsx"
+filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 T, scales, names, bandwidths = make_densities(filename, 2^5, P=95);
 
 # Change measurment name "ages" to "Age" for consistantcy with the measurements in the sources file
@@ -60,11 +60,11 @@ if !normalize_each_update
 end
 
 # Import ground truth matricies C and F
-source_filename = "./sundelldata/20sinks from 3Sources from Sundell et al 2022.xlsx"
+source_filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 source_amounts = XLSX.readdata(source_filename,"Source proportions","B2:D21")
 C_true = source_amounts / 75 # 75 Grains in each sink
 
-dist_filename = "./sundelldata/3Sources from Sundell et al 2022.xlsx"
+dist_filename = "./data/sundell2022/3Sources from Sundell et al 2022.xlsx"
 F_true, scales_true, names_true, bandwidths_true = make_densities(dist_filename, 2^5, P=100, scales=scales, bandwidths=bandwidths);
 scale_slices!(F_true, scales, 2)
 

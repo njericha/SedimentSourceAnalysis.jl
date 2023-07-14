@@ -10,7 +10,7 @@ using NMF
 # Import data and list of elements
 include("./dataimport.jl")
 elements = ["ages", "Eu_anomaly", "Ti_temp", "LREE_HREE", "Dy_Yb", "(Ce_Nd)_Y"]#"Th_U"
-data_path = "sundelldata/20sinks from 3Sources from Sundell et al 2022.xlsx"
+data_path = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 grain_data, rock_index = import_grain_data(data_path, elements);
 start_index = [idx for (idx, _) ∈ rock_index]
 end_index = [idx for (_, idx) ∈ rock_index]
@@ -70,4 +70,4 @@ for j ∈ 1:rank
 end
 
 # Calculuate C_true
-# 
+#

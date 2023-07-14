@@ -132,8 +132,8 @@ Rough draft of a function to import the raw data and make the density estimates
     as well as plot the estimates.
 """
 function density_draft()
-    filename_3sources = "./sundelldata/3Sources from Sundell et al 2022.xlsx"
-    filename_20sinks = "./sundelldata/20sinks from 3Sources from Sundell et al 2022.xlsx"
+    filename_3sources = "./data/sundell2022/3Sources from Sundell et al 2022.xlsx"
+    filename_20sinks = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 
     # Start by observing the source data
     true_data = read_raw_data(filename_3sources)

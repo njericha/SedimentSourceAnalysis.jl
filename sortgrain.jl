@@ -45,7 +45,7 @@ test_scale = 1:10
 
 Estimates the probability of observing grain_vec from the single factor
 This assumes the distributions are normalized in the sence that
-they carry equal weight e.i. the row_sums are 1. 
+they carry equal weight e.i. the row_sums are 1.
 
 Note the distributions before rescaling have a row_sum equal to 1/stepsize
 with stepsize being the intervel width used in scale.
@@ -57,7 +57,7 @@ function estimate_prob(factor_slice, scales, grain_vec)
         density_k = density[subinterval_k] # Get the probability for observing a measurment on that intervel
         measurment_probabilities[j] = density_k
     end
-    ## Multiply the probabilities to get the overall probability of 
+    ## Multiply the probabilities to get the overall probability of
     ## observing the data in that volume
     return prod(measurment_probabilities)
 end
@@ -70,7 +70,7 @@ the grain vector came from
 """
 function estimate_which_factor(F, scales, grain_vec)
     n_factors, _, _ = size(F)
-    likelyhoods = zeros(n_factors) 
+    likelyhoods = zeros(n_factors)
     for (i, factor_slice) ∈ enumerate(eachslice(F, dims=1)) #factor_slice = F[1, :, :]
         prob = estimate_prob(factor_slice, scales, grain_vec)
         likelyhoods[i] = prob
@@ -96,7 +96,7 @@ function estimate_factors_and_probs(F, scales, raw_data, sink_j)
         prob_estimates[i] = prob
     end
     return factor_estimates, prob_estimates
-end 
+end
 
 # Shorthand Helpers
 estimate_factor_probs(grain_i,sink_j) = (estimate_which_factor(F, scales, get_grain(raw_data, (grain_i,sink_j))))[2]
@@ -104,7 +104,7 @@ factor_probs(grain_i,sink_j) = (estimate_which_factor(F_true, scales, get_grain(
 
 #= Start of Script Portion of File =#
 
-# Load the learned coefficients C and factor distributions F  
+# Load the learned coefficients C and factor distributions F
 using JLD2
 using UnPack
 
@@ -114,7 +114,7 @@ end
 
 # Import the raw grain data
 include("./dataimport.jl")
-filename = "./sundelldata/20sinks from 3Sources from Sundell et al 2022.xlsx"
+filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 raw_data = read_raw_data(filename)
 
 n_sinks = 20
@@ -140,8 +140,8 @@ for sink_j ∈ 1:n_sinks
     display(p)
 end
 
-# True distributions 
-dist_filename = "./sundelldata/3Sources from Sundell et al 2022.xlsx"
+# True distributions
+dist_filename = "./data/sundell2022/3Sources from Sundell et al 2022.xlsx"
 F_true, scales_true, names_true, bandwidths_true = make_densities(dist_filename, 2^5, P=100, scales=scales, bandwidths=bandwidths);
 
 Δxs = [scale[2]-scale[1] for scale ∈ scales] # TODO replace this with scale_slices!() once the function is moved and avalible
@@ -168,7 +168,7 @@ for sink_j ∈ 1:n_sinks
 end
 
 # Ground truth grain sources
-source_filename = "./sundelldata/20sinks from 3Sources from Sundell et al 2022.xlsx"
+source_filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 source_proportions = XLSX.readdata(source_filename,"Source proportions","B2:D21")
 source_proportions = convert.(Int, source_proportions)
 """
@@ -192,7 +192,7 @@ end
 
 for (i, proportion) ∈ enumerate(eachrow(source_proportions))
     true_factors = make_source_vector(proportion)
-    
+
     # Plot the factor estimates, where brighter colors indicate a higher probability
     p = scatter(true_factors;
     yticks = 1:n_sources,

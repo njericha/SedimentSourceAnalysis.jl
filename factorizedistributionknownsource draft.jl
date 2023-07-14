@@ -13,7 +13,7 @@ include("./coorddecent.jl")
 
 # Import data
 include("./dataimport.jl")
-filename = "./sundelldata/20sinks from 3Sources from Sundell et al 2022_DISTRIBUTIONS.xlsx"
+filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022_DISTRIBUTIONS.xlsx"
 distributions = read_distribution_data(filename);
 D = to_tensor(distributions);
 
@@ -118,7 +118,7 @@ end
 
 
 #= True Source proportions =#
-source_filename = "./sundelldata/20sinks from 3Sources from Sundell et al 2022.xlsx"
+source_filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 source_proportions = XLSX.readdata(source_filename,"Source proportions","B2:D21")
 source_proportions ./= 75 # 75 Grains in each sink
 
@@ -133,7 +133,7 @@ heatmap(C_true,
 )
 
 #= True Factor distributions =#
-dist_filename = "./sundelldata/3Sources from Sundell et al 2022_DISTRIBUTIONS.xlsx"
+dist_filename = "./data/sundell2022/3Sources from Sundell et al 2022_DISTRIBUTIONS.xlsx"
 true_distributions = read_distribution_data(dist_filename);
 D_true = to_tensor(true_distributions);
 
