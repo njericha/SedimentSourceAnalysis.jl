@@ -9,7 +9,7 @@ include("./coorddecent.jl")
 
 # Import data
 include("./dataimport.jl")
-filename = "Lee et al 2021 distributions.xlsx"
+filename = "data/lee2021/Lee et al 2021 distributions.xlsx"
 distributions = read_distribution_data(filename);
 D = to_tensor(distributions)
 

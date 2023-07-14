@@ -8,7 +8,7 @@ using NMF
 
 # Import data and list of elements
 include("./dataimport.jl")
-raw_data_path(s::String) = join(["rawdata/Lee et al 2021 " s ".xlsx"],"")
+raw_data_path(s::String) = join(["data/lee2021/Lee et al 2021 " s ".xlsx"],"")
 elements = ["Y", "Nb", "Ce", "Pr", "Nd", "Sm", "Eu_Euprime", "U", "age"]
 grain_data, rock_index = read_xlsx_data(raw_data_path, elements);
 start_index = [idx for (idx, _) ∈ rock_index]
