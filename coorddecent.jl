@@ -10,7 +10,7 @@ ReLU(x) = max(0,x)
 
 rel_error(x, xhat) = abs(x - xhat) / x
 
-import Base: *
+import Base: * # TODO use better style, maybe custom symbol
 function *(A::AbstractMatrix{T}, B::Array{T,3}) where T
     @einsum C[i,j,k] := A[i,l] * B[l,j,k]
     return C
@@ -19,7 +19,7 @@ end
 """
     dist_to_Ncone_of_Rplus(grad_C, grad_F, C, F)
 
-Calculate the distance of the -gradient to the normal cone of the positive orthant 
+Calculate the distance of the -gradient to the normal cone of the positive orthant
 """
 function dist_to_Ncone_of_Rplus(grad_C, grad_F, C, F)
     grad_C_restricted = grad_C[(C .> 0) .|| (grad_C .< 0)]
@@ -71,7 +71,7 @@ function coorddecent(Y, R; maxiter=100, tol=1e-3, normalize_each_update = false,
     end
 
     function norm_gradient(grad_C, grad_F)
-        return sqrt(norm(grad_C)^2 + norm(grad_F)^2) 
+        return sqrt(norm(grad_C)^2 + norm(grad_F)^2)
     end
 
     function rescaleCF!(C, F)
@@ -80,7 +80,7 @@ function coorddecent(Y, R; maxiter=100, tol=1e-3, normalize_each_update = false,
             avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
             F .= avg_factor_sums^(-1) * F # TODO make more accurate scaling
             C .= C * avg_factor_sums
-        end 
+        end
     end
 
     # Initialize Looping
@@ -104,7 +104,7 @@ function coorddecent(Y, R; maxiter=100, tol=1e-3, normalize_each_update = false,
     # Main Loop
     # Ensure at least 1 step is performed
     while (i == 1) || (not_converged(dist_Ncone, i) && (i < maxiter))
-        if (plot_progress != 0) && ((i-1) % plot_progress == 0) # every plot_progress iterations 
+        if (plot_progress != 0) && ((i-1) % plot_progress == 0) # every plot_progress iterations
             fiber_sums = sum.(eachslice(F,dims=(1,2)))
             avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
             F_temp = avg_factor_sums^(-1) * F
@@ -186,7 +186,7 @@ function binarycoorddecent(Y, R; maxiter=100, tol=1e-3)
         CC = C'C
         grad_C = C*FF .- Y*F'
         grad_F = CC*F .- C'*Y
-        return sqrt(norm(grad_C)^2 + norm(grad_F)^2) 
+        return sqrt(norm(grad_C)^2 + norm(grad_F)^2)
     end
 
     # Initialize Looping
