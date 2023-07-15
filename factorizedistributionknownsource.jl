@@ -9,7 +9,6 @@ using StatsPlots
 using Printf # for formating floats as strings
 using JLD2, UnPack # for saving and loading data to a file
 
-
 include("./coorddecent.jl")
 include("./estimatekernel.jl")
 
