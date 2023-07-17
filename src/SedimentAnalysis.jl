@@ -1,13 +1,12 @@
-#= Single module that pulls from the
+#= Single module that combines the
 factorization and data handling modules =#
 
 module SedimentAnalysis #TODO check if these files should be included and reexported instead
+using Reexport
 
 include("MTF/MTF.jl")
 include("SedimentTools/SedimentTools.jl")
-using .MTF
-using .SedimentTools
-
-export * # reexport everything
+@reexport using .MTF
+@reexport using .SedimentTools
 
 end # SedimentAnalysis

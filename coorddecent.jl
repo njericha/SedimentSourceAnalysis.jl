@@ -28,14 +28,14 @@ function dist_to_Ncone_of_Rplus(grad_C, grad_F, C, F)
 end
 
 """
-Factorizes Y ≈ C F where Y[i,j,k] ≈ \\sum_r^R C[i,r]*F[r,j,k]
+Factorizes Y ≈ C F where ``Y[i,j,k] \\approx \\sum_r^R C[i,r]*F[r,j,k]``
 and the factors C, F ≥ 0 are nonnegative
 
 Note there may NOT be a unique optimal solution
 
 If plot_progress is different from 0, plot the progress of F every plot_progress iterations
 """
-function coorddecent(Y, R; maxiter=100, tol=1e-3, normalize_each_update = false, plot_progress = 0)
+function coorddecent(Y, R; maxiter=100, tol=1e-3, normalize_each_update = false, plot_progress = 0, names= nothing)
     # Extract Dimentions
     M, N, P = size(Y)
 
@@ -70,16 +70,27 @@ function coorddecent(Y, R; maxiter=100, tol=1e-3, normalize_each_update = false,
         return grad_C, grad_F
     end
 
-    function norm_gradient(grad_C, grad_F)
-        return sqrt(norm(grad_C)^2 + norm(grad_F)^2)
-    end
+    norm_gradient(grad_C, grad_F) = sqrt(norm(grad_C)^2 + norm(grad_F)^2)
 
     function rescaleCF!(C, F)
-        if normalize_each_update
-            fiber_sums = sum.(eachslice(F,dims=(1,2)))
-            avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
-            F .= avg_factor_sums^(-1) * F # TODO make more accurate scaling
-            C .= C * avg_factor_sums
+        fiber_sums = sum.(eachslice(F,dims=(1,2)))
+        avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
+        F .= avg_factor_sums^(-1) * F # TODO make more accurate scaling
+        C .= C * avg_factor_sums
+    end
+
+    function plot_factors(F, i, names)
+        fiber_sums = sum.(eachslice(F,dims=(1,2)))
+        avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
+        F_temp = avg_factor_sums^(-1) * F
+        for (j, F_slice) ∈ enumerate(eachslice(F_temp,dims=1))
+            p = heatmap(F_slice,
+                yticks=(eachindex(F_slice[:,1]), names),
+                xticks=([1, length(F_slice[1,:])],["0", "1"]),
+                xlabel="Normalized Range of Values",
+                title = "Learned Distributions for Factor $j at i=$i"
+            )
+            display(p)
         end
     end
 
@@ -104,23 +115,13 @@ function coorddecent(Y, R; maxiter=100, tol=1e-3, normalize_each_update = false,
     # Main Loop
     # Ensure at least 1 step is performed
     while (i == 1) || (not_converged(dist_Ncone, i) && (i < maxiter))
-        if (plot_progress != 0) && ((i-1) % plot_progress == 0) # every plot_progress iterations
-            fiber_sums = sum.(eachslice(F,dims=(1,2)))
-            avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
-            F_temp = avg_factor_sums^(-1) * F
-            for (j, F_slice) ∈ enumerate(eachslice(F_temp,dims=1))
-                p = heatmap(F_slice,
-                    yticks=(eachindex(F_slice[:,1]), names),
-                    xticks=([1, length(F_slice[1,:])],["0", "1"]),
-                    xlabel="Normalized Range of Values",
-                    title = "Learned Distributions for Factor $j at i=$i"
-                    )
-                display(p)
-            end
+        if (plot_progress != 0) && ((i-1) % plot_progress == 0)
+            plot_factors(F, i, names)
         end
         update_C!(C, F)
         update_F!(C, F)
-        rescaleCF!(C, F)
+
+        normalize_each_update ? rescaleCF!(C, F) : nothing
 
         # Calculate error and norm of gradient
         i += 1
@@ -136,10 +137,6 @@ function coorddecent(Y, R; maxiter=100, tol=1e-3, normalize_each_update = false,
     dist_Ncone = dist_Ncone[keep_slice]
     return C, F, error, norm_grad, dist_Ncone
 end
-
-#binary_project(x) = (sign(x-0.5) + 1) / 2 |> handle_point5
-#handle_point5(x) = x ≈ 0.5 ? rand01() : x
-#rand01() = (randperm(2) .- 1)[1]
 
 function onehot_rows!(X)
     for (i, row) ∈ enumerate(eachrow(X))
@@ -173,7 +170,7 @@ function binarycoorddecent(Y, R; maxiter=100, tol=1e-3)
 
     function update_F!(C, F)
         CC = C'C
-        L = norm(CC) # TODO Optimize calculation to take advantage of symmetry of FF
+        L = norm(CC) # TODO Optimize calculation to take advantage of symmetry of CC
         F .-= (CC*F .- C'*Y) ./ L # gradient
         F .= ReLU.(F) # project
         factor_norms = Diagonal(norm.(eachrow(F)))
