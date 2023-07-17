@@ -3,4 +3,4 @@
   - 3 Sources from Sundell et all 2022_DISTRIBUTIONS.xlsx
   - 20sinks from 3Sources from Sundell et al 2022_DISTRIBUTIONS.xlsx
 - [ ] consider making Jupyter/Pluto/Google collab versions of the examples for easier interation
--
+- [ ] regenerate figures using the new examples and code

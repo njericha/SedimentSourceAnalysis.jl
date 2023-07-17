@@ -109,7 +109,7 @@ end
 
 Plot each horizontal slice of F. Names give the name of each vertical slice.
 """
-function plot_factors(F, names; appendtitle="")
+function plot_factors(F, names=string.(eachindex(F[1,:,1])); appendtitle="")
     size(F)[2] == length(names) || ArgumentError("names should have the same length as size(F)[2]")
     fiber_sums = sum.(eachslice(F,dims=(1,2)))
     avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))

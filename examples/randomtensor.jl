@@ -10,3 +10,6 @@ example decomposition on a random tensor
 # decompose Y
 
 # compare learned A and B with the true A and B
+
+include("../src/SedimentAnalysis.jl")
+using .SedimentAnalysis
