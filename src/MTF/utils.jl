@@ -51,6 +51,11 @@ ReLU(x) = max(0,x)
     rel_error(x, xhat)
 
 Compute the relative error between x (true value) and xhat (its approximation).
+
+The relative error is given by:
+```math
+\\frac{\\lVert x - \\hat{x} \\rVert}{\\lVert x \\rVert}
+```
 """
 rel_error(x, xhat) = norm(x - xhat) / norm(x)
 # TODO use Distances.jl to define a more robust error

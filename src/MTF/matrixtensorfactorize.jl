@@ -4,8 +4,9 @@ and related helpers
 =#
 
 """
-    coorddecent(Y::Abstract3Tensor, R::Integer; kwargs...)
+    nnmtf(Y::Abstract3Tensor, R::Integer; kwargs...)
 
+Non-negatively matrix-tensor factorizes an order 3 tensor Y with a given "rank" R.
 
 Factorizes Y ≈ C F where ``Y[i,j,k] \\approx \\sum_r^R C[i,r]*F[r,j,k]``
 and the factors C, F ≥ 0 are nonnegative.
@@ -30,7 +31,7 @@ Note there may NOT be a unique optimal solution
 - `norm_grad::Vector{Float64}`: norm of the full gradient at each iteration
 - `dist_Ncone::Vector{Float64}`: distance of the -gradient to the normal cone at each iteration
 """
-function coorddecent(
+function nnmtf(
     Y::Abstract3Tensor,
     R::Integer;
     maxiter::Integer=100,
@@ -58,7 +59,7 @@ function coorddecent(
     rel_errors[i] = rel_error(Y, C*F)
     grad_C, grad_F = calc_gradient(C, F, Y)
     norm_grad[i] = combined_norm(grad_C, grad_F)
-    dist_Ncone[i] = dist_to_Ncone_of_Rplus(grad_C, grad_F, C, F)
+    dist_Ncone[i] = dist_to_Ncone(grad_C, grad_F, C, F)
 
     # Convergence criteria. We "normalize" the distance vector so the tolerance can be
     # picked independent of the dimentions of Y and rank R
@@ -81,7 +82,7 @@ function coorddecent(
         rel_errors[i] = rel_error(Y, C*F)
         grad_C, grad_F = calc_gradient(C, F, Y)
         norm_grad[i] = combined_norm(grad_C, grad_F)
-        dist_Ncone[i] = dist_to_Ncone_of_Rplus(grad_C, grad_F, C, F)
+        dist_Ncone[i] = dist_to_Ncone(grad_C, grad_F, C, F)
     end
 
     # Chop Excess
@@ -93,11 +94,11 @@ function coorddecent(
 end
 
 """
-    dist_to_Ncone_of_Rplus(grad_C, grad_F, C, F)
+    dist_to_Ncone(grad_C, grad_F, C, F)
 
-Calculate the distance of the -gradient to the normal cone of the positive orthant
+Calculate the distance of the -gradient to the normal cone of the positive orthant.
 """
-function dist_to_Ncone_of_Rplus(grad_C, grad_F, C, F)
+function dist_to_Ncone(grad_C, grad_F, C, F)
     grad_C_restricted = grad_C[(C .> 0) .|| (grad_C .< 0)]
     grad_F_restricted = grad_F[(F .> 0) .|| (grad_F .< 0)]
     return sqrt(norm(grad_C_restricted)^2 + norm(grad_F_restricted)^2)

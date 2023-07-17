@@ -6,7 +6,7 @@ using Random
 using LinearAlgebra
 using Einsum
 
-export rel_error
+export nnmtf, plot_factors, rel_error
 
 include("utils.jl")
 include("matrixtensorfactorize.jl")
