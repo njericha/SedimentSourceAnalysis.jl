@@ -2,8 +2,9 @@
 Matrix-Tensor Factorization
 """
 module MTF
-using Random
 using LinearAlgebra
+using Plots
+using Random
 using Einsum
 
 export nnmtf, plot_factors, rel_error

@@ -14,7 +14,7 @@ matrix-matrix multiplication. For this reason, we resuse the same symbol.
 
 This is equivilent to the ``1``-mode product ``B \\times_1 A``.
 """
-function Base.*(A::AbstractMatrix, B::Abstract3Tensor)
+function Base.:*(A::AbstractMatrix, B::Abstract3Tensor)
     @einsum C[i,j,k] := A[i,l] * B[l,j,k]
     return C
 end
