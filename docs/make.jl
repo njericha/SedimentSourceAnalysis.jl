@@ -2,6 +2,8 @@ using Documenter
 
 #push!(LOAD_PATH,"../src/")
 using SedimentAnalysis
+using SedimentAnalysis.MTF
+using SedimentAnalysis.SedimentTools
 
 # DocMeta.setdocmeta!(
 #     SedimentAnalysis,

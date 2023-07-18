@@ -103,7 +103,7 @@ function dist_to_Ncone(grad_C, grad_F, C, F)
     grad_F_restricted = grad_F[(F .> 0) .|| (grad_F .< 0)]
     return sqrt(norm(grad_C_restricted)^2 + norm(grad_F_restricted)^2)
 end
-
+# TODO move this ploting function to SedimentTools? Or seperate viz.jl file?
 """
     plot_factors(F, names; appendtitle="")
 
