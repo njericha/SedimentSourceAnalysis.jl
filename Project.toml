@@ -1,3 +1,8 @@
+name = "SedimentAnalysis"
+uuid = "ec7d977d-20c2-4b4d-b160-abe0d9e86f32"
+authors = ["Nicholas Richardson <njericha@math.ubc.ca>"]
+version = "0.1.0"
+
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
 Einsum = "b7d42ee7-0b51-5a75-98ca-779d3107e4c0"
