@@ -42,8 +42,6 @@ function find_subinterval(scale, grain_value)
     return k
 end
 
-
-
 """
     estimate_prob(factor_slice, scales, grain_vec)
 

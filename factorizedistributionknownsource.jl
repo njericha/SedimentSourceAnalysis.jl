@@ -21,7 +21,6 @@ T, scales, names, bandwidths = make_densities(filename, 2^5, P=95);
 age_idx = findall(s -> s == "ages", names)
 names[age_idx] .= "Age"
 
-
 # Look at distributions
 for (j, (scale, name)) ∈ enumerate(zip(scales,names))
     p = plot(scale,eachrow(T[:,j,:]),
