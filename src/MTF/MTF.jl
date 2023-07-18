@@ -7,7 +7,7 @@ using Plots
 using Random
 using Einsum
 
-export nnmtf, plot_factors, rel_error
+export combined_norm, nnmtf, plot_factors, rel_error
 
 include("utils.jl")
 include("matrixtensorfactorize.jl")

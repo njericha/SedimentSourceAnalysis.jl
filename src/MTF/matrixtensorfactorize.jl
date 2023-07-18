@@ -8,8 +8,8 @@ and related helpers
 
 Non-negatively matrix-tensor factorizes an order 3 tensor Y with a given "rank" R.
 
-Factorizes Y ≈ C F where ``Y[i,j,k] \\approx \\sum_r^R C[i,r]*F[r,j,k]``
-and the factors C, F ≥ 0 are nonnegative.
+Factorizes ``Y \\approx C F`` where ``\\displaystyle Y[i,j,k] \\approx \\sum_{r=1}^R C[i,r]*F[r,j,k]``
+and the factors ``C, F \\geq 0`` are nonnegative.
 
 Note there may NOT be a unique optimal solution
 

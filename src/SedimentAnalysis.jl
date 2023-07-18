@@ -6,7 +6,11 @@ using Reexport
 
 include("MTF/MTF.jl")
 include("SedimentTools/SedimentTools.jl")
-@reexport using .MTF
-@reexport using .SedimentTools
+#@reexport using .MTF
+#@reexport using .SedimentTools
+using .MTF
+export nnmft, combined_norm
+
+using .SedimentTools
 
 end # SedimentAnalysis
