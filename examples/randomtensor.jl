@@ -13,3 +13,4 @@ example decomposition on a random tensor
 
 include("../src/SedimentAnalysis.jl")
 using .SedimentAnalysis
+using Random
