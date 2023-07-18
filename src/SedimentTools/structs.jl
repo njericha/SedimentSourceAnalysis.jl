@@ -25,3 +25,12 @@ Base.getindex(D::Distributions, i::Int) = DistributionData(D.names[i], D.scales[
 Converts the Distributions to a plain Array{T,3} type
 """
 to_tensor(D::Distributions) = cat(D.data..., dims=3)
+
+
+############
+
+struct Grain{T} <: AbstractVector{T}
+    #Eu::T
+    #Ti::T
+    #...
+end
