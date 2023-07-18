@@ -15,3 +15,7 @@ makedocs(
     #modules = [SedimentAnalysis], # could use [MTF, SedimentTools] ?
     modules = [SedimentAnalysis, MTF, SedimentTools], # could use  ?
 )
+
+deploydocs(
+    repo = "github.com/njericha/Sediment-Source-Analysis.jl.git",
+)
