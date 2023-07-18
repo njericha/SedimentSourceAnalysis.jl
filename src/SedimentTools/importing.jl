@@ -3,7 +3,7 @@
 # by double quotes. This is nessesary because some excel entries have mistakenly
 # read the number as a string.
 import Base: convert
-Base.convert(::Type{T}, s::String) where T <: Number = parse(T, s)
+Base.convert(::Type{Number}, s::String) = parse(T, s)
 
 """
     grain_data, rock_index = read_xlsx_data(elements)
