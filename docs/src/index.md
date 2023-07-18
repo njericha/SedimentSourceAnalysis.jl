@@ -2,7 +2,7 @@
 
 ```@meta
 DocTestSetup = quote
-    using .SedimentAnalysis
+    using SedimentAnalysis
 end
 ```
 
