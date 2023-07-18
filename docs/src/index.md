@@ -12,7 +12,10 @@ end
 ## Functions
 
 ```@docs
+combined_norm
 nnmtf
+plot_factors
+rel_error
 ```
 
 ## Index
