@@ -14,10 +14,9 @@ using SedimentAnalysis.SedimentTools
 
 makedocs(
     sitename="Sediment Source Analysis",
-    #modules = [SedimentAnalysis], # could use [MTF, SedimentTools] ?
-    modules = [SedimentAnalysis, MTF, SedimentTools], # could use  ?
+    modules = [SedimentAnalysis, MTF, SedimentTools],
 )
 
-deploydocs(
+deploydocs( # TODO either use SedimentSourceAnalysis or SedimentAnalysis
     repo = "github.com/njericha/Sediment-Source-Analysis.jl.git",
 )
