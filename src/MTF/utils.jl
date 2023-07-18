@@ -1,9 +1,10 @@
 #= Short helpers for MTF.jl =#
 
-# TODO maybe use a custom symbol in the future
+# TODO see if this is nessesary or not
 import Base
 const Abstract3Tensor{T} = AbstractArray{T, 3}
 
+# TODO maybe use a custom symbol in the future
 """
     Base.*(A::AbstractMatrix, B::Abstract3Tensor)
 

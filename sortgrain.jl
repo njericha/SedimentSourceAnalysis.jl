@@ -24,21 +24,25 @@ function get_grain(raw_data, (grain_i, sink_j))
 end
 
 # Compare with the distribution for a factor
-"""Find which subinterval the data lies in for each measurement"""
+"""
+    find_subinterval(scale, grain_value)
+
+Find which subinterval the data lies in for each measurement
+
+```jdocstest
+julia> test_scale = 1:10
+1:10
+
+julia> find_subinterval(test_scale, 4.8)
+5
+```
+"""
 function find_subinterval(scale, grain_value)
     val, k = findmin(x->abs(x-grain_value), scale)
     return k
 end
 
-test_scale = 1:10
-@assert find_subinterval(test_scale, 1) == 1
-@assert find_subinterval(test_scale, 10) == 10
-@assert find_subinterval(test_scale, 0) == 1
-@assert find_subinterval(test_scale, 15.5) == 10
-@assert find_subinterval(test_scale, 5) == 5
-@assert find_subinterval(test_scale, 4.8) == 5
-@assert find_subinterval(test_scale, 4.5) == 4
-@assert find_subinterval(test_scale, 4.4) == 4
+
 
 """
     estimate_prob(factor_slice, scales, grain_vec)

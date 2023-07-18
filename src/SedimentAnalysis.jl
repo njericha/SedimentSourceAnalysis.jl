@@ -9,7 +9,7 @@ include("SedimentTools/SedimentTools.jl")
 #@reexport using .MTF
 #@reexport using .SedimentTools
 using .MTF
-export nnmft, combined_norm
+export combined_norm, nnmft, plot_factors, rel_error
 
 using .SedimentTools
 
