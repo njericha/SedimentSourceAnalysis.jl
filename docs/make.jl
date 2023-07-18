@@ -1,7 +1,7 @@
 using Documenter
 
-push!(LOAD_PATH,"../src/")
-using .SedimentAnalysis
+#push!(LOAD_PATH,"../src/")
+using SedimentAnalysis
 
 # DocMeta.setdocmeta!(
 #     SedimentAnalysis,
