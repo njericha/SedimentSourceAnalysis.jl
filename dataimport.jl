@@ -110,7 +110,6 @@ function import_grain_data(filepath, elements)
 end
 
 ###
-
 function read_distribution_data(filepath)
     xf = XLSX.readxlsx(filepath)
     sheet_names = XLSX.sheetnames(xf)
@@ -121,7 +120,7 @@ function read_distribution_data(filepath)
         sheet_data = hcat(sheet.data...)
         #sheet_data = xf[sheet_name][:]
         scale, data = sheet_data[:,1], sheet_data[:,2:end]
-        
+
         # Remove columns if they are entirely missing
         if any(ismissing.(data))
             data = hcat(filter(v->(!all(ismissing.(v))), eachcol(data))...)
@@ -129,7 +128,7 @@ function read_distribution_data(filepath)
 
         data = convert(Matrix{Float64},data)
         scale = convert(Vector{Float64},scale)
-        
+
         #check for negatives and NaN's
         if !all(data .>= 0)
             negative_indexes = findall(data .< 0)
@@ -160,7 +159,7 @@ ex. data == OrderedDict("ages" => [1 2 3 ; 4 5 6], ...)
 function read_raw_data(filename)
     xf = XLSX.readxlsx(filename)
     sheet_names = XLSX.sheetnames(xf)
-    isallowed(n) = lowercase(n) ∉ ["source proportions","grain id"] 
+    isallowed(n) = lowercase(n) ∉ ["source proportions","grain id"]
     measurments = filter(isallowed, sheet_names)
     data = OrderedDict{String, Matrix{Union{Missing,Float64}}}()
     for sheet_name ∈ measurments
@@ -170,4 +169,3 @@ function read_raw_data(filename)
     end
     return data
 end
-
