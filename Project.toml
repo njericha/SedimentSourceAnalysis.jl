@@ -4,7 +4,9 @@ authors = ["Nicholas Richardson <njericha@math.ubc.ca>"]
 version = "0.1.0"
 
 [deps]
+AxisArrays = "39de3d68-74b9-583c-8d2d-e117c070f3a9"
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Einsum = "b7d42ee7-0b51-5a75-98ca-779d3107e4c0"
 JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 KernelDensity = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"

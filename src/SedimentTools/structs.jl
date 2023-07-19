@@ -55,17 +55,20 @@ Base.getindex(g::Grain, key::String) = OrderedDict(g)[key]
 Base.setindex!(g::Grain{T}, value::T, key::String) = setindex!(OrderedDict(g), value, key)
 =#
 
-#########
 # TODO use NamedArray backend
+
+#########
+
 # Grains
+#=
 Grain{T <: Number} = OrderedDict{String, T}
 import Base: Vector
 
 """turns a grain into a regular Vector type"""
 Base.Vector{T}(g::Grain{T}) where T <: Number = collect(values(g))
 Vector(g::Grain{T}) where T <: Number = Vector{T}(g)
-getnames(g::Grain) = collect(keys(g))
-getvalues(g::Grain) = collect(values(g))
+names(g::Grain) = collect(keys(g))
+values(g::Grain) = collect(values(g::OrderedDict))
 Grain(iter) = OrderedDict(iter)
 
 # Sinks
@@ -73,7 +76,7 @@ Grain(iter) = OrderedDict(iter)
 Sink{T <: Number} = Vector{Grain{T}} # Using vector and not a set to preserve order
 #Rock = Sink # TODO Make Alias and check it works
 
-getnames(s::Sink) = iszero(length(s)) ? String[] : get_names(s[1])
+names(s::Sink) = iszero(length(s)) ? String[] : names(s[1])
 getindex(s::Sink, key::String) = [g[key] for g ∈ s]
 
 """
@@ -112,12 +115,12 @@ struct DistributionSink{T} <: AbstractArray{T,3}
     sampled_distributions::AbstractArray{T,3}
 end
 
-getnames(d::DistributionSink) = d.names
-getdistributions(d::DistributionSink) = d.sampled_distributions
-getbandwidths(d::DistributionSink) = d.bandwidths
-getscales(d::DistributionSink) = d.scales
-getindex(d::DistributionSink, args...) = getindex(getdistributions(d), args...)
-size(d::DistributionSink) = size(getdistributions(d))
+names(d::DistributionSink) = d.names
+distributions(d::DistributionSink) = d.sampled_distributions
+bandwidths(d::DistributionSink) = d.bandwidths
+scales(d::DistributionSink) = d.scales
+getindex(d::DistributionSink, args...) = getindex(distributions(d), args...)
+size(d::DistributionSink) = size(distributions(d))
 
 """
     DistributionSink(s::Sink, steps::Integer; kwargs...)
@@ -131,14 +134,91 @@ function DistributionSink(
     steps::Integer;
     kwargs...
 )
-    names = getnames(s)
     sampled_distributions, distributions, bandwidths, scales = make_distributions(s, steps; kwargs...)
-    return DistributionSink(names, distributions, bandwidths, scales, sampled_distributions)
+    return DistributionSink(names(s), distributions, bandwidths, scales, sampled_distributions)
 end
 
 """Shortcut to get distributions streight from a Sink"""
-function getdistributions(s::Sink, steps; kwargs...)
-    return getdistributions(DistributionSink(s, steps; kwargs...))
+function distributions(s::Sink, steps; kwargs...)
+    return distributions(DistributionSink(s, steps; kwargs...))
 end
 
-to_tensor(sinks::AbstractVector{Sink}) = cat(collect.(getdistributions(sinks))..., dims=1)
+to_tensor(sinks::AbstractVector{Sink}) = cat(collect.(distributions(sinks))..., dims=1)
+=#
+
+#########
+# Grain #
+#########
+
+Grain{T <: Number} = NamedVector{T}
+measurments(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
+
+#################
+# Sinks / Rocks #
+#################
+
+Sink{T <: Number} = Vector{Grain{T}} # Using vector and not a set to preserve order
+Rock = Sink
+
+measurments(s::Sink) = iszero(length(s)) ? String[] : measurments(s[1])
+getindex(s::Sink, key::String) = (g[key] for g ∈ s)
+
+"""Iterator for a list of values of each measurement"""
+eachmeasurment(s::Sink) = (s[m] for m in measurments(s))
+
+"""
+    Sink(grain1, grain2, ...)
+    Sink([grain1, grain2, ...])
+
+Collects a list of Grains into a Rock/Sink.
+
+Ensures all Grains have the same names and are in the same order.
+"""
+function Sink(vec_of_grains::AbstractVector{Grain}) #want each element to be a grain
+    @assert allequal(measurments.(vec_of_grains))
+    return collect(vec_of_grains)::Sink
+end
+Sink(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
+
+####################
+# DistributionSink #
+####################
+
+DistributionSinks{T <: Number} = NamedArray{T, 3}
+
+measurments(d::DistributionSinks) = names(d, "measurments")
+getsink(d::DistributionSinks, i::Integer) = d[i, :, :] # TODO see if @view is better
+getsource = getsink
+
+"""Methods to get the names given the axis name rather than the axis number"""
+function Base.names(n::NamedArray, dimname::Union{String,Symbol})
+    return names(n, findfirst(dimnames(n) .== dimname))
+end
+Base.names(n::NamedArray, dimname::Name) = names(n, findfirst(dimnames(n) .== dimname.names))
+
+to_tensor(sinks::DistributionSinks) = sinks.array
+
+function DistributionSinks(sinks::AbstractVector{Sinks}, KDEs::AbstractVector{AbstractVector{UnivariateKDE}})
+    # Argument Handeling
+    allequal(measurments.(sinks)) ||
+        ArgumentError("All sinks must have the same measurements in the same order.")
+    length(sinks) == length(KDEs) ||
+        ArgumentError("Must be the same number of sinks as there are lists of KDEs.")
+    measurment_names = measurments(sinks[begin])
+    length(measurment_names) == length(KDEs[begin]) ||
+        ArgumentError("Must be the same number of measurements as there are KDEs for each sink.")
+
+        # TODO make this line more legible, possible by naming the KDEs to begin with
+    # Magic line to take the KDEs into an order-3 tensor
+    data = permutedims(cat(cat(map.(k -> k.density, KDEs)..., dims=2)..., dims=3), [3,2,1])
+
+    # Confirm all the dimentions are in the right order
+    n_density_samples = length((KDEs[begin][begin]).x)
+    @assert size(data) == (length(sinks), length(measurment_names), n_density_samples)
+
+    # Wrap in a NamedArray
+    dsinks = NamedArray(data, dimnames=("sink", "measurment", "density"))::DistributionSinks
+    setnames!(dsinks, measurment_names, 2)
+
+    return dsinks
+end

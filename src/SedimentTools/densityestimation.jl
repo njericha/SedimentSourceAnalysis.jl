@@ -7,14 +7,14 @@ function inner_percentile!(v, P)
     filter!(inrange, v)
 end
 
-function my_bandwidth(v)
+function calc_bandwidth(v)
     #q25, q75 = quantile(v, [0.25, 0.75])
     #quantile_width = (q75 - q25)/1.34
     #return quantile_width
     return default_bandwidth(v, 1.5)
 end
 
-global DEFAULT_ALPHA = 0.9
+global DEFAULT_ALPHA = 0.9::Real
 
 function set_alpha(alpha)
     DEFAULT_ALPHA = alpha
@@ -123,36 +123,56 @@ function make_distributions(d::Sink, n_steps::Integer; P=100, scales=nothing, ba
 end
 
 """
-    make_distributions(s::Sink)
+    make_distributions(s::DataSink; inner_percentile::Integer=100, bandwidths::Union{AbstractVector{<:Real}, Nothing}=nothing)
 
 estimates the distributions for each measurment in a DataSink
 returns the UnivariateKDE as well as samples of the kernel
 """
-function make_distributions(s::DataSink; n_samples=64, inner_percentile=100, bandwidths=nothing)
+function make_distributions(
+    s::DataSink;
+    inner_percentile::Integer=100,
+    bandwidths::AbstractVector{<:Real}=default_bandwidth.(eachmeasurment(s)),
+    )
+    # Argument Handeling
     # Check input is in the correct range
     (0 < inner_percentile <= 100) ||
         ArgumentError("inner_percentile must be between 0 and 100, got $inner_percentile")
 
-    # TODO
+    # Loop setup
+    eachmeasurment = eachmeasurment(s)
+    n_measurments = length(eachmeasurment)
+    density_estimates = Vector{UnivariateKDE}(undef, n_measurments)
 
+    for (i, (measurment_values, b)) in enumerate(zip(eachmeasurment, bandwidths))
+        # Estimate density based on the inner precentile to ignore outliers
+        inner_percentile!(measurment_values, inner_percentile)
+        KDEs[i] = kde(measurment_values, bandwidth=b)
+    end
+
+    return density_estimates, bandwidths
 end
 
-function make_distribution(v, n_samples, inner_percentile)
-end
+#function estimate_density(values, bandwidth; inner_percentile) end
 
+const DEFAULT_N_SAMPLES = 64::Integer
 """
-    standardize!(sinks::AbstractVector{Sink})
-    standardize!(sink1, sink2, ...)
+    standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
 
 Resample the distributions within each sink so that like-measurments use the same scale
 """
-function standardize!(sinks::AbstractVector{DistributionSink})
-    # Get the scales for each sink
-    # For each measurment
-        # Find the outer ranges of its scale (the x values)
-        # resample the values on this (larger) range
-        # use the values to sample the distributions
-        # Save the newly sampled distribution to that sink
+function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
+    a = minimum(d -> d.x[begin], KDEs) # smallest left endpoint
+    b = maximum(d -> d.x[end]  , KDEs) # biggest right endpoint
+
+    x_new = range(a, b, length=n_samples) # make the (larger) x-values range
+    KDEs_new = pdf.(KDEs, x_new) # resample the densities on the new range
+
+    return KDEs_new, x_new
 end
 
-standardize!(sinks::AbstractVector{DistributionSink}...) = standardize!(sinks)
+# For each measurment
+# for m in measurments(sinks[begin])
+#         measurment_densities =
+# allequal(measurments.(sinks)) ||
+# ArgumentError("All sinks must have the same measurements in the same order.")
+# standardize!(sinks::AbstractVector{DistributionSink}...; n_samples=DEFAULT_N_SAMPLES) = standardize!(sinks, n_samples=n_samples)
