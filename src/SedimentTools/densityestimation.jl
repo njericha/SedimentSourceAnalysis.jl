@@ -52,86 +52,24 @@ function default_bandwidth(data::AbstractVector{<: Real}, alpha::Float64 = DEFAU
 end
 
 """
-    make_densities(filename::String, n_steps::Integer; P=100)
+    make_distributions(s::Sink; inner_percentile::Integer=100, bandwidths::AbstractVector{<:Real})
 
-Creates a tensor of size (n_sinks, n_measurements, n_steps) using data
-at filename. Each 3-fibre (there are n_sinks × n_measurements of them) is
-a probability density, evenly sampled at n_steps points. The points they are evaluated
-at are stored in scales. Note every fibre in the same vertical slice uses the same scale.
-The vector measurements stores the names of the measurment for each vertical slice.
+Estimates the distributions for each measurment in a Sink
+returns the UnivariateKDE as well as samples of the kernel
 
-P is an optional value between 0 and 100 that filters out each distribution to use only the inner
-P percentile range. This can help remove outliers and focus in on where the bulk of the data is.
-
-scales is an optional argument that will use the provided scales instead of the full range of values
-for the interpolation points "x".
-
-bandwidths is similar to scales but hold the bandwidth used for each measurement kernel estimation
+# Parameters
+- `inner_percentile`: value between 0 and 100 that filters out each distribution
+and uses the inner percentile range. This can help remove outliers and focus in on where
+the bulk of the data is.
+- `bandwidths`: list of bandwidths used for each measurement's density estimation
 
 # Returns
-T, scales, measurements, bandwidths_used
-"""
-function make_distributions(d::Sink, n_steps::Integer; P=100, scales=nothing, bandwidths=nothing) # TODO clean up data types to avoid complicated dictionaries
-    sink_data = d
-    measurements = collect(keys(sink_data))
-    n_measurements = length(measurements)
-    n_samples, n_sinks = size(sink_data[measurements[1]]) # TODO more simply extract n_sinks
-
-    # Estimate Kernels Individualy first
-    raw_distributions = OrderedDict{String, Vector{UnivariateKDE}}()
-    bandwidths_used = zeros(n_measurements)
-    for (i, (m, ds)) ∈ enumerate(sink_data)
-        kernel_vector = Vector{UnivariateKDE}(undef,n_sinks)
-        bandwidth = nothing
-        for (j, single_sink_data) ∈ enumerate(eachcol(ds)) # s=1,2,3, but abstracted to allow for more sources
-            single_sink_data = remove_missing(single_sink_data)
-            inner_percentile!(single_sink_data, P)
-            bandwidth = (j==1) ? my_bandwidth(single_sink_data) : bandwidth #ensures the same bandwidth is used for each distribution within the same measurement
-            bandwidth = isnothing(bandwidths) ? bandwidth : bandwidths[i]
-            kernel_vector[j] = kde(single_sink_data, bandwidth=bandwidth) #kde_lscv(single_sink_data)
-        end
-        raw_distributions[m] = kernel_vector
-        bandwidths_used[i] = bandwidth
-    end
-
-    # Standardize Estimations to have the same range within a measurement
-    standard_distributions = OrderedDict{String, NamedTuple{(:x,:densities),Tuple{AbstractVector{Float64}, Matrix{Float64}}}}()
-    for (i, (m, ds)) ∈ enumerate(raw_distributions)
-        # Find extreme values within a measurement
-        a = minimum(d -> d.x[begin], ds)
-        b = maximum(d -> d.x[end]  , ds)
-
-        # resample each distribution along the larger intervel
-        #n_steps = length((ds[1]).x) # use the n_steps given in the input
-        x = isnothing(scales) ? range(a, b, n_steps) : scales[i] # use the provided interpolation points if given
-        densities = zeros((n_sinks, n_steps))
-        for (j, kernel) ∈ enumerate(ds)
-            densities[j,:] = pdf(kernel, x) # resample the kernel at the new x values
-        end
-        standard_distributions[m] = (x=x, densities=densities)
-    end
-
-    # Collect data into a single tensor of size (n_sinks, n_measurements, n_steps)
-    T = stack((d[2]).densities for d ∈ standard_distributions)::Array{Float64,3}
-    T = permutedims(T, [1,3,2])
-
-    # Collect scales for each measurment (the "x" values)
-    scales = [(d[2]).x for d ∈ standard_distributions]
-
-
-    return T, scales, measurements, bandwidths_used
-end
-
-"""
-    make_distributions(s::DataSink; inner_percentile::Integer=100, bandwidths::Union{AbstractVector{<:Real}, Nothing}=nothing)
-
-estimates the distributions for each measurment in a DataSink
-returns the UnivariateKDE as well as samples of the kernel
+- `density_estimates`
 """
 function make_distributions(
-    s::DataSink;
+    s::Sink;
     inner_percentile::Integer=100,
-    bandwidths::AbstractVector{<:Real}=default_bandwidth.(eachmeasurment(s)),
+    bandwidths::AbstractVector{<:Real},
     )
     # Argument Handeling
     # Check input is in the correct range
@@ -149,12 +87,20 @@ function make_distributions(
         KDEs[i] = kde(measurment_values, bandwidth=b)
     end
 
-    return density_estimates, bandwidths
+    return density_estimates
 end
 
-#function estimate_density(values, bandwidth; inner_percentile) end
+function make_distributions(s::Sink; inner_percentile::Integer=100)
+    bandwidths = default_bandwidth.(eachmeasurment(s))
+    return (make_distributions(
+        s::Sink;
+        inner_percentile=inner_percentile,
+        bandwidths=bandwidths,
+        ), bandwidths)
+end
 
 const DEFAULT_N_SAMPLES = 64::Integer
+
 """
     standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
 
@@ -169,10 +115,3 @@ function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT
 
     return KDEs_new, x_new
 end
-
-# For each measurment
-# for m in measurments(sinks[begin])
-#         measurment_densities =
-# allequal(measurments.(sinks)) ||
-# ArgumentError("All sinks must have the same measurements in the same order.")
-# standardize!(sinks::AbstractVector{DistributionSink}...; n_samples=DEFAULT_N_SAMPLES) = standardize!(sinks, n_samples=n_samples)
