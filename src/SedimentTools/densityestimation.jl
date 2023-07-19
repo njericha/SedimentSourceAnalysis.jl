@@ -7,18 +7,7 @@ function inner_percentile!(v, P)
     filter!(inrange, v)
 end
 
-function calc_bandwidth(v)
-    #q25, q75 = quantile(v, [0.25, 0.75])
-    #quantile_width = (q75 - q25)/1.34
-    #return quantile_width
-    return default_bandwidth(v, 1.5)
-end
-
 global DEFAULT_ALPHA = 0.9::Real
-
-function set_alpha(alpha)
-    DEFAULT_ALPHA = alpha
-end
 
 """
     default_bandwidth(data::AbstractVector{<:Real}, alpha::Float64 = 0.9)
@@ -90,8 +79,8 @@ function make_distributions(
     return density_estimates
 end
 
-function make_distributions(s::Sink; inner_percentile::Integer=100)
-    bandwidths = default_bandwidth.(eachmeasurment(s))
+function make_distributions(s::Sink; inner_percentile::Integer=100, alpha=DEFAULT_ALPHA)
+    bandwidths = default_bandwidth.(eachmeasurment(s), alpha)
     return (make_distributions(
         s::Sink;
         inner_percentile=inner_percentile,
