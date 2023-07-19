@@ -66,7 +66,7 @@ P percentile range. This can help remove outliers and focus in on where the bulk
 scales is an optional argument that will use the provided scales instead of the full range of values
 for the interpolation points "x".
 
-bandwidths is similar to scales but hold the bandwidth used for each measurement kernal estimation
+bandwidths is similar to scales but hold the bandwidth used for each measurement kernel estimation
 
 # Returns
 T, scales, measurements, bandwidths_used
@@ -77,7 +77,7 @@ function make_distributions(d::Sink, n_steps::Integer; P=100, scales=nothing, ba
     n_measurements = length(measurements)
     n_samples, n_sinks = size(sink_data[measurements[1]]) # TODO more simply extract n_sinks
 
-    # Estimate Kernals Individualy first
+    # Estimate Kernels Individualy first
     raw_distributions = OrderedDict{String, Vector{UnivariateKDE}}()
     bandwidths_used = zeros(n_measurements)
     for (i, (m, ds)) ∈ enumerate(sink_data)
@@ -106,7 +106,7 @@ function make_distributions(d::Sink, n_steps::Integer; P=100, scales=nothing, ba
         x = isnothing(scales) ? range(a, b, n_steps) : scales[i] # use the provided interpolation points if given
         densities = zeros((n_sinks, n_steps))
         for (j, kernel) ∈ enumerate(ds)
-            densities[j,:] = pdf(kernel, x) # resample the kernal at the new x values
+            densities[j,:] = pdf(kernel, x) # resample the kernel at the new x values
         end
         standard_distributions[m] = (x=x, densities=densities)
     end
@@ -121,3 +121,38 @@ function make_distributions(d::Sink, n_steps::Integer; P=100, scales=nothing, ba
 
     return T, scales, measurements, bandwidths_used
 end
+
+"""
+    make_distributions(s::Sink)
+
+estimates the distributions for each measurment in a DataSink
+returns the UnivariateKDE as well as samples of the kernel
+"""
+function make_distributions(s::DataSink; n_samples=64, inner_percentile=100, bandwidths=nothing)
+    # Check input is in the correct range
+    (0 < inner_percentile <= 100) ||
+        ArgumentError("inner_percentile must be between 0 and 100, got $inner_percentile")
+
+    # TODO
+
+end
+
+function make_distribution(v, n_samples, inner_percentile)
+end
+
+"""
+    standardize!(sinks::AbstractVector{Sink})
+    standardize!(sink1, sink2, ...)
+
+Resample the distributions within each sink so that like-measurments use the same scale
+"""
+function standardize!(sinks::AbstractVector{DistributionSink})
+    # Get the scales for each sink
+    # For each measurment
+        # Find the outer ranges of its scale (the x values)
+        # resample the values on this (larger) range
+        # use the values to sample the distributions
+        # Save the newly sampled distribution to that sink
+end
+
+standardize!(sinks::AbstractVector{DistributionSink}...) = standardize!(sinks)

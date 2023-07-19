@@ -105,19 +105,19 @@ end
 # TODO Should this really be part of the Sink struct where the distributions
 # are auto calculated? May not want to because of it would hide the computation.
 struct DistributionSink{T} <: AbstractArray{T,3}
-    names::AbstractVector{String}
-    distributions::AbstractArray{T,3}
-    bandwidths::AbstractVector{<:Real}
-    scales::AbstractVector{AbstractVector{T}}
+    names::Vector{String}
+    distributions::Vector{UnivariateKDE}
+    bandwidths::Vector{<:Real}
+    scales::Vector{AbstractVector{T}}
+    sampled_distributions::AbstractArray{T,3}
 end
 
 getnames(d::DistributionSink) = d.names
-getdistributions(d::DistributionSink) = d.distributions
-getbandwidths(d::DistributionSink) = d.distributions
+getdistributions(d::DistributionSink) = d.sampled_distributions
+getbandwidths(d::DistributionSink) = d.bandwidths
 getscales(d::DistributionSink) = d.scales
 getindex(d::DistributionSink, args...) = getindex(getdistributions(d), args...)
 size(d::DistributionSink) = size(getdistributions(d))
-to_tensor(d::DistributionSink) = collect(getdistributions(d))
 
 """
     DistributionSink(s::Sink, steps::Integer; kwargs...)
@@ -131,16 +131,14 @@ function DistributionSink(
     steps::Integer;
     kwargs...
 )
-    # Check input is in the correct range
-    (0 < inner_percentile <= 100) ||
-        ArgumentError("inner_percentile must be between 0 and 100, got $inner_percentile")
-
     names = getnames(s)
-    distributions, bandwidths, scales = make_distributions(s, steps; kwargs...)
-    return DistributionSink(names, distributions, bandwidths, scales)
+    sampled_distributions, distributions, bandwidths, scales = make_distributions(s, steps; kwargs...)
+    return DistributionSink(names, distributions, bandwidths, scales, sampled_distributions)
 end
 
 """Shortcut to get distributions streight from a Sink"""
 function getdistributions(s::Sink, steps; kwargs...)
     return getdistributions(DistributionSink(s, steps; kwargs...))
 end
+
+to_tensor(sinks::AbstractVector{Sink}) = cat(collect.(getdistributions(sinks))..., dims=1)

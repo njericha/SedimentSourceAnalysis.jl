@@ -6,6 +6,7 @@ module SedimentTools
 using LinearAlgebra
 using XLSX # TODO annotate exactly what is being used from each imported package
 using OrderedCollections
+using NamedArrays
 
 #export ...
 
