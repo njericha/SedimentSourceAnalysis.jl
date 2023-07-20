@@ -6,19 +6,27 @@ import Base: convert
 Base.convert(::Type{Number}, s::String) = parse(T, s)
 
 """
-    data = read_raw_data(filename)
+    read_raw_data(filename)
+    read_raw_data(filename; skip_sheets)
 
-Imports data to a Vector{Sink} type
+Imports excel data to a `Vector{Sink}`.
+
+Excel file must have one element per page where different columns correspond to different
+sinks. Each sink can have a different number of grains (length of the column), but a sink
+must have a consistant length across different measurments (sheets).
+
+Optionaly provide a collection `skip_sheets` to blacklist sheet names from the excel file.
 """
-function read_raw_data(filename)
+function read_raw_data(filename; skip_sheets=Set(["source proportions","grain id"]))
     # Load the file
     xf = XLSX.readxlsx(filename)
 
     # Get the list of measurments (each sheet is 1 measurment)
     sheet_names = XLSX.sheetnames(xf)
-    isallowed(n) = lowercase(n) ∉ ["source proportions","grain id"]
+    isallowed(n) = lowercase(n) ∉ skip_sheets
     filter!(isallowed, sheet_names)
 
+    # Extract data to a dictionary Dict("element 1" => sheet_data, ...)
     data = OrderedDict{String, Matrix{Union{Missing,Float64}}}()
     for sheet_name ∈ sheet_names
         @info "extracting $sheet_name..."
@@ -26,20 +34,25 @@ function read_raw_data(filename)
         data[sheet_name] = sheet_data
     end
 
+    # Collect all sheets into a single 3-tensor (Array{T, 3})
     data_tensor = cat(collect(values(data)),dims=3)
     n_grains, n_sinks, n_measurements = size(data_tensor)
-    list_of_sinks = Vector{Sink}(undef, n_sinks)
+
+    # Construct a vector of sinks, each sink is a vector of grains
+    vec_of_sinks = Vector{Sink}(undef, n_sinks)
     for (j, s) in enumerate(eachslice(data_tensor, dims=(1, 3)))
+
         vec_of_grains = Vector{<:Grain}(undef, n_grains)
         for (i, g) in enumerate(eachrow(s))
+
             # Skip grains that contain missing values
-            if any(ismissing.(g))
-                break
-            end
+            any(ismissing.(g)) ? break : nothing
+
             vec_of_grains[i] = Grain(g::Vector{Float64}, measurment_names=sheet_names)
         end
-        list_of_sinks[j] = Sink(vec_of_grains)
+
+        vec_of_sinks[j] = Sink(vec_of_grains)
     end
 
-    return list_of_sinks
+    return vec_of_sinks
 end

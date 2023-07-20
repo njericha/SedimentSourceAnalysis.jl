@@ -16,8 +16,8 @@ end
 
 """Struct to hold sink level data"""
 Sink{T <: Number} = Vector{Grain{T}} # Using vector and not a set to preserve order
-Rock = Sink
 
+"""Gets the names of measurments from a Sink"""
 measurments(s::Sink) = iszero(length(s)) ? String[] : measurments(s[1])
 getindex(s::Sink, key::String) = (g[key] for g ∈ s)
 
@@ -32,11 +32,14 @@ Collects a list of Grains into a Rock/Sink.
 
 Ensures all Grains have the same names and are in the same order.
 """
-function Sink(vec_of_grains::AbstractVector{Grain{T}}) #want each element to be a grain
+function Sink(vec_of_grains::AbstractVector{Grain{T}}) # each element is a grain
     @assert allequal(measurments.(vec_of_grains))
     return collect(vec_of_grains)::Sink{T}
 end
 Sink(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
+
+"""Alias for Sink"""
+Rock = Sink
 
 ####################
 # DistributionSink #
@@ -67,7 +70,7 @@ function DistributionSinks(sinks::AbstractVector{Sinks}, KDEs::AbstractVector{Ab
     length(measurment_names) == length(KDEs[begin]) ||
         ArgumentError("Must be the same number of measurements as there are KDEs for each sink.")
 
-        # TODO make this line more legible, possible by naming the KDEs to begin with
+    # TODO make this line more legible, possible by wrapping the KDEs in a struct so they're named
     # Magic line to take the KDEs into an order-3 tensor
     data = permutedims(cat(cat(map.(k -> k.density, KDEs)..., dims=2)..., dims=3), [3,2,1])
 
