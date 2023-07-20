@@ -44,10 +44,10 @@ C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank)
 ## Package F into a DensityTensor with the same domain and measurments as Y
 ## Each collection of measurments is no longer a sink and is now a "factor"
 factortensor = DensityTensor(F; domain, measurments=measurments(densitytensor))
-setsourcename!(factortensor, "factor")
+setsourcename!(factortensor, "learned source")
 
 ## Package C into a NamedMatrix to label the dimentions
-coefficientmatrix = NamedMatrix(C, dimnames=("sink", "factor"))
+coefficientmatrix = NamedMatrix(C, dimnames=("sink", "learned source"))
 
 # Compare learned C and F to the known sources
 # Import data for ground truth F
@@ -63,12 +63,14 @@ sources = read_raw_data(filename)::Vector{Source}
 true_densities = make_densities.(sources; domains, bandwidths, inner_percentile)
 
 ## Wrap in DensityTensor
+factortensor_true = DensityTensor(true_densities; domain, measurments=measurments(densitytensor))
+setsourcename!(factortensor_true, "true source")
 
 # Import data for ground truth C
 filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 source_amounts = XLSX.readdata(source_filename,"Source proportions","B2:D21")
 C_true = source_amounts / 75 # 75 Grains in each sink
-
+coefficientmatrix_true = NamedMatrix(C_true, dimnames=("sink", "true source"))
 
 # Ensure the factors in C and F are in the same order as the true densities
 # Visualize coefficientmatrix and factortensor

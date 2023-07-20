@@ -10,3 +10,7 @@ function short_name(s::String)
         return split(s,"_")[1]
     end
 end
+
+function heatmap(M::NamedMatrix; kw...) #may clash when looking at a subarray of a DensityTensor
+    heatmap(names(M,1), names(M,2), M; yflip=true, kw...)
+end
