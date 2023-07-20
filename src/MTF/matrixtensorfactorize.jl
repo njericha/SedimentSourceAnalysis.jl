@@ -36,7 +36,7 @@ function nnmtf(
     R::Integer;
     maxiter::Integer=100,
     tol::Real=1e-3,
-    rescale::Bool=false,
+    rescale::Bool=true,
     plot_F::Integer=0,
     names::AbstractVector{String}=String[],
 )
