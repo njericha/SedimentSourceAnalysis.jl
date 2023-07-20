@@ -97,16 +97,16 @@ function make_densities(
     return density_estimates
 end
 
-function make_densities(s::Sink; inner_percentile::Integer=100, alpha=DEFAULT_ALPHA)
-    bandwidths = default_bandwidth.(eachmeasurment(s), alpha, inner_percentile)
-    return (make_densities(s; bandwidths, inner_percentile), bandwidths)
-end
+#function make_densities(s::Sink; inner_percentile::Integer=100, alpha=DEFAULT_ALPHA)
+#    bandwidths = default_bandwidth.(eachmeasurment(s), alpha, inner_percentile)
+#    return (make_densities(s; bandwidths, inner_percentile), bandwidths)
+#end
 
 """If given domains, a list where each entry is a domain for a different measurement,
 resample the kernal on this domain."""
 function make_densities(
-    sinks::Sink;
-    domains::AbstractVector{<:AbstractVector},
+    sinks::Sink,
+    domains::AbstractVector{<:AbstractVector};
     kwargs...
     )
     KDEs = make_densities(sinks; kwargs...)

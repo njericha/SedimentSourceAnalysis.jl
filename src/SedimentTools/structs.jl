@@ -2,11 +2,11 @@
 # Grain #
 #########
 
-"""Struct to hold grain level data"""
-Grain{T <: Real} = NamedVector{T}
+#"""Struct to hold grain level data"""
+Grain{T} = NamedVector{T} where T <: Real
 measurments(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
 
-function Grain(v::AbstractVector{T<:Real}, measurment_names::AbstractVector{String})
+function Grain(v::AbstractVector{T}, measurment_names::AbstractVector{String}) where T<:Real
     return NamedArray(v, (measurment_names,), ("measurment",))::Grain{T}
 end
 
@@ -15,7 +15,7 @@ end
 #################
 
 """Struct to hold sink level data"""
-Sink{T <: Real} = Vector{Grain{T}} # Using vector and not a set to preserve order
+Sink{T} = Vector{Grain{T}} where T <: Real # Using vector and not a set to preserve order
 
 """Gets the names of measurments from a Sink"""
 measurments(s::Sink) = iszero(length(s)) ? String[] : measurments(s[1])
@@ -32,7 +32,7 @@ Collects a list of Grains into a Rock/Sink.
 
 Ensures all Grains have the same names and are in the same order.
 """
-function Sink(vec_of_grains::AbstractVector{Grain{T}}) # each element is a grain
+function Sink(vec_of_grains::AbstractVector{Grain{T}}) where T <: Real # each element is a grain
     @assert allequal(measurments.(vec_of_grains))
     return collect(vec_of_grains)::Sink{T}
 end
@@ -88,7 +88,7 @@ function DensityTensor(
     KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},
     domains::AbstractVector{<: AbstractVector{T}},
     sinks::AbstractVector{Sink{T}},
-    )
+    ) where T <: Real
     # Argument Handeling
     allequal(measurments.(sinks)) ||
         ArgumentError("All sinks must have the same measurements in the same order.")
