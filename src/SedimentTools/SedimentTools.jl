@@ -8,6 +8,7 @@ using DataFrames: dropmissing! # TODO see if this is better than the remove_miss
 using XLSX # TODO annotate exactly what is being used from each imported package
 using OrderedCollections
 using NamedArrays
+using ReusePatterns
 
 #export ...
 
