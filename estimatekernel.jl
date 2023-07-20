@@ -61,9 +61,9 @@ end
     T, scales, measurements = make_densities(filename::String, n_steps::Integer; P=100)
 
 Creates a tensor of size (n_sinks, n_measurements, n_steps) using data
-at filename. Each 3-fibre (there are n_sinks × n_measurements of them) is
+at filename. Each 3-fiber (there are n_sinks × n_measurements of them) is
 a probability density, evenly sampled at n_steps points. The points they are evaluated
-at are stored in scales. Note every fibre in the same vertical slice uses the same scale.
+at are stored in scales. Note every fiber in the same vertical slice uses the same scale.
 The vector measurements stores the names of the measurment for each vertical slice.
 
 P is an optional value between 0 and 100 that filters out each distribution to use only the inner

@@ -40,6 +40,7 @@ Sink(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
 
 """Alias for Sink"""
 Rock = Sink
+Source = Sink
 
 #################
 # DensityTensor #
@@ -51,10 +52,10 @@ Rock = Sink
 # since Julia can only subtype abstract types...
 """
     DensityTensor(tensor::NamedArray{T, 3})
-    DensityTensor(tensor::NamedArray{T, 3}, domains::AbstractVector{AbstractVector{T}})
+    DensityTensor(tensor::NamedArray{T, 3}, domains::AbstractVector{<: AbstractVector{T}})
     DensityTensor(
-    KDEs::AbstractVector{AbstractVector{UnivariateKDE}},
-    domains::AbstractVector{AbstractVector{T}},
+    KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},
+    domains::AbstractVector{<: AbstractVector{T}},
     sinks::AbstractVector{Sink{T}},
     )
 
@@ -62,15 +63,18 @@ An order 3 array to hold the density distributions for multiple sinks.
 """
 struct DensityTensor{T <: Real} <: AbstractArray{T, 3}
     tensor::NamedArray{T, 3}
-    domains::AbstractVector{AbstractVector{T}} # inner vector needs to be abstract to hold intervals ex. 1:10
-    function DensityTensor(args...; kw...)
+    domains::AbstractVector{<: AbstractVector{T}} # inner vector needs to be abstract to hold intervals ex. 1:10
+    function DensityTensor(args...; domains, measurments, kw...)
         array = args[begin]
         typeT = typeof(array[begin,begin,begin])
-        tensor = NamedArray(args...; kw...)
-        init_domains = [[]] #TODO initialize with the correct size
+        namedarray = NamedArray(args...; kw...)
+        setnames!(namedarray, measurments, 2)
+        setdimnames!(namedarray, "measurment", 2)
+        setdimnames!(namedarray, "density", 3)
+        #init_domains = [[]] #TODO initialize with the correct size
         #I, J, K = size(array)
         #init_xs = Vector{Vector{typeT}}(Vector{typeT}(undef, K), J)
-        return new{typeT}(tensor, init_domains)
+        return new{typeT}(namedarray, domains)
     end
 end
 domains(D::DensityTensor) = D.domains
@@ -81,8 +85,8 @@ array(D::DensityTensor) = (nammedarray(D)).array
 ReusePatterns.@forward((DensityTensor, :tensor), NamedArray)
 
 function DensityTensor(
-    KDEs::AbstractVector{AbstractVector{UnivariateKDE}},
-    domains::AbstractVector{AbstractVector{T}},
+    KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},
+    domains::AbstractVector{<: AbstractVector{T}},
     sinks::AbstractVector{Sink{T}},
     )
     # Argument Handeling
@@ -132,6 +136,9 @@ sink = source
 function getmeasurmentindex(D::DensityTensor, measurment::String)
     return findfirst(names(D, "measurement") .== measurment)
 end
+
+# Setters
+setsourcename!(D::DensityTensor, name::String) = setdimnames!(D, name, 1)
 
 # Iterators
 eachdensity(D::DensityTensor) = eachslice(D, dims=3)

@@ -74,7 +74,7 @@ data is.
 - `density_estimates`
 """
 function make_densities(
-    s::Sink,
+    s::Sink;
     bandwidths::AbstractVector{<:Real},
     inner_percentile::Integer=100,
     )
@@ -99,7 +99,19 @@ end
 
 function make_densities(s::Sink; inner_percentile::Integer=100, alpha=DEFAULT_ALPHA)
     bandwidths = default_bandwidth.(eachmeasurment(s), alpha, inner_percentile)
-    return (make_densities(s::Sink, bandwidths, inner_percentile), bandwidths)
+    return (make_densities(s; bandwidths, inner_percentile), bandwidths)
+end
+
+"""If given domains, a list where each entry is a domain for a different measurement,
+resample the kernal on this domain."""
+function make_densities(
+    sinks::Sink;
+    domains::AbstractVector{<:AbstractVector},
+    kwargs...
+    )
+    KDEs = make_densities(sinks; kwargs...)
+    KDEs_new = pdf.(KDEs, domains)
+    return KDEs_new
 end
 
 const DEFAULT_N_SAMPLES = 64::Integer
@@ -107,7 +119,7 @@ const DEFAULT_N_SAMPLES = 64::Integer
 """
     standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
 
-Resample the densities within each sink so that like-measurments use the same scale
+Resample the densities so they all are smapled from the same domain.
 """
 function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
     a = minimum(d -> d.x[begin], KDEs) # smallest left endpoint
@@ -119,10 +131,15 @@ function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT
     return KDEs_new, x_new
 end
 
+"""
+Resample the densities within each sink so that like-measurments use the same scale
+"""
 function standardize_KDEs(
     list_of_KDEs::AbstractVector{AbstractVector{UnivariateKDE}};
     n_samples=DEFAULT_N_SAMPLES,
     )
+    # Use zip to ensure similar measurements across sinks are standardized,
+    # not different measurements within a sink.
     list_of_KDEs, xs = zip(standardize_KDEs.(zip(list_of_KDEs),n_samples))
     return collect(list_of_KDEs), collect(xs)
 end

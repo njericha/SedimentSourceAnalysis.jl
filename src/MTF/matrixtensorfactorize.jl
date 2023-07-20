@@ -20,7 +20,8 @@ Note there may NOT be a unique optimal solution
 # Keywords
 - `maxiter::Integer=100`: maxmimum number of iterations
 - `tol::Real=1e-3`: desiered tolerance for the -gradient's distance to the normal cone
-- `rescale::Bool=false`: scale F at each iteration so that the 3-fiber sums are 1 (on average)
+- `rescale::Bool=false`: scale F at each iteration so that the 3-fiber sums are 1 (on average).
+This also preprocesses the input `Y` in a similar way, and rescales the final F so Y=CF.
 - `plot_F::Integer=0`: if not 0, plot F every plot_F iterations
 - `names::AbstractVector{String}=String[]`: names of the slices of F to use for ploting
 
@@ -48,6 +49,12 @@ function nnmtf(
     F = abs.(randn((R, N, P)))
 
     problem_size = R*(M + N*P)
+
+    # Scale Y if desired
+    if rescale
+        Y_input = copy(Y)
+        Y, avg_factor_sums = rescaleY(Y)
+    end
 
     # Initialize Looping
     i = 1
@@ -90,6 +97,16 @@ function nnmtf(
     rel_errors = rel_errors[keep_slice]
     norm_grad = norm_grad[keep_slice]
     dist_Ncone = dist_Ncone[keep_slice]
+
+    # Rescale F back if Y was initialy scaled
+    if rescale
+        # Compare:
+        # If F_rescaled := avg_factor_sums * F,
+        # Y_input ≈ C * F_rescaled
+        #       Y ≈ C * F (Here, Y and F have normalized fibers)
+        F .= avg_factor_sums * F
+    end
+
     return C, F, rel_errors, norm_grad, dist_Ncone
 end
 
@@ -154,4 +171,10 @@ function rescaleCF!(C, F)
     avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
     F .= avg_factor_sums^(-1) * F # TODO make more accurate scaling
     C .= C * avg_factor_sums
+end
+
+function rescaleY(Y)
+    fiber_sums = sum.(eachslice(Y,dims=(1,2)))
+    avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
+    return avg_factor_sums^(-1) * Y, avg_factor_sums
 end
