@@ -6,6 +6,10 @@
 Grain{T <: Number} = NamedVector{T}
 measurments(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
 
+function Grain(v::AbstractVector{T<:Number}, measurment_names::AbstractVector{String})
+    return NamedArray(v, (measurment_names,), ("measurment",))::Grain{T}
+end
+
 #################
 # Sinks / Rocks #
 #################
@@ -28,9 +32,9 @@ Collects a list of Grains into a Rock/Sink.
 
 Ensures all Grains have the same names and are in the same order.
 """
-function Sink(vec_of_grains::AbstractVector{Grain}) #want each element to be a grain
+function Sink(vec_of_grains::AbstractVector{Grain{T}}) #want each element to be a grain
     @assert allequal(measurments.(vec_of_grains))
-    return collect(vec_of_grains)::Sink
+    return collect(vec_of_grains)::Sink{T}
 end
 Sink(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
 
