@@ -1,22 +1,40 @@
-function inner_percentile!(v, P)
+"""
+    inner_percentile!(v, P)
+    inner_percentile(v, P)
+
+Filters elements so only the ones in the inner P percentile remain.
+"""
+inner_percentile!(v, P) = filter!(inrange(v, P), v)
+inner_percentile(v, P) = filter(inrange(v, P), v)
+
+function inrange(v, P)
     p_low = (100 - P) / 2
     p_high = 100 - p_low
     a = percentile(v, p_low)
     b = percentile(v, p_high)
-    inrange(x) = (a ≤ x ≤ b)
-    filter!(inrange, v)
+    return x -> (a ≤ x ≤ b)
 end
 
 global DEFAULT_ALPHA = 0.9::Real
 
 """
-    default_bandwidth(data::AbstractVector{<:Real}, alpha::Float64 = 0.9)
+    default_bandwidth(data; alpha=0.9, inner_percentile=100)
 
 Coppied from KernelDensity since this function is not exported. I want access
-to it so that the same bandwidth can be used for different distributions for the
+to it so that the same bandwidth can be used for different densities for the
 same measurments.
 """
-function default_bandwidth(data::AbstractVector{<: Real}, alpha::Float64 = DEFAULT_ALPHA)
+function default_bandwidth(
+    data::AbstractVector{<: Real},
+    alpha::Real = DEFAULT_ALPHA,
+    inner_percentile::Integer=100,
+    )
+
+    # Filter outliers, remove values outside the inner percentile
+    if inner_percentile < 100
+        data = inner_percentile(data, inner_percentile)
+    end
+
     # Determine length of data
     ndata = length(data)
     ndata <= 1 && return alpha
@@ -41,24 +59,24 @@ function default_bandwidth(data::AbstractVector{<: Real}, alpha::Float64 = DEFAU
 end
 
 """
-    make_distributions(s::Sink; inner_percentile::Integer=100, bandwidths::AbstractVector{<:Real})
+    make_densities(s::Sink; inner_percentile::Integer=100, bandwidths::AbstractVector{<:Real})
 
-Estimates the distributions for each measurment in a Sink
+Estimates the densities for each measurment in a Sink
 returns the UnivariateKDE as well as samples of the kernel
 
 # Parameters
-- `inner_percentile`: value between 0 and 100 that filters out each distribution
-and uses the inner percentile range. This can help remove outliers and focus in on where
-the bulk of the data is.
+- `inner_percentile`: value between 0 and 100 that filters out each measurement by using the
+inner percentile range. This can help remove outliers and focus in on where the bulk of the
+data is.
 - `bandwidths`: list of bandwidths used for each measurement's density estimation
 
 # Returns
 - `density_estimates`
 """
-function make_distributions(
-    s::Sink;
-    inner_percentile::Integer=100,
+function make_densities(
+    s::Sink,
     bandwidths::AbstractVector{<:Real},
+    inner_percentile::Integer=100,
     )
     # Argument Handeling
     # Check input is in the correct range
@@ -79,13 +97,9 @@ function make_distributions(
     return density_estimates
 end
 
-function make_distributions(s::Sink; inner_percentile::Integer=100, alpha=DEFAULT_ALPHA)
-    bandwidths = default_bandwidth.(eachmeasurment(s), alpha)
-    return (make_distributions(
-        s::Sink;
-        inner_percentile=inner_percentile,
-        bandwidths=bandwidths,
-        ), bandwidths)
+function make_densities(s::Sink; inner_percentile::Integer=100, alpha=DEFAULT_ALPHA)
+    bandwidths = default_bandwidth.(eachmeasurment(s), alpha, inner_percentile)
+    return (make_densities(s::Sink, bandwidths, inner_percentile), bandwidths)
 end
 
 const DEFAULT_N_SAMPLES = 64::Integer
@@ -93,7 +107,7 @@ const DEFAULT_N_SAMPLES = 64::Integer
 """
     standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
 
-Resample the distributions within each sink so that like-measurments use the same scale
+Resample the densities within each sink so that like-measurments use the same scale
 """
 function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
     a = minimum(d -> d.x[begin], KDEs) # smallest left endpoint
@@ -103,4 +117,12 @@ function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT
     KDEs_new = pdf.(KDEs, x_new) # resample the densities on the new range
 
     return KDEs_new, x_new
+end
+
+function standardize_KDEs(
+    list_of_KDEs::AbstractVector{AbstractVector{UnivariateKDE}};
+    n_samples=DEFAULT_N_SAMPLES,
+    )
+    list_of_KDEs, xs = zip(standardize_KDEs.(zip(list_of_KDEs),n_samples))
+    return collect(list_of_KDEs), collect(xs)
 end

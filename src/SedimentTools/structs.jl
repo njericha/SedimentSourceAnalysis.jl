@@ -41,15 +41,15 @@ Sink(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
 """Alias for Sink"""
 Rock = Sink
 
-####################
-# DistributionSink #
-####################
+#################
+# DensityTensor #
+#################
 
-"""Struct to hold sink level distribution data"""
-DistributionSinks{T <: Number} = NamedArray{T, 3}
+"""Struct to hold sink level density data"""
+DensityTensor{T <: Number} = NamedArray{T, 3}
 
-measurments(d::DistributionSinks) = names(d, "measurments")
-getsink(d::DistributionSinks, i::Integer) = d[i, :, :] # TODO see if @view is better
+measurments(d::DensityTensor) = names(d, "measurments")
+getsink(d::DensityTensor, i::Integer) = d[i, :, :] # TODO see if @view is better
 getsource = getsink
 
 """Methods to get the names given the axis name rather than the axis number"""
@@ -58,9 +58,9 @@ function Base.names(n::NamedArray, dimname::Union{String,Symbol})
 end
 Base.names(n::NamedArray, dimname::Name) = names(n, findfirst(dimnames(n) .== dimname.names))
 
-to_tensor(sinks::DistributionSinks) = sinks.array
+to_tensor(sinks::DensityTensor) = sinks.array
 
-function DistributionSinks(sinks::AbstractVector{Sinks}, KDEs::AbstractVector{AbstractVector{UnivariateKDE}})
+function DensityTensor(sinks::AbstractVector{Sinks}, KDEs::AbstractVector{AbstractVector{UnivariateKDE}})
     # Argument Handeling
     allequal(measurments.(sinks)) ||
         ArgumentError("All sinks must have the same measurements in the same order.")
@@ -79,7 +79,7 @@ function DistributionSinks(sinks::AbstractVector{Sinks}, KDEs::AbstractVector{Ab
     @assert size(data) == (length(sinks), length(measurment_names), n_density_samples)
 
     # Wrap in a NamedArray
-    dsinks = NamedArray(data, dimnames=("sink", "measurment", "density"))::DistributionSinks
+    dsinks = NamedArray(data, dimnames=("sink", "measurment", "density"))::DensityTensor
     setnames!(dsinks, measurment_names, 2)
 
     return dsinks

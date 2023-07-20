@@ -2,8 +2,8 @@
 # This should not be used on arbitrary strings and only on numbers surrounded
 # by double quotes. This is nessesary because some excel entries have mistakenly
 # read the number as a string.
-import Base: convert
-Base.convert(::Type{Number}, s::String) = parse(T, s)
+#import Base: convert
+#Base.convert(::Type{Number}, s::String) = parse(T, s)
 
 """
     read_raw_data(filename)
