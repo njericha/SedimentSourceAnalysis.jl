@@ -20,8 +20,7 @@ Note there may NOT be a unique optimal solution
 # Keywords
 - `maxiter::Integer=100`: maxmimum number of iterations
 - `tol::Real=1e-3`: desiered tolerance for the -gradient's distance to the normal cone
-- `rescale::Bool=false`: scale F at each iteration so that the 3-fiber sums are 1 (on average).
-This also preprocesses the input `Y` in a similar way, and rescales the final F so Y=CF.
+- `rescale::Bool=false`: scale F at each iteration so that the 3-fiber sums are 1 (on average). This also preprocesses the input `Y` in a similar way, and rescales the final F so Y=CF.
 - `plot_F::Integer=0`: if not 0, plot F every plot_F iterations
 - `names::AbstractVector{String}=String[]`: names of the slices of F to use for ploting
 
@@ -120,6 +119,7 @@ function dist_to_Ncone(grad_C, grad_F, C, F)
     grad_F_restricted = grad_F[(F .> 0) .|| (grad_F .< 0)]
     return sqrt(norm(grad_C_restricted)^2 + norm(grad_F_restricted)^2)
 end
+
 # TODO move this ploting function to SedimentTools? Or seperate viz.jl file?
 """
     plot_factors(F, names; appendtitle="")
@@ -169,7 +169,7 @@ end
 function rescaleCF!(C, F)
     fiber_sums = sum.(eachslice(F,dims=(1,2)))
     avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
-    F .= avg_factor_sums^(-1) * F # TODO make more accurate scaling
+    F .= avg_factor_sums^(-1) * F
     C .= C * avg_factor_sums
 end
 

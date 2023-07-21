@@ -2,6 +2,8 @@
 
 # TODO see if this is nessesary or not
 import Base
+
+"""Alias for an AbstractArray{T, 3}."""
 const Abstract3Tensor{T} = AbstractArray{T, 3}
 
 # TODO maybe use a custom symbol in the future
@@ -38,8 +40,8 @@ combined_norm(u, v)
 5.0
 ```
 """
-combined_norm(vargs...) = sqrt(sum(norm2, vargs))
-norm2(x) = norm(x)^2
+combined_norm(vargs...) = sqrt(sum(_norm2, vargs))
+_norm2(x) = norm(x)^2
 
 """
     ReLU(x)

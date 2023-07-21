@@ -3,7 +3,7 @@
 #########
 
 #"""Struct to hold grain level data"""
-Grain{T} = NamedVector{T} where T <: Real
+const Grain{T} = NamedVector{T} where T <: Real
 measurments(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
 
 function Grain(v::AbstractVector{T}, measurment_names::AbstractVector{String}) where T<:Real
@@ -15,7 +15,7 @@ end
 #################
 
 """Struct to hold sink level data"""
-Sink{T} = Vector{Grain{T}} where T <: Real # Using vector and not a set to preserve order
+const Sink{T} = Vector{Grain{T}} where T <: Real # Using vector and not a set to preserve order
 
 """Gets the names of measurments from a Sink"""
 measurments(s::Sink) = iszero(length(s)) ? String[] : measurments(s[1])
@@ -39,9 +39,12 @@ function Sink(vec_of_grains::AbstractVector{Grain{T}}) where T <: Real # each el
 end
 Sink(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
 
+# Define aliases so Rock or Source can be used in place of Sink when those terms make more
+# sense in those contexts.
 """Alias for Sink"""
-Rock = Sink
-Source = Sink
+const Rock = Sink
+"""Alias for Sink"""
+const Source = Sink
 
 #################
 # DensityTensor #
@@ -133,7 +136,7 @@ measurments(D::DensityTensor) = names(D, "measurment")
 domain(D::DensityTensor, measurment::String) = domains(D)[_getmeasurmentindex(D, measurment)]
 domain(D::DensityTensor, j::Integer) = domains(D)[j]
 source(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
-sink = source
+sink = source # No use of `const` because we may want to use sink as a variable name...but maybe that is bad form...
 function _getmeasurmentindex(D::DensityTensor, measurment::String)
     return findfirst(names(D, "measurement") .== measurment)
 end
@@ -145,4 +148,4 @@ setsourcename!(D::DensityTensor, name::String) = setdimnames!(D, name, 1)
 eachdensity(D::DensityTensor) = eachslice(D, dims=3)
 eachmeasurment(D::DensityTensor) = eachslice(D, dims=(1,3))
 eachsource(D::DensityTensor) = eachslice(D, dims=(2,3))
-eachsink = eachsource
+const eachsink = eachsource
