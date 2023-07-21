@@ -21,7 +21,7 @@ function source_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when
     domain_length = length(domains(D)[begin])
     for (name, source) in zip(names(D, 1), eachsource(D))
         full_title = title * "$(dimnames(D)[1]) $name"
-        h = Plots.heatmap(
+        h = heatmap(
             array(source);
             yticks=(eachindex(measurements), measurements),
             xticks=([1, domain_length],["min", "max"]),
@@ -39,16 +39,14 @@ end
     measurment_heatmaps(D::DensityTensor; kw...)
 
 Returns heatmaps for each measurment (lateral slices) of D.
-
-The source name/index for each source will be appended to sourcename.
 """
-function measurment_heatmaps(D::DensityTensor; sourcename="", kwargs...) # may clash when looking at a subarray of a DensityTensor
+function measurment_heatmaps(D::DensityTensor; kwargs...) # may clash when looking at a subarray of a DensityTensor
     plots = []
     # No need to normalize since every distribution on the same plot has the same scale
     measurements = measurments(D)
     sources = sources(D)
     for (name, measurement, domain) in zip(measurements(D), eachmeasurment(D), domains(D))
-        h = Plots.heatmap(
+        h = heatmap(
             domain, sources, array(measurement);
             yflip=true,
             title=title * name,
@@ -57,4 +55,19 @@ function measurment_heatmaps(D::DensityTensor; sourcename="", kwargs...) # may c
         push!(plots, h)
     end
     return plots
+end
+
+"""
+    measurment_heatmaps(D::DensityTensor, measurment::String; kw...)
+
+Returns one plot will all distributions for a given measurment (lateral slice) of D.
+"""
+function measurment_distributions(D::DensityTensor, measurment::String; kwargs...) # may clash when looking at a subarray of a DensityTensor
+    # No need to normalize since every distribution on the same plot has the same scale
+    domain = domain(D, measurement)
+    p = plot()
+    for (source_name, density) in zip(sources(D), eachdensity(D, measurment))
+        plot!(domain, density; label=source_name, kw...)
+    end
+    return p
 end

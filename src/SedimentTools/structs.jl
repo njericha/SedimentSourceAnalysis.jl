@@ -176,6 +176,7 @@ end
 
 # Iterators
 eachdensity(D::DensityTensor) = eachslice(D, dims=3)
+eachdensity(D::DensityTensor, measurment::String) = eachrow(D[:, measurment, :])
 eachmeasurment(D::DensityTensor) = eachslice(D, dims=(1,3))
 eachsource(D::DensityTensor) = eachslice(D, dims=(2,3))
 const eachsink = eachsource

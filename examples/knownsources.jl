@@ -32,7 +32,7 @@ densities, domains = standardize_KDEs(raw_densities)
 
 # Package the densities into a single order-3 tensor
 densitytensor = DensityTensor(densities, domains, sinks)
-setsourcename!(factortensor, "sink")
+setsourcename!(densitytensor, "sink")
 
 # Visualize the tensor
 
