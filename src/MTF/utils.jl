@@ -25,8 +25,8 @@ end
 
 Compute the combined norm of the arguments as if all arguments were part of one large array.
 
-This is equivilent to norm(cat(u, v, ...)), but this
-implimentation avoids creating anintermediate array.
+This is equivilent to `norm(cat(u, v, ...))``, but this
+implimentation avoids creating an intermediate array.
 
 ```jldoctest
 u = [3 0]

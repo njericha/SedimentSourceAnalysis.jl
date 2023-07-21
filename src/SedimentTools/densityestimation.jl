@@ -1,13 +1,12 @@
 """
-    inner_percentile!(v, P)
-    inner_percentile(v, P)
-
 Filters elements so only the ones in the inner P percentile remain.
 """
-inner_percentile!(v, P) = filter!(inrange(v, P), v)
-inner_percentile(v, P) = filter(inrange(v, P), v)
+_inner_percentile(v, P) = filter(_inrange(v, P), v)
 
-function inrange(v, P)
+"""
+Returns a function that checks if a value is in the inner P percentile of the values in v.
+"""
+function _inrange(v, P)
     p_low = (100 - P) / 2
     p_high = 100 - p_low
     a = percentile(v, p_low)
@@ -15,6 +14,7 @@ function inrange(v, P)
     return x -> (a ≤ x ≤ b)
 end
 
+"""Smoothing parameter for calculating a kernel's bandwidth"""
 global DEFAULT_ALPHA = 0.9::Real
 
 """
@@ -32,7 +32,7 @@ function default_bandwidth(
 
     # Filter outliers, remove values outside the inner percentile
     if inner_percentile < 100
-        data = inner_percentile(data, inner_percentile)
+        data = _inner_percentile(data, inner_percentile)
     end
 
     # Determine length of data
@@ -59,29 +59,34 @@ function default_bandwidth(
 end
 
 """
-    make_densities(s::Sink; inner_percentile::Integer=100, bandwidths::AbstractVector{<:Real})
+    make_densities(s::Sink; kwargs...)
+    make_densities(s::Sink, domains::AbstractVector{<:AbstractVector}; kwargs...)
 
-Estimates the densities for each measurment in a Sink
-returns the UnivariateKDE as well as samples of the kernel
+Estimates the densities for each measurment in a Sink.
+
+When given domains, a list where each entry is a domain for a different measurement,
+resample the kernel on this domain.
 
 # Parameters
-- `inner_percentile`: value between 0 and 100 that filters out each measurement by using the
-inner percentile range. This can help remove outliers and focus in on where the bulk of the
-data is.
-- `bandwidths`: list of bandwidths used for each measurement's density estimation
+- `bandwidths::AbstractVector{<:Real}`: list of bandwidths used for each measurement's
+density estimation
+- `inner_percentile::Integer=100`: value between 0 and 100 that filters out each measurement
+by using the inner percentile range. This can help remove outliers and focus in on where the
+bulk of the data is.
 
 # Returns
-- `density_estimates`
+- `density_estimates::Vector{UnivariateKDE}`
 """
 function make_densities(
     s::Sink;
-    bandwidths::AbstractVector{<:Real},
     inner_percentile::Integer=100,
+    bandwidths::AbstractVector{<:Real}=default_bandwidth(s,DEFAULT_ALPHA,inner_percentile),
     )
     # Argument Handeling
     # Check input is in the correct range
     (0 < inner_percentile <= 100) ||
         ArgumentError("inner_percentile must be between 0 and 100, got $inner_percentile")
+
 
     # Loop setup
     eachmeasurment = eachmeasurment(s)
@@ -90,20 +95,13 @@ function make_densities(
 
     for (i, (measurment_values, b)) in enumerate(zip(eachmeasurment, bandwidths))
         # Estimate density based on the inner precentile to ignore outliers
-        inner_percentile!(measurment_values, inner_percentile)
+        measurment_values = _inner_percentile(measurment_values, inner_percentile)
         KDEs[i] = kde(measurment_values, bandwidth=b)
     end
 
     return density_estimates
 end
 
-#function make_densities(s::Sink; inner_percentile::Integer=100, alpha=DEFAULT_ALPHA)
-#    bandwidths = default_bandwidth.(eachmeasurment(s), alpha, inner_percentile)
-#    return (make_densities(s; bandwidths, inner_percentile), bandwidths)
-#end
-
-"""If given domains, a list where each entry is a domain for a different measurement,
-resample the kernal on this domain."""
 function make_densities(
     sinks::Sink,
     domains::AbstractVector{<:AbstractVector};
@@ -114,6 +112,7 @@ function make_densities(
     return KDEs_new
 end
 
+"""Number of samples to use when standardizing a vector of density estimates."""
 const DEFAULT_N_SAMPLES = 64::Integer
 
 """
@@ -132,7 +131,7 @@ function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT
 end
 
 """
-Resample the densities within each sink so that like-measurments use the same scale
+Resample the densities within each sink so that like-measurments use the same scale.
 """
 function standardize_KDEs(
     list_of_KDEs::AbstractVector{AbstractVector{UnivariateKDE}};

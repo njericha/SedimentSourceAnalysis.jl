@@ -19,7 +19,8 @@ Sink{T} = Vector{Grain{T}} where T <: Real # Using vector and not a set to prese
 
 """Gets the names of measurments from a Sink"""
 measurments(s::Sink) = iszero(length(s)) ? String[] : measurments(s[1])
-getindex(s::Sink, key::String) = (g[key] for g ∈ s)
+import Base: getindex
+Base.getindex(s::Sink, key::String) = (g[key] for g ∈ s)
 
 """Iterator for a list of values of each measurement"""
 eachmeasurment(s::Sink) = (s[m] for m in measurments(s))
@@ -129,11 +130,11 @@ Base.names(n::NamedArray, dimname::Name) = names(n, findfirst(dimnames(n) .== di
 
 # Getters for useful quantities
 measurments(D::DensityTensor) = names(D, "measurment")
-domain(D::DensityTensor, measurment::String) = domains(D)[getmeasurmentindex(D, measurment)]
+domain(D::DensityTensor, measurment::String) = domains(D)[_getmeasurmentindex(D, measurment)]
 domain(D::DensityTensor, j::Integer) = domains(D)[j]
 source(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
 sink = source
-function getmeasurmentindex(D::DensityTensor, measurment::String)
+function _getmeasurmentindex(D::DensityTensor, measurment::String)
     return findfirst(names(D, "measurement") .== measurment)
 end
 

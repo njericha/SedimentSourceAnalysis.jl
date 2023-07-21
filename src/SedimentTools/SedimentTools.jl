@@ -11,11 +11,20 @@ using NamedArrays
 using ReusePatterns
 using KernelDensity
 
-#export ...
-
+export Grain, DensityTensor, Rock, Sink, Source # Types
+export array, domain, domains, measurments, nammedarray, sink, source # Getters
+export setsourcename! # Setters
+export eachdensity, eachmeasurment, eachsink, eachsource # Iterators
 include("structs.jl")
+
+export read_raw_data
 include("importing.jl")
+
+export DEFAULT_ALPHA, DEFAULT_N_SAMPLES # Constants
+export default_bandwidth, make_densities, standardize_KDEs # Functions
 include("densityestimation.jl")
+
 include("classifysource.jl")
+
 include("viz.jl")
 end
