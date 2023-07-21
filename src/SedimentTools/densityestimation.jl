@@ -9,8 +9,7 @@ Returns a function that checks if a value is in the inner P percentile of the va
 function _inrange(v, P)
     p_low = (100 - P) / 2
     p_high = 100 - p_low
-    a = percentile(v, p_low)
-    b = percentile(v, p_high)
+    a, b = quantile(v, [p_low, p_high] ./ 100)
     return x -> (a ≤ x ≤ b)
 end
 

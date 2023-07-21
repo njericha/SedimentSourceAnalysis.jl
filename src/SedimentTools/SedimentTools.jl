@@ -17,7 +17,7 @@ using Plots: Plots, heatmap
 
 # Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
-export array, domain, domains, measurments, nammedarray, sink, source # Getters
+export array, domain, domains, getsourcename, measurments, nammedarray, sink, source # Getters
 export normalize_density_sums!, normalize_density_sums, setsourcename! # Setters
 export eachdensity, eachmeasurment, eachsink, eachsource # Iterators
 include("structs.jl")

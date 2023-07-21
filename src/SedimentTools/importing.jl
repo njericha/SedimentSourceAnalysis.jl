@@ -19,10 +19,10 @@ Optionaly provide a collection `skip_sheets` to blacklist sheet names from the e
 """
 function read_raw_data(filename; skip_sheets=Set(["source proportions","grain id"]))
     # Load the file
-    xf = XLSX.readxlsx(filename)
+    xf = readxlsx(filename)
 
     # Get the list of measurments (each sheet is 1 measurment)
-    sheet_names = XLSX.sheetnames(xf)
+    sheet_names = sheetnames(xf)
     isallowed(n) = lowercase(n) ∉ skip_sheets
     filter!(isallowed, sheet_names)
 

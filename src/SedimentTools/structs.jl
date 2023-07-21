@@ -82,7 +82,8 @@ struct DensityTensor{T <: Real} <: AbstractArray{T, 3}
 end
 domains(D::DensityTensor) = D.domains
 nammedarray(D::DensityTensor) = D.tensor
-array(D::DensityTensor) = (nammedarray(D)).array
+array(D::DensityTensor) = array(nammedarray(D))
+array(N::NamedArray) = N.array
 # ...but with ReusePatterns, DensityTensor can now be used like a NamedArray!
 # Note (DensityTensor <: NamedArray == false) formally.
 ReusePatterns.@forward((DensityTensor, :tensor), NamedArray)
@@ -142,6 +143,7 @@ domain(D::DensityTensor, j::Integer) = domains(D)[j]
 getsource(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
 getsink = getsource
 getstepsizes(D::DensityTensor) = [d[begin+1] - d[begin] for d in domains(D)]
+sources(D::DensityTensor) = ["$(dimnames(D)[1]) $s" for s in names(D, 1)]
 
 # Setters
 setsourcename!(D::DensityTensor, name::String) = setdimnames!(D, name, 1)
