@@ -17,9 +17,9 @@ using Base: getindex, names #, convert
 
 # Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
-export array, domain, domains, getsourcename, measurments, nammedarray, sink, source # Getters
+export array, domain, domains, getsourcename, measurements, nammedarray, sink, source # Getters
 export normalize_density_sums!, normalize_density_sums, setsourcename! # Setters
-export eachdensity, eachmeasurment, eachsink, eachsource # Iterators
+export eachdensity, eachmeasurement, eachsink, eachsource # Iterators
 include("structs.jl")
 
 export read_raw_data
@@ -31,6 +31,6 @@ include("densityestimation.jl")
 
 include("classifysource.jl")
 
-export measurment_heatmaps, source_heatmaps
+export measurement_heatmaps, source_heatmaps
 include("viz.jl")
 end # module SedimentTools

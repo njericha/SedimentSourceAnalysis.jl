@@ -17,7 +17,7 @@ include("./estimatekernel.jl")
 filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 T, scales, names, bandwidths = make_densities(filename, 2^5, P=95);
 
-# Change measurment name "ages" to "Age" for consistantcy with the measurements in the sources file
+# Change measurement name "ages" to "Age" for consistantcy with the measurements in the sources file
 age_idx = findall(s -> s == "ages", names)
 names[age_idx] .= "Age"
 

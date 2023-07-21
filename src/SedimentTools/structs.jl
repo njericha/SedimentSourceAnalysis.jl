@@ -4,11 +4,11 @@
 
 """Struct to hold grain level data"""
 const Grain{T} = NamedVector{T} where T <: Real
-measurments(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
+measurements(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
 
 """Main constructor for a Grain"""
-function Grain(v::AbstractVector{T}, measurment_names::AbstractVector{String}) where T<:Real
-    return NamedArray(v, (measurment_names,), ("measurment",))::Grain{T}
+function Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where T<:Real
+    return NamedArray(v, (measurement_names,), ("measurement",))::Grain{T}
 end
 
 #################
@@ -18,12 +18,12 @@ end
 """Struct to hold sink level data"""
 const Sink{T} = Vector{Grain{T}} where T <: Real # Using vector and not a set to preserve order
 
-"""Gets the names of measurments from a Sink"""
-measurments(s::Sink) = iszero(length(s)) ? String[] : measurments(s[1])
+"""Gets the names of measurements from a Sink"""
+measurements(s::Sink) = iszero(length(s)) ? String[] : measurements(s[1])
 Base.getindex(s::Sink, key::String) = (g[key] for g ∈ s)
 
 """Iterator for a list of values of each measurement"""
-eachmeasurment(s::Sink) = (s[m] for m in measurments(s))
+eachmeasurement(s::Sink) = (s[m] for m in measurements(s))
 
 """
     Sink(grain1, grain2, ...)
@@ -34,7 +34,7 @@ Collects a list of Grains into a Rock/Sink.
 Ensures all Grains have the same names and are in the same order.
 """
 function Sink(vec_of_grains::AbstractVector{Grain{T}}) where T <: Real # each element is a grain
-    @assert allequal(measurments.(vec_of_grains))
+    @assert allequal(measurements.(vec_of_grains))
     return collect(vec_of_grains)::Sink{T}
 end
 Sink(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
@@ -68,12 +68,12 @@ An order 3 array to hold the density distributions for multiple sinks.
 struct DensityTensor{T <: Real} <: AbstractArray{T, 3}
     tensor::NamedArray{T, 3}
     domains::AbstractVector{<: AbstractVector{T}} # inner vector needs to be abstract to hold intervals ex. 1:10
-    function DensityTensor(args...; domains, measurments, kw...)
+    function DensityTensor(args...; domains, measurements, kw...)
         array = args[begin]
         typeT = typeof(array[begin,begin,begin])
         namedarray = NamedArray(args...; kw...)
-        setnames!(namedarray, measurments, 2)
-        setdimnames!(namedarray, "measurment", 2)
+        setnames!(namedarray, measurements, 2)
+        setdimnames!(namedarray, "measurement", 2)
         setdimnames!(namedarray, "density", 3)
         #init_domains = [[]] #TODO initialize with the correct size
         #I, J, K = size(array)
@@ -95,12 +95,12 @@ function DensityTensor(
     sinks::AbstractVector{Sink{T}},
     ) where T <: Real
     # Argument Handeling
-    allequal(measurments.(sinks)) ||
+    allequal(measurements.(sinks)) ||
         ArgumentError("All sinks must have the same measurements in the same order.")
     length(sinks) == length(KDEs) ||
         ArgumentError("Must be the same number of sinks as there are lists of KDEs.")
-    measurment_names = measurments(sinks[begin])
-    length(measurment_names) == length(KDEs[begin]) ||
+    measurement_names = measurements(sinks[begin])
+    length(measurement_names) == length(KDEs[begin]) ||
         ArgumentError("Must be the same number of measurements as there are KDEs for each sink.")
 
     # TODO make this line more legible, possible by wrapping the KDEs in a struct so they're named
@@ -109,11 +109,11 @@ function DensityTensor(
 
     # Confirm all the dimentions are in the right order
     n_density_samples = length((KDEs[begin][begin]).x)
-    @assert size(data) == (length(sinks), length(measurment_names), n_density_samples)
+    @assert size(data) == (length(sinks), length(measurement_names), n_density_samples)
 
     # Wrap in a NamedArray
-    namedarray = NamedArray(data, dimnames=("sink", "measurment", "density"))
-    setnames!(namedarray, measurment_names, 2)
+    namedarray = NamedArray(data, dimnames=("sink", "measurement", "density"))
+    setnames!(namedarray, measurement_names, 2)
 
     # Wrap again in a DensityTensor to store the domains
     densitytensor = DensityTensor(namedarray, domains)
@@ -133,13 +133,13 @@ end
 Base.names(n::NamedArray, dimname::Name) = names(n, findfirst(dimnames(n) .== dimname.names))
 
 # Getters for useful quantities
-measurments(D::DensityTensor) = names(D, "measurment")
+measurements(D::DensityTensor) = names(D, "measurement")
 
-function _getmeasurmentindex(D::DensityTensor, measurment::String)
-    return findfirst(names(D, "measurement") .== measurment)
+function _getmeasurementindex(D::DensityTensor, measurement::String)
+    return findfirst(names(D, "measurement") .== measurement)
 end
 
-domain(D::DensityTensor, measurment::String) = domains(D)[_getmeasurmentindex(D, measurment)]
+domain(D::DensityTensor, measurement::String) = domains(D)[_getmeasurementindex(D, measurement)]
 domain(D::DensityTensor, j::Integer) = domains(D)[j]
 getsource(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
 getsink = getsource
@@ -162,7 +162,7 @@ density curve is 1. In the case of an evenly sampled density, this area is
 Use `normalize_densities` to avoid mutation.
 """
 function normalize_density_sums!(D::DensityTensor)
-    for (slice, x) in zip(eachmeasurment(D), getstepsizes(D))
+    for (slice, x) in zip(eachmeasurement(D), getstepsizes(D))
         slice ./= x
     end
 end
@@ -176,7 +176,7 @@ end
 
 # Iterators
 eachdensity(D::DensityTensor) = eachslice(D, dims=3)
-eachdensity(D::DensityTensor, measurment::String) = eachrow(D[:, measurment, :])
-eachmeasurment(D::DensityTensor) = eachslice(D, dims=(1,3))
+eachdensity(D::DensityTensor, measurement::String) = eachrow(D[:, measurement, :])
+eachmeasurement(D::DensityTensor) = eachslice(D, dims=(1,3))
 eachsource(D::DensityTensor) = eachslice(D, dims=(2,3))
 const eachsink = eachsource

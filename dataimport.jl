@@ -160,9 +160,9 @@ function read_raw_data(filename)
     xf = XLSX.readxlsx(filename)
     sheet_names = XLSX.sheetnames(xf)
     isallowed(n) = lowercase(n) ∉ ["source proportions","grain id"]
-    measurments = filter(isallowed, sheet_names)
+    measurements = filter(isallowed, sheet_names)
     data = OrderedDict{String, Matrix{Union{Missing,Float64}}}()
-    for sheet_name ∈ measurments
+    for sheet_name ∈ measurements
         @info "extracting $sheet_name..."
         sheet_data = xf[sheet_name][:]
         data[sheet_name]= sheet_data

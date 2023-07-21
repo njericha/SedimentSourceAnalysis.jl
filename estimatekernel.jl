@@ -31,7 +31,7 @@ end
 
 Coppied from KernelDensity since this function is not exported, but I want access
 to it so the same bandwidth can be used for different distributions for the
-same measurments
+same measurements
 """
 function default_bandwidth(data::AbstractVector{<:Real}, alpha::Float64 = 0.9)
     # Determine length of data
@@ -64,7 +64,7 @@ Creates a tensor of size (n_sinks, n_measurements, n_steps) using data
 at filename. Each 3-fiber (there are n_sinks × n_measurements of them) is
 a probability density, evenly sampled at n_steps points. The points they are evaluated
 at are stored in scales. Note every fiber in the same vertical slice uses the same scale.
-The vector measurements stores the names of the measurment for each vertical slice.
+The vector measurements stores the names of the measurement for each vertical slice.
 
 P is an optional value between 0 and 100 that filters out each distribution to use only the inner
 P percentile range. This can help remove outliers and focus in on where the bulk of the data is.
@@ -118,7 +118,7 @@ function make_densities(filename::String, n_steps::Integer; P=100, scales=nothin
     T = stack((d[2]).densities for d ∈ standard_distributions)::Array{Float64,3}
     T = permutedims(T, [1,3,2])
 
-    # Collect scales for each measurment (the "x" values)
+    # Collect scales for each measurement (the "x" values)
     scales = [(d[2]).x for d ∈ standard_distributions]
 
 

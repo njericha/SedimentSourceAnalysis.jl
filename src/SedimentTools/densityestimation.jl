@@ -21,7 +21,7 @@ global DEFAULT_ALPHA = 0.9::Real
 
 Coppied from KernelDensity since this function is not exported. I want access
 to it so that the same bandwidth can be used for different densities for the
-same measurments.
+same measurements.
 """
 function default_bandwidth(
     data::AbstractVector{<: Real},
@@ -61,7 +61,7 @@ end
     make_densities(s::Sink; kwargs...)
     make_densities(s::Sink, domains::AbstractVector{<:AbstractVector}; kwargs...)
 
-Estimates the densities for each measurment in a Sink.
+Estimates the densities for each measurement in a Sink.
 
 When given domains, a list where each entry is a domain for a different measurement,
 resample the kernel on this domain.
@@ -88,14 +88,14 @@ function make_densities(
 
 
     # Loop setup
-    eachmeasurment = eachmeasurment(s)
-    n_measurments = length(eachmeasurment)
-    density_estimates = Vector{UnivariateKDE}(undef, n_measurments)
+    eachmeasurement = eachmeasurement(s)
+    n_measurements = length(eachmeasurement)
+    density_estimates = Vector{UnivariateKDE}(undef, n_measurements)
 
-    for (i, (measurment_values, b)) in enumerate(zip(eachmeasurment, bandwidths))
+    for (i, (measurement_values, b)) in enumerate(zip(eachmeasurement, bandwidths))
         # Estimate density based on the inner precentile to ignore outliers
-        measurment_values = _inner_percentile(measurment_values, inner_percentile)
-        KDEs[i] = kde(measurment_values, bandwidth=b)
+        measurement_values = _inner_percentile(measurement_values, inner_percentile)
+        KDEs[i] = kde(measurement_values, bandwidth=b)
     end
 
     return density_estimates
@@ -130,7 +130,7 @@ function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT
 end
 
 """
-Resample the densities within each sink so that like-measurments use the same scale.
+Resample the densities within each sink so that like-measurements use the same scale.
 """
 function standardize_KDEs(
     list_of_KDEs::AbstractVector{AbstractVector{UnivariateKDE}};

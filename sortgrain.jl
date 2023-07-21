@@ -7,12 +7,12 @@ source it most likely belongs to.
 using OrderedCollections
 
 # Transform data to a more useful format by grain
-# Or have a function look up the vector of measurments for the grain
+# Or have a function look up the vector of measurements for the grain
 """
     get_grain(raw_data, (grain_i, sink_j))
 
 obtains grain_i from sink_j in the raw_data and returns a vector
-of the measurments of that grain
+of the measurements of that grain
 """
 function get_grain(raw_data, (grain_i, sink_j))
     n_measurements = length(raw_data)
@@ -53,15 +53,15 @@ Note the distributions before rescaling have a row_sum equal to 1/stepsize
 with stepsize being the intervel width used in scale.
 """
 function estimate_prob(factor_slice, scales, grain_vec)
-    measurment_probabilities = zeros(n_measurements)
+    measurement_probabilities = zeros(n_measurements)
     for (j, (grain_value, density, scale)) ∈ enumerate(zip(grain_vec, eachrow(factor_slice), scales))
         subinterval_k = find_subinterval(scale, grain_value)
-        density_k = density[subinterval_k] # Get the probability for observing a measurment on that intervel
-        measurment_probabilities[j] = density_k
+        density_k = density[subinterval_k] # Get the probability for observing a measurement on that intervel
+        measurement_probabilities[j] = density_k
     end
     ## Multiply the probabilities to get the overall probability of
     ## observing the data in that volume
-    return prod(measurment_probabilities)
+    return prod(measurement_probabilities)
 end
 
 """

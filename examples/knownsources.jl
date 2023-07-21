@@ -15,10 +15,10 @@ sinks = read_raw_data(filename)::Vector{Sink}
 sink1 = @view sinks[begin]
 inner_percentile = 95 # Filter outliers; ignore values outside the inner percentile
 alpha = 1.5 # smooth density estimate, 0.9 is the default
-bandwidths = default_bandwidth.(eachmeasurment(sink1), alpha, inner_percentile)
+bandwidths = default_bandwidth.(eachmeasurement(sink1), alpha, inner_percentile)
 
 ## Obtain the raw densities estimates
-## The same measurment could (and likely!) have different supports for different sinks...
+## The same measurement could (and likely!) have different supports for different sinks...
 raw_densities = make_densities.(sinks; bandwidths, inner_percentile)
 
 ## ...so we standardize them by resampling the densities on the same domain,
@@ -41,9 +41,9 @@ Y = array(densitytensor) # plain Array{T, 3} type for faster factorization
 rank = 3
 C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank)
 
-## Package F into a DensityTensor with the same domain and measurments as Y
-## Each collection of measurments is no longer a sink and is now a "factor"
-factortensor = DensityTensor(F; domain, measurments=measurments(densitytensor))
+## Package F into a DensityTensor with the same domain and measurements as Y
+## Each collection of measurements is no longer a sink and is now a "factor"
+factortensor = DensityTensor(F; domain, measurements=measurements(densitytensor))
 setsourcename!(factortensor, "learned source")
 
 ## Package C into a NamedMatrix to label the dimentions
@@ -55,7 +55,7 @@ filename = "./data/sundell2022/3Sources from Sundell et al 2022.xlsx"
 sources = read_raw_data(filename)::Vector{Source}
 
 ## Confirm the measurements are the same and in the same order
-@assert measurments(sources[begin]) == measurments(sink[begin])
+@assert measurements(sources[begin]) == measurements(sink[begin])
 
 ## Estimate densities for the known sources
 ## We pass in the previously calculated domains to ensure the densities are
@@ -63,7 +63,7 @@ sources = read_raw_data(filename)::Vector{Source}
 true_densities = make_densities.(sources; domains, bandwidths, inner_percentile)
 
 ## Wrap in DensityTensor
-factortensor_true = DensityTensor(true_densities; domain, measurments=measurments(densitytensor))
+factortensor_true = DensityTensor(true_densities; domain, measurements=measurements(densitytensor))
 setsourcename!(factortensor_true, "true source")
 
 # Import data for ground truth C

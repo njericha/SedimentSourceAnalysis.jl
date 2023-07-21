@@ -13,7 +13,7 @@ Imports excel data to a `Vector{Sink}`.
 
 Excel file must have one element per page where different columns correspond to different
 sinks. Each sink can have a different number of grains (length of the column), but a sink
-must have a consistant length across different measurments (sheets).
+must have a consistant length across different measurements (sheets).
 
 Optionaly provide a collection `skip_sheets` to blacklist sheet names from the excel file.
 """
@@ -21,7 +21,7 @@ function read_raw_data(filename; skip_sheets=Set(["source proportions","grain id
     # Load the file
     xf = readxlsx(filename)
 
-    # Get the list of measurments (each sheet is 1 measurment)
+    # Get the list of measurements (each sheet is 1 measurement)
     sheet_names = sheetnames(xf)
     isallowed(n) = lowercase(n) ∉ skip_sheets
     filter!(isallowed, sheet_names)
@@ -48,7 +48,7 @@ function read_raw_data(filename; skip_sheets=Set(["source proportions","grain id
             # Skip grains that contain missing values
             any(ismissing.(g)) ? break : nothing
 
-            vec_of_grains[i] = Grain(g::Vector{Float64}, measurment_names=sheet_names)
+            vec_of_grains[i] = Grain(g::Vector{Float64}, measurement_names=sheet_names)
         end
 
         vec_of_sinks[j] = Sink(vec_of_grains)

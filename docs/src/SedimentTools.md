@@ -38,7 +38,7 @@ array
 domain
 domains
 getsourcename
-measurments
+measurements
 nammedarray
 sink
 source
@@ -54,7 +54,7 @@ setsourcename!
 ### Iterators
 ```@docs
 eachdensity
-eachmeasurment
+eachmeasurement
 eachsink
 eachsource
 ```
@@ -68,7 +68,7 @@ standardize_KDEs
 
 ### Visualizers
 ```@docs
-measurment_heatmaps
+measurement_heatmaps
 source_heatmaps
 ```
 

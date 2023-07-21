@@ -17,7 +17,7 @@ The source name/index for each source will be appended to title.
 function source_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when looking at a subarray of a DensityTensor
     plots = []
     D = normalize_density_sums(D)
-    measurements = measurments(D)
+    measurements = measurements(D)
     domain_length = length(domains(D)[begin])
     for (name, source) in zip(names(D, 1), eachsource(D))
         full_title = title * "$(dimnames(D)[1]) $name"
@@ -36,16 +36,16 @@ function source_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when
 end
 
 """
-    measurment_heatmaps(D::DensityTensor; kw...)
+    measurement_heatmaps(D::DensityTensor; kw...)
 
-Returns heatmaps for each measurment (lateral slices) of D.
+Returns heatmaps for each measurement (lateral slices) of D.
 """
-function measurment_heatmaps(D::DensityTensor; kwargs...) # may clash when looking at a subarray of a DensityTensor
+function measurement_heatmaps(D::DensityTensor; kwargs...) # may clash when looking at a subarray of a DensityTensor
     plots = []
     # No need to normalize since every distribution on the same plot has the same scale
-    measurements = measurments(D)
+    measurements = measurements(D)
     sources = sources(D)
-    for (name, measurement, domain) in zip(measurements(D), eachmeasurment(D), domains(D))
+    for (name, measurement, domain) in zip(measurements(D), eachmeasurement(D), domains(D))
         h = heatmap(
             domain, sources, array(measurement);
             yflip=true,
@@ -58,15 +58,15 @@ function measurment_heatmaps(D::DensityTensor; kwargs...) # may clash when looki
 end
 
 """
-    measurment_heatmaps(D::DensityTensor, measurment::String; kw...)
+    measurement_heatmaps(D::DensityTensor, measurement::String; kw...)
 
-Returns one plot will all distributions for a given measurment (lateral slice) of D.
+Returns one plot will all distributions for a given measurement (lateral slice) of D.
 """
-function measurment_distributions(D::DensityTensor, measurment::String; kwargs...) # may clash when looking at a subarray of a DensityTensor
+function measurement_distributions(D::DensityTensor, measurement::String; kwargs...) # may clash when looking at a subarray of a DensityTensor
     # No need to normalize since every distribution on the same plot has the same scale
     domain = domain(D, measurement)
     p = plot()
-    for (source_name, density) in zip(sources(D), eachdensity(D, measurment))
+    for (source_name, density) in zip(sources(D), eachdensity(D, measurement))
         plot!(domain, density; label=source_name, kw...)
     end
     return p
