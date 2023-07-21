@@ -13,6 +13,7 @@ Abstract3Tensor
 ```@docs
 *(::AbstractMatrix, ::Abstract3Tensor)
 combined_norm
+dist_to_Ncone
 nnmtf
 plot_factors
 rel_error
