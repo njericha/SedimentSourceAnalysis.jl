@@ -1,8 +1,5 @@
 #= Short helpers for MTF.jl =#
 
-# TODO see if this is nessesary or not
-import Base
-
 """Alias for an AbstractArray{T, 3}."""
 const Abstract3Tensor{T} = AbstractArray{T, 3}
 

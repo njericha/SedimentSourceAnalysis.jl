@@ -86,7 +86,7 @@ array(D::DensityTensor) = array(nammedarray(D))
 array(N::NamedArray) = N.array
 # ...but with ReusePatterns, DensityTensor can now be used like a NamedArray!
 # Note (DensityTensor <: NamedArray == false) formally.
-ReusePatterns.@forward((DensityTensor, :tensor), NamedArray)
+@forward((DensityTensor, :tensor), NamedArray)
 
 function DensityTensor(
     KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},

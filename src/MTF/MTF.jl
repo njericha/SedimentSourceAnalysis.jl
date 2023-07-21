@@ -7,6 +7,9 @@ using Plots
 using Random
 using Einsum
 
+# Method extentions
+using Base: *
+
 export Abstract3Tensor # Types
 export combined_norm, nnmtf, plot_factors, rel_error # Functions
 

@@ -7,12 +7,12 @@ using LinearAlgebra
 using Statistics: std, quantile
 using XLSX: readxlsx, sheetnames
 using OrderedCollections: OrderedDict
-using NamedArrays: NamedArray, setnames!, setdimnames!
-using ReusePatterns: ReusePatterns, @forward
+using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!
+using ReusePatterns: @forward, forward # need to add the regular function `forward` because it is called by the macro @forward
 using KernelDensity: UnivariateKDE, kde, pdf
 
 # Method extentions
-using Base: Base, getindex, names, (:*) #, convert
+using Base: Base, getindex, names #, convert
 using Plots: Plots, heatmap
 
 # Exports
