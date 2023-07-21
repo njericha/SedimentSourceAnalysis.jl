@@ -2,7 +2,7 @@
 Import, store, and visualize sediment data.
 """
 module SedimentTools
-# Required packages # TODO annotate exactly what is being used from each imported package
+# Required packages
 using LinearAlgebra
 using Statistics: std, quantile
 using XLSX: readxlsx, sheetnames
@@ -10,10 +10,10 @@ using OrderedCollections: OrderedDict
 using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!
 using ReusePatterns: @forward, forward # need to add the regular function `forward` because it is called by the macro @forward
 using KernelDensity: UnivariateKDE, kde, pdf
+using Plots: heatmap
 
 # Method extentions
-using Base: Base, getindex, names #, convert
-using Plots: Plots, heatmap
+using Base: getindex, names #, convert
 
 # Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
@@ -31,5 +31,6 @@ include("densityestimation.jl")
 
 include("classifysource.jl")
 
+export measurment_heatmaps, source_heatmaps
 include("viz.jl")
-end
+end # module SedimentTools

@@ -2,10 +2,11 @@
 # Grain #
 #########
 
-#"""Struct to hold grain level data"""
+"""Struct to hold grain level data"""
 const Grain{T} = NamedVector{T} where T <: Real
 measurments(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
 
+"""Main constructor for a Grain"""
 function Grain(v::AbstractVector{T}, measurment_names::AbstractVector{String}) where T<:Real
     return NamedArray(v, (measurment_names,), ("measurment",))::Grain{T}
 end
