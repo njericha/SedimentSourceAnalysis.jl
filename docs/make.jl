@@ -5,12 +5,12 @@ using SedimentAnalysis
 using SedimentAnalysis.MTF
 using SedimentAnalysis.SedimentTools
 
-# DocMeta.setdocmeta!(
-#     SedimentAnalysis,
-#     :DocTestSetup,
-#     :(using .MTF);
-#     recursive=true
-# )
+DocMeta.setdocmeta!(
+    SedimentAnalysis,
+    :DocTestSetup,
+    :(using SedimentAnalysis);
+    recursive=true
+)
 
 makedocs(
     sitename="Sediment Source Analysis",
