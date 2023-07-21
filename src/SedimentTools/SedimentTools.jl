@@ -2,18 +2,23 @@
 Import, store, and visualize sediment data.
 """
 module SedimentTools
-# TODO should import Base: convert, length etc. go here?
+# Required packages # TODO annotate exactly what is being used from each imported package
 using LinearAlgebra
-#using DataFrames: dropmissing! # TODO see if this is better than the remove_missing function I made
-using XLSX # TODO annotate exactly what is being used from each imported package
-using OrderedCollections
-using NamedArrays
-using ReusePatterns
-using KernelDensity
+using Statistics: std, quantile
+using XLSX: readxlsx, sheetnames
+using OrderedCollections: OrderedDict
+using NamedArrays: NamedArray, setnames!, setdimnames!
+using ReusePatterns: ReusePatterns, @forward
+using KernelDensity: UnivariateKDE, kde, pdf
 
+# Method extentions
+using Base: Base, getindex, names, (:*) #, convert
+using Plots: Plots, heatmap
+
+# Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
 export array, domain, domains, measurments, nammedarray, sink, source # Getters
-export setsourcename! # Setters
+export normalize_density_sums!, normalize_density_sums, setsourcename! # Setters
 export eachdensity, eachmeasurment, eachsink, eachsource # Iterators
 include("structs.jl")
 

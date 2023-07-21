@@ -19,7 +19,6 @@ const Sink{T} = Vector{Grain{T}} where T <: Real # Using vector and not a set to
 
 """Gets the names of measurments from a Sink"""
 measurments(s::Sink) = iszero(length(s)) ? String[] : measurments(s[1])
-import Base: getindex
 Base.getindex(s::Sink, key::String) = (g[key] for g ∈ s)
 
 """Iterator for a list of values of each measurement"""
@@ -133,16 +132,44 @@ Base.names(n::NamedArray, dimname::Name) = names(n, findfirst(dimnames(n) .== di
 
 # Getters for useful quantities
 measurments(D::DensityTensor) = names(D, "measurment")
-domain(D::DensityTensor, measurment::String) = domains(D)[_getmeasurmentindex(D, measurment)]
-domain(D::DensityTensor, j::Integer) = domains(D)[j]
-source(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
-sink = source # No use of `const` because we may want to use sink as a variable name...but maybe that is bad form...
+
 function _getmeasurmentindex(D::DensityTensor, measurment::String)
     return findfirst(names(D, "measurement") .== measurment)
 end
 
+domain(D::DensityTensor, measurment::String) = domains(D)[_getmeasurmentindex(D, measurment)]
+domain(D::DensityTensor, j::Integer) = domains(D)[j]
+getsource(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
+getsink = getsource
+getstepsizes(D::DensityTensor) = [d[begin+1] - d[begin] for d in domains(D)]
+
 # Setters
 setsourcename!(D::DensityTensor, name::String) = setdimnames!(D, name, 1)
+
+# Other manipulators
+"""
+    normalize_density_sums!(D::DensityTensor)
+
+Rescales the densities so that the sum of the density samples is 1.
+
+This is in constrast to the usualy normalization for density functions where the area of the
+density curve is 1. In the case of an evenly sampled density, this area is
+`sum(density_samples)*step_size`.
+
+Use `normalize_densities` to avoid mutation.
+"""
+function normalize_density_sums!(D::DensityTensor)
+    for (slice, x) in zip(eachmeasurment(D), getstepsizes(D))
+        slice ./= x
+    end
+end
+
+"""See [normalize_density_sums!](@ref)"""
+function normalize_density_sums(D::DensityTensor)
+    D_copy = deepcopy(D)
+    normalize_density_sums!(D_copy)
+    return D_copy
+end
 
 # Iterators
 eachdensity(D::DensityTensor) = eachslice(D, dims=3)
