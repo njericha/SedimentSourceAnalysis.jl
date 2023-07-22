@@ -15,7 +15,7 @@ function match_sources!(
     C_true::AbstractMatrix,
     F_true::AbstractArray{T, 3};
     double_check=false,
-    )
+    ) where T <: Real
     # make list to store which true source the columns of C match
     n_factors = size(C_true)[2]
     true_ordering = zeros(Integer, n_factors)

@@ -13,7 +13,7 @@ using Plots: plot
 
 # Method extentions
 using Base: getindex, names #, convert
-using Plots: heatmap
+using Plots: Plots, heatmap
 
 # Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
