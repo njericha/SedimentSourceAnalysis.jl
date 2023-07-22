@@ -40,7 +40,7 @@ end
 
 Returns heatmaps for each measurement (lateral slices) of D.
 """
-function measurement_heatmaps(D::DensityTensor; kwargs...) # may clash when looking at a subarray of a DensityTensor
+function measurement_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when looking at a subarray of a DensityTensor
     plots = []
     # No need to normalize since every distribution on the same plot has the same scale
     measurements = measurements(D)
@@ -58,11 +58,11 @@ function measurement_heatmaps(D::DensityTensor; kwargs...) # may clash when look
 end
 
 """
-    measurement_heatmaps(D::DensityTensor, measurement::String; kw...)
+    distributions_plot(D::DensityTensor, measurement::String; kw...)
 
 Returns one plot will all distributions for a given measurement (lateral slice) of D.
 """
-function measurement_distributions(D::DensityTensor, measurement::String; kwargs...) # may clash when looking at a subarray of a DensityTensor
+function plot_densities(D::DensityTensor, measurement::String; kwargs...) # may clash when looking at a subarray of a DensityTensor
     # No need to normalize since every distribution on the same plot has the same scale
     domain = domain(D, measurement)
     p = plot()

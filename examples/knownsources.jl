@@ -2,6 +2,9 @@
 Use data from /data/sundell2022
 =#
 
+using XLSX
+using NamedArrays
+using Plots
 using SedimentAnalysis
 
 # Import data from excel file
@@ -34,20 +37,13 @@ densities, domains = standardize_KDEs(raw_densities)
 densitytensor = DensityTensor(densities, domains, sinks)
 setsourcename!(densitytensor, "sink")
 
-# Visualize the tensor
+# Visualize the data in the tensor by plotting the densities for the first measurement
+plot_densities(densitytensor, measurements(densitytensor)[1])
 
 # Perform the nonnegative decomposition Y=CF
 Y = array(densitytensor) # plain Array{T, 3} type for faster factorization
 rank = 3
 C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank)
-
-## Package F into a DensityTensor with the same domain and measurements as Y
-## Each collection of measurements is no longer a sink and is now a "factor"
-factortensor = DensityTensor(F; domain, measurements=measurements(densitytensor))
-setsourcename!(factortensor, "learned source")
-
-## Package C into a NamedMatrix to label the dimentions
-coefficientmatrix = NamedMatrix(C, dimnames=("sink", "learned source"))
 
 # Compare learned C and F to the known sources
 # Import data for ground truth F
@@ -73,4 +69,37 @@ C_true = source_amounts / 75 # 75 Grains in each sink
 coefficientmatrix_true = NamedMatrix(C_true, dimnames=("sink", "true source"))
 
 # Ensure the factors in C and F are in the same order as the true densities
-# Visualize coefficientmatrix and factortensor
+match_sources!(C, F, coefficientmatrix_true, factortensor_true)
+
+## Package F into a DensityTensor with the same domain and measurements as Y
+## Each collection of measurements is no longer a sink and is now a "factor"
+factortensor = DensityTensor(F; domain, measurements=measurements(densitytensor))
+setsourcename!(factortensor, "learned source")
+
+## Package C into a NamedMatrix to label the dimentions
+coefficientmatrix = NamedMatrix(C, dimnames=("sink", "learned source"))
+
+# Visualize and compare the coefficientmatrix and factortensor
+# Note display should be called after all plots have been finalized
+p = heatmap(coefficientmatrix; title="Learned Coefficients")
+display.(p)
+p = heatmap(coefficientmatrix_true; title="True Coefficients")
+display.(p)
+
+plots = source_heatmaps(factortensor; title="Learned Densities for ");
+display.(plots)
+plots = source_heatmaps(factortensor_true; title="True Densities for ");
+display.(plots)
+
+plots = measurement_heatmaps(factortensor; title="Learned Densities for ")
+display.(plots)
+
+rel_error(coefficientmatrix, coefficientmatrix_true)
+rel_error(factortensor, factortensor_true)
+
+# Now go back and classify each grain as source 1, 2, or 3 based on the learned sources
+## Start with just the first sink
+
+source_indexes = map(g -> estimate_which_source(g, factortensor)[1][1], sinks[1])
+
+plot(source_indexes)

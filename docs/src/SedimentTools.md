@@ -23,6 +23,7 @@ DEFAULT_N_SAMPLES
 ```@docs
 getindex(::Sink, ::String)
 names(::NamedArray, ::Union{String,Symbol})
+heatmap(::NamedArray)
 ```
 
 ## Functions
@@ -59,16 +60,19 @@ eachsink
 eachsource
 ```
 
-### Density Estimation
+### Density and Source Estimation
 ```@docs
+estimate_which_source
 default_bandwidth
 make_densities
+match_sources!
 standardize_KDEs
 ```
 
 ### Visualizers
 ```@docs
 measurement_heatmaps
+plot_densities
 source_heatmaps
 ```
 
