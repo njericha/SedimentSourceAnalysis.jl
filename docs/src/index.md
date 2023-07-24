@@ -1,19 +1,24 @@
 # Sediment Source Analysis
-<!--
-```@meta
-DocTestSetup = quote
-    using SedimentAnalysis
-end
-```
--->
 
 ```@contents
 Depth = 3
 ```
-## Importing
-For now, clone the repo and install with `julia> ] add SedimentAnalysis`.
-To import, type `using SedimentAnalysis` at the top of your file to load both submodules.
-If only one of the modules is desired, type `using SedimentAnalysis.XXX`.
+## How to use
+
+### In Browser
+1. Go to https://github.dev/njericha/Sediment-Source-Analysis.jl
+
+Note you can start a terminal with `Ctrl+Shift+C` (Windows) or `Cmd+Shift+C` (Mac).
+
+**OR**
+### On your own device
+1. Clone the repo at https://github.com/njericha/Sediment-Source-Analysis.jl 
+
+### Importing the package
+2. Install with `julia> ] add SedimentAnalysis`.
+3. To import into a file or in the REPL, type `using SedimentAnalysis` load both submodules (`MTF` and `SedimentTools`).
+4. If only one of the modules is desired, type `using SedimentAnalysis.XXX`.
+
 The modules are built to be independent of each other so that (eventually) the MTF could be moved to an separate package altogether.
 
 ## Submodules
