@@ -9,7 +9,7 @@ using SedimentAnalysis
 
 # Import data from excel file
 filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
-sinks = read_raw_data(filename)::Vector{Sink}
+@run sinks = read_raw_data(filename)::Vector{Sink}
 
 # Estimate the densities of each sink
 
