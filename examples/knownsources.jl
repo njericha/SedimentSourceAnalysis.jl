@@ -9,16 +9,16 @@ using SedimentAnalysis
 
 # Import data from excel file
 filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
-@run sinks = read_raw_data(filename)::Vector{Sink}
+sinks = read_raw_data(filename)::Vector{Sink}
 
 # Estimate the densities of each sink
 
 ## Select the bandwidth for the estimation
 ## Uses Silverman's rule of thumb
-sink1 = @view sinks[begin]
+sink1 = sinks[begin]
 inner_percentile = 95 # Filter outliers; ignore values outside the inner percentile
 alpha = 1.5 # smooth density estimate, 0.9 is the default
-bandwidths = default_bandwidth.(eachmeasurement(sink1), alpha, inner_percentile)
+bandwidths = default_bandwidth.(collect(eachmeasurement(sink1)), alpha, inner_percentile)
 
 ## Obtain the raw densities estimates
 ## The same measurement could (and likely!) have different supports for different sinks...

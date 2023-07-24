@@ -24,7 +24,7 @@ to it so that the same bandwidth can be used for different densities for the
 same measurements.
 """
 function default_bandwidth(
-    data::AbstractVector{<: Real},
+    data,::AbstractVector{<: Real},
     alpha::Real = DEFAULT_ALPHA,
     inner_percentile::Integer=100,
     )
@@ -88,14 +88,14 @@ function make_densities(
 
 
     # Loop setup
-    eachmeasurement = eachmeasurement(s)
-    n_measurements = length(eachmeasurement)
+    _eachmeasurement = eachmeasurement(s)
+    n_measurements = length(_eachmeasurement)
     density_estimates = Vector{UnivariateKDE}(undef, n_measurements)
 
-    for (i, (measurement_values, b)) in enumerate(zip(eachmeasurement, bandwidths))
+    for (i, (measurement_values, b)) in enumerate(zip(_eachmeasurement, bandwidths))
         # Estimate density based on the inner precentile to ignore outliers
         measurement_values = _inner_percentile(measurement_values, inner_percentile)
-        KDEs[i] = kde(measurement_values, bandwidth=b)
+        density_estimates[i] = kde(measurement_values, bandwidth=b)
     end
 
     return density_estimates
@@ -133,11 +133,15 @@ end
 Resample the densities within each sink so that like-measurements use the same scale.
 """
 function standardize_KDEs(
-    list_of_KDEs::AbstractVector{AbstractVector{UnivariateKDE}};
+    list_of_KDEs::AbstractVector{<:AbstractVector{UnivariateKDE}};
     n_samples=DEFAULT_N_SAMPLES,
     )
     # Use zip to ensure similar measurements across sinks are standardized,
     # not different measurements within a sink.
-    list_of_KDEs, xs = zip(standardize_KDEs.(zip(list_of_KDEs),n_samples))
+    list_of_KDEs, xs = myzip(standardize_KDEs.(myzip(list_of_KDEs);n_samples))
     return collect(list_of_KDEs), collect(xs)
+end
+
+function myzip(list_of_lists)
+    return [[list[i] for list in list_of_lists] for i in eachindex(list_of_lists[begin])]
 end

@@ -40,9 +40,9 @@ function read_raw_data(filename; skip_sheets=Set(["source proportions","grain id
 
     # Construct a vector of sinks, each sink is a vector of grains
     vec_of_sinks = Vector{Sink}(undef, n_sinks)
-    for (j, s) in enumerate(eachslice(data_tensor, dims=(1, 3)))
+    for (j, s) in enumerate(eachslice(data_tensor, dims=2))
 
-        vec_of_grains = Vector{Any}(undef, n_grains)
+        vec_of_grains = Grain[] #Vector{Grain}(Grain(Float64[],String[]), n_grains)
         for (i, g) in enumerate(eachrow(s))
 
             # Skip grains that contain missing values
@@ -50,10 +50,11 @@ function read_raw_data(filename; skip_sheets=Set(["source proportions","grain id
                 vec_of_grains = vec_of_grains[1:(i-1)]
                 break
             else
-                Vector{Float64}(g)
+                g = Vector{Float64}(g)
             end
 
-            vec_of_grains[i] = Grain(g, measurement_names=sheet_names)
+            #vec_of_grains[i] = Grain(g, sheet_names) # measurement_names = sheet_names
+            push!(vec_of_grains, Grain(g, sheet_names))
         end
 
         vec_of_sinks[j] = Sink(vec_of_grains)

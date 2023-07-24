@@ -3,20 +3,28 @@
 #########
 
 """Struct to hold grain level data"""
-const Grain{T} = NamedVector{T} where T <: Real
+Grain{T} = NamedVector{T} where T <: Real
 measurements(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
 
+# Very hand-wavey stuff so you can call Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String})
 """Main constructor for a Grain"""
-function Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where T<:Real
+function (::Type{S})(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where {S<:NamedArray{P,1} where P, T<:Real}
     return NamedArray(v, (measurement_names,), ("measurement",))::Grain{T}
 end
+
+# measurements(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
+
+# """Main constructor for a Grain"""
+# function Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where T<:Real
+#     return NamedVector(v, (measurement_names,), ("measurement",))::Grain{T}
+# end
 
 #################
 # Sinks / Rocks #
 #################
 
 """Struct to hold sink level data"""
-const Sink{T} = Vector{Grain{T}} where T <: Real # Using vector and not a set to preserve order
+Sink = Vector{Grain{T} where T<:Real} # Using vector and not a set to preserve order
 
 """Gets the names of measurements from a Sink"""
 measurements(s::Sink) = iszero(length(s)) ? String[] : measurements(s[1])
@@ -33,18 +41,23 @@ Collects a list of Grains into a Rock/Sink.
 
 Ensures all Grains have the same names and are in the same order.
 """
-function Sink(vec_of_grains::AbstractVector{Grain{T}}) where T <: Real # each element is a grain
+# function (::Type{Vector{Grain{T}}})(vec_of_grains::AbstractVector{Grain{T}}) where T <: Real # each element is a grain
+#     @assert allequal(measurements.(vec_of_grains))
+#     return collect(vec_of_grains)::Sink
+# end
+#(::Type{Vector{Grain}})(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
+
+function (::Type{S})(vec_of_grains::AbstractVector{Grain}) where S <: Sink # each element is a grain
     @assert allequal(measurements.(vec_of_grains))
-    return collect(vec_of_grains)::Sink{T}
+    return collect(vec_of_grains)::Sink
 end
-Sink(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
 
 # Define aliases so Rock or Source can be used in place of Sink when those terms make more
 # sense in those contexts.
 """Alias for Sink"""
-const Rock = Sink
+Rock = Sink
 """Alias for Sink"""
-const Source = Sink
+Source = Sink
 
 #################
 # DensityTensor #
@@ -60,7 +73,7 @@ const Source = Sink
     DensityTensor(
     KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},
     domains::AbstractVector{<: AbstractVector{T}},
-    sinks::AbstractVector{Sink{T}},
+    sinks::AbstractVector{Sink},
     )
 
 An order 3 array to hold the density distributions for multiple sinks.
@@ -87,12 +100,12 @@ array(D::DensityTensor) = array(nammedarray(D))
 array(N::NamedArray) = N.array
 # ...but with ReusePatterns, DensityTensor can now be used like a NamedArray!
 # Note (DensityTensor <: NamedArray == false) formally.
-@forward((DensityTensor, :tensor), NamedArray)
+@forward((DensityTensor, :tensor), NamedArray);
 
 function DensityTensor(
     KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},
     domains::AbstractVector{<: AbstractVector{T}},
-    sinks::AbstractVector{Sink{T}},
+    sinks::AbstractVector{Sink},
     ) where T <: Real
     # Argument Handeling
     allequal(measurements.(sinks)) ||

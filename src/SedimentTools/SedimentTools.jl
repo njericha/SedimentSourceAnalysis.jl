@@ -14,6 +14,7 @@ using Plots: plot
 # Method extentions
 using Base: getindex, names #, convert
 using Plots: Plots, heatmap
+using NamedArrays: NamedArrays, NamedArray
 
 # Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
