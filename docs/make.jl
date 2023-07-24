@@ -8,7 +8,7 @@ using SedimentAnalysis.SedimentTools
 DocMeta.setdocmeta!(
     SedimentAnalysis,
     :DocTestSetup,
-    :(using SedimentAnalysis);
+    :(using SedimentAnalysis; using NamedArrays: NamedArray);
     recursive=true
 )
 
