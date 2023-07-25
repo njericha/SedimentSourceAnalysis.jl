@@ -4,6 +4,7 @@ using Documenter
 using SedimentAnalysis
 using SedimentAnalysis.MTF
 using SedimentAnalysis.SedimentTools
+using NamedArrays
 
 DocMeta.setdocmeta!(
     SedimentAnalysis,
