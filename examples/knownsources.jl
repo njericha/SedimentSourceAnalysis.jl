@@ -39,7 +39,7 @@ densities, domains = standardize_KDEs(raw_densities) #Made it to here so far
 
 # Package the densities into a single order-3 tensor
 densitytensor = DensityTensor(densities, domains, sinks);
-setsourcename!(densitytensor, "sink")
+setsourcename!(densitytensor, "sink");
 
 # Visualize the data in the tensor by plotting the densities for the first measurement
 plot_densities(densitytensor, measurements(densitytensor)[1])
@@ -63,7 +63,7 @@ sources = read_raw_data(filename)::Vector{Source}
 true_densities = make_densities.(sources; domains, bandwidths, inner_percentile)
 
 ## Wrap in DensityTensor
-factortensor_true = DensityTensor(true_densities; domain, measurements=measurements(densitytensor))
+factortensor_true = DensityTensor(true_densities, domain, measurements(densitytensor))
 setsourcename!(factortensor_true, "true source")
 
 # Import data for ground truth C
@@ -77,7 +77,7 @@ match_sources!(C, F, coefficientmatrix_true, factortensor_true)
 
 ## Package F into a DensityTensor with the same domain and measurements as Y
 ## Each collection of measurements is no longer a sink and is now a "factor"
-factortensor = DensityTensor(F; domain, measurements=measurements(densitytensor))
+factortensor = DensityTensor(F, domain, measurements(densitytensor))
 setsourcename!(factortensor, "learned source")
 
 ## Package C into a NamedMatrix to label the dimentions

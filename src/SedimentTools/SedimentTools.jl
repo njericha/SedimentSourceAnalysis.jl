@@ -6,20 +6,20 @@ module SedimentTools
 using Statistics: std, quantile
 using XLSX: readxlsx, sheetnames
 using OrderedCollections: OrderedDict
-using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!
-using ReusePatterns: @forward, forward # need to add the regular function `forward` because it is called by the macro @forward
+using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!, dimnames
+#using ReusePatterns: @forward, forward # need to add the regular function `forward` because it is called by the macro @forward
 using KernelDensity: UnivariateKDE, kde, pdf
 using Plots: plot
 using Base: AbstractVecOrTuple
 
 # Method extentions
-using Base: getindex, names #, convert
+using Base: getindex, names
 using Plots: Plots, heatmap
-using NamedArrays: NamedArrays, NamedArray
+using NamedArrays: NamedArrays#, NamedArray
 
 # Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
-export array, domain, domains, getsourcename, measurements, nammedarray, sink, source # Getters
+export array, getdomain, getdomains, getsourcename, measurements, nammedarray, sink, source # Getters
 export normalize_density_sums!, normalize_density_sums, setsourcename! # Setters
 export eachdensity, eachmeasurement, eachsink, eachsource # Iterators
 include("structs.jl")

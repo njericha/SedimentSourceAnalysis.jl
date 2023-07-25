@@ -36,8 +36,8 @@ read_raw_data
 ### Getters
 ```@docs
 array
-domain
-domains
+getdomain
+getdomains
 getsourcename
 measurements
 nammedarray
