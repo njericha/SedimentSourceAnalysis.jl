@@ -42,7 +42,7 @@ densitytensor = DensityTensor(densities, domains, sinks);
 setsourcename!(densitytensor, "sink");
 
 # Visualize the data in the tensor by plotting the densities for the first measurement
-plot_densities(densitytensor, measurements(densitytensor)[1])
+plot_densities(densitytensor, getmeasurements(densitytensor)[1])
 
 # Perform the nonnegative decomposition Y=CF
 Y = array(densitytensor) # plain Array{T, 3} type for faster factorization
@@ -55,7 +55,7 @@ filename = "./data/sundell2022/3Sources from Sundell et al 2022.xlsx"
 sources = read_raw_data(filename)::Vector{Source}
 
 ## Confirm the measurements are the same and in the same order
-@assert measurements(sources[begin]) == measurements(sink[begin])
+@assert getmeasurements(sources[begin]) == getmeasurements(sink[begin])
 
 ## Estimate densities for the known sources
 ## We pass in the previously calculated domains to ensure the densities are
@@ -63,7 +63,7 @@ sources = read_raw_data(filename)::Vector{Source}
 true_densities = make_densities.(sources; domains, bandwidths, inner_percentile)
 
 ## Wrap in DensityTensor
-factortensor_true = DensityTensor(true_densities, domain, measurements(densitytensor))
+factortensor_true = DensityTensor(true_densities, domain, getmeasurements(densitytensor))
 setsourcename!(factortensor_true, "true source")
 
 # Import data for ground truth C
@@ -77,7 +77,7 @@ match_sources!(C, F, coefficientmatrix_true, factortensor_true)
 
 ## Package F into a DensityTensor with the same domain and measurements as Y
 ## Each collection of measurements is no longer a sink and is now a "factor"
-factortensor = DensityTensor(F, domain, measurements(densitytensor))
+factortensor = DensityTensor(F, domain, getmeasurements(densitytensor))
 setsourcename!(factortensor, "learned source")
 
 ## Package C into a NamedMatrix to label the dimentions

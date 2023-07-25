@@ -39,7 +39,8 @@ array
 getdomain
 getdomains
 getsourcename
-measurements
+getsourcenames
+getmeasurements
 nammedarray
 sink
 source

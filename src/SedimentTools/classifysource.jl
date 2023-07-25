@@ -90,7 +90,7 @@ Returns the likelyhood and source index of the mostly likely factor
 the grain vector came from.
 """
 function estimate_which_source(grain::Grain, F::DensityTensor)
-    measurements(grain) == measurements(F) ||
+    getmeasurements(grain) == getmeasurements(F) ||
         ArgumentError("Grain and F don't have matching measurements")
     sources = eachsource(F)
     likelyhoods = zeros(length(sources))

@@ -17,7 +17,7 @@ The source name/index for each source will be appended to title.
 function source_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when looking at a subarray of a DensityTensor
     plots = []
     D = normalize_density_sums(D)
-    measurements = measurements(D)
+    measurements = getmeasurements(D)
     domain_length = length(getdomains(D)[begin])
     for (name, source) in zip(names(D, 1), eachsource(D))
         full_title = title * "$(dimnames(D)[1]) $name"
@@ -43,9 +43,9 @@ Returns heatmaps for each measurement (lateral slices) of D.
 function measurement_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when looking at a subarray of a DensityTensor
     plots = []
     # No need to normalize since every distribution on the same plot has the same scale
-    measurements = measurements(D)
-    sources = sources(D)
-    for (name, measurement, domain) in zip(measurements(D), eachmeasurement(D), getdomains(D))
+    measurements = getmeasurements(D)
+    sources = getsourcenames(D)
+    for (name, measurement, domain) in zip(getmeasurements(D), eachmeasurement(D), getdomains(D))
         h = heatmap(
             domain, sources, array(measurement);
             yflip=true,
@@ -66,7 +66,7 @@ function plot_densities(D::DensityTensor, measurement::String; kwargs...) # may 
     # No need to normalize since every distribution on the same plot has the same scale
     domain = getdomain(D, measurement)
     p = plot()
-    for (source_name, density) in zip(sources(D), eachdensity(D, measurement))
+    for (source_name, density) in zip(getsourcenames(D), eachdensity(D, measurement))
         plot!(domain, density; label=source_name, kwargs...)
     end
     return p
