@@ -10,6 +10,7 @@ using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!
 using ReusePatterns: @forward, forward # need to add the regular function `forward` because it is called by the macro @forward
 using KernelDensity: UnivariateKDE, kde, pdf
 using Plots: plot
+using Base: AbstractVecOrTuple
 
 # Method extentions
 using Base: getindex, names #, convert

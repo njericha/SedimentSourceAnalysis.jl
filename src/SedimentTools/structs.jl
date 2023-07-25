@@ -28,7 +28,7 @@ Sink = Vector{Grain{T} where T<:Real} # Using vector and not a set to preserve o
 
 """Gets the names of measurements from a Sink"""
 measurements(s::Sink) = iszero(length(s)) ? String[] : measurements(s[1])
-Base.getindex(s::Sink, key::String) = (g[key] for g ∈ s)
+Base.getindex(s::Sink, key::String) = collect(g[key] for g ∈ s)
 
 """Iterator for a list of values of each measurement"""
 eachmeasurement(s::Sink) = (s[m] for m in measurements(s))
@@ -68,8 +68,7 @@ Source = Sink
 # lateral slice j :( This means we must wrap the named array in a new type
 # since Julia can only subtype abstract types...
 """
-    DensityTensor(tensor::NamedArray{T, 3})
-    DensityTensor(tensor::NamedArray{T, 3}, domains::AbstractVector{<: AbstractVector{T}})
+    DensityTensor(array; domains, measurements)
     DensityTensor(
     KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},
     domains::AbstractVector{<: AbstractVector{T}},
@@ -81,32 +80,32 @@ An order 3 array to hold the density distributions for multiple sinks.
 struct DensityTensor{T <: Real} <: AbstractArray{T, 3}
     tensor::NamedArray{T, 3}
     domains::AbstractVector{<: AbstractVector{T}} # inner vector needs to be abstract to hold intervals ex. 1:10
-    function DensityTensor(args...; domains, measurements, kw...)
-        array = args[begin]
-        typeT = typeof(array[begin,begin,begin])
-        namedarray = NamedArray(args...; kw...)
+    function DensityTensor(array::AbstractArray{U, 3}, args...; domains, measurements, kw...) where U <: Real
+        #array = args[begin]
+        #typeT = typeof(array[begin,begin,begin])
+        namedarray = NamedArray(array, args...; kw...)
         setnames!(namedarray, measurements, 2)
         setdimnames!(namedarray, "measurement", 2)
         setdimnames!(namedarray, "density", 3)
         #init_domains = [[]] #TODO initialize with the correct size
         #I, J, K = size(array)
         #init_xs = Vector{Vector{typeT}}(Vector{typeT}(undef, K), J)
-        return new{typeT}(namedarray, domains)
+        return new{U}(namedarray, domains)
     end
 end
 domains(D::DensityTensor) = D.domains
-nammedarray(D::DensityTensor) = D.tensor
-array(D::DensityTensor) = array(nammedarray(D))
+namedarray(D::DensityTensor) = D.tensor
+array(D::DensityTensor) = array(namedarray(D))
 array(N::NamedArray) = N.array
 # ...but with ReusePatterns, DensityTensor can now be used like a NamedArray!
 # Note (DensityTensor <: NamedArray == false) formally.
 @forward((DensityTensor, :tensor), NamedArray);
 
 function DensityTensor(
-    KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},
-    domains::AbstractVector{<: AbstractVector{T}},
+    KDEs::AbstractVecOrTuple{AbstractVecOrTuple{AbstractVecOrTuple{T}}},#UnivariateKDE
+    domains::AbstractVector{<: AbstractVector{U}},
     sinks::AbstractVector{Sink},
-    ) where T <: Real
+    ) where {T <: Real, U <: Real}
     # Argument Handeling
     allequal(measurements.(sinks)) ||
         ArgumentError("All sinks must have the same measurements in the same order.")
@@ -115,21 +114,25 @@ function DensityTensor(
     measurement_names = measurements(sinks[begin])
     length(measurement_names) == length(KDEs[begin]) ||
         ArgumentError("Must be the same number of measurements as there are KDEs for each sink.")
+    allequal(length.(domains)) ||
+        ArgumentError("Domains have different number of samples.")
+    length(KDEs[begin][begin]) == length(domains[begin]) ||
+        ArgumentError("Number of density samples in KDEs does not match number of domain samples.")
 
     # TODO make this line more legible, possible by wrapping the KDEs in a struct so they're named
-    # Magic line to take the KDEs into an order-3 tensor
-    data = permutedims(cat(cat(map.(k -> k.density, KDEs)..., dims=2)..., dims=3), [3,2,1])
+    # Magic line to turn the KDEs into an order-3 tensor
+    #data = permutedims(cat(cat(map.(k -> k.density, KDEs)..., dims=2)..., dims=3), [3,2,1])
+    data = permutedims(cat(cat.(KDEs..., dims=2)..., dims=3), [3,2,1])
 
     # Confirm all the dimentions are in the right order
-    n_density_samples = length((KDEs[begin][begin]).x)
-    @assert size(data) == (length(sinks), length(measurement_names), n_density_samples)
+    #n_density_samples = length(KDEs[begin][begin])
+    @assert size(data) == (length(sinks), length(measurement_names), length(domains[begin]))
 
     # Wrap in a NamedArray
-    namedarray = NamedArray(data, dimnames=("sink", "measurement", "density"))
-    setnames!(namedarray, measurement_names, 2)
 
     # Wrap again in a DensityTensor to store the domains
-    densitytensor = DensityTensor(namedarray, domains)
+    densitytensor = DensityTensor(data; domains, measurements=measurement_names)
+    #setsourcename!(densitytensor, "sink")
 
     return densitytensor
 end
@@ -160,7 +163,7 @@ getstepsizes(D::DensityTensor) = [d[begin+1] - d[begin] for d in domains(D)]
 sources(D::DensityTensor) = ["$(dimnames(D)[1]) $s" for s in names(D, 1)]
 
 # Setters
-setsourcename!(D::DensityTensor, name::String) = setdimnames!(D, name, 1)
+setsourcename!(D::DensityTensor, name::String) = setdimname!(D::NamedArray, name, 1)
 
 # Other manipulators
 """

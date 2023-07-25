@@ -11,6 +11,10 @@ using SedimentAnalysis
 filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 sinks = read_raw_data(filename)::Vector{Sink}
 
+## Look at a grain
+sink1 = sinks[begin]
+grain1 = sink1[begin]
+
 # Estimate the densities of each sink
 
 ## Select the bandwidth for the estimation
@@ -26,7 +30,7 @@ raw_densities = make_densities.(sinks; bandwidths, inner_percentile)
 
 ## ...so we standardize them by resampling the densities on the same domain,
 ## which is the union of all intervels.
-densities, domains = standardize_KDEs(raw_densities)
+densities, domains = standardize_KDEs(raw_densities) #Made it to here so far
 
 ## We now have a list of densities and domain xs they are sampled at.
 ## Here, densities[i] are the densities for the ith sink (sinks[i]),
@@ -34,7 +38,7 @@ densities, domains = standardize_KDEs(raw_densities)
 ## Importantly, this is the same domain regardless of the sink!
 
 # Package the densities into a single order-3 tensor
-densitytensor = DensityTensor(densities, domains, sinks)
+densitytensor = DensityTensor(densities, domains, sinks);
 setsourcename!(densitytensor, "sink")
 
 # Visualize the data in the tensor by plotting the densities for the first measurement

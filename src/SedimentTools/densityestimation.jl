@@ -24,7 +24,7 @@ to it so that the same bandwidth can be used for different densities for the
 same measurements.
 """
 function default_bandwidth(
-    data,::AbstractVector{<: Real},
+    data,#::AbstractVector{<: Real},
     alpha::Real = DEFAULT_ALPHA,
     inner_percentile::Integer=100,
     )
@@ -101,15 +101,15 @@ function make_densities(
     return density_estimates
 end
 
-function make_densities(
-    sinks::Sink,
-    domains::AbstractVector{<:AbstractVector};
-    kwargs...
-    )
-    KDEs = make_densities(sinks; kwargs...)
-    KDEs_new = pdf.(KDEs, domains)
-    return KDEs_new
-end
+# function make_densities(
+#     sinks::Sink,
+#     domains::AbstractVector{<:AbstractVector};
+#     kwargs...
+#     )
+#     KDEs = make_densities(sinks; kwargs...)
+#     KDEs_new = pdf.(KDEs, domains)
+#     return KDEs_new
+# end
 
 """Number of samples to use when standardizing a vector of density estimates."""
 const DEFAULT_N_SAMPLES = 64::Integer
@@ -119,13 +119,15 @@ const DEFAULT_N_SAMPLES = 64::Integer
 
 Resample the densities so they all are smapled from the same domain.
 """
-function standardize_KDEs(KDEs::AbstractVector{UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
+function standardize_KDEs(KDEs::AbstractVecOrTuple{<:UnivariateKDE}; n_samples=DEFAULT_N_SAMPLES,)
     a = minimum(d -> d.x[begin], KDEs) # smallest left endpoint
     b = maximum(d -> d.x[end]  , KDEs) # biggest right endpoint
 
     x_new = range(a, b, length=n_samples) # make the (larger) x-values range
-    KDEs_new = pdf.(KDEs, x_new) # resample the densities on the new range
-
+    KDEs_new = pdf.(KDEs, (x_new,)) # Resample the densities on the new range.
+                                    # Note the second argument is a 1-tuple so that we can
+                                    # broadcast over the first argument only, i.e.
+                                    # KDEs_new[i] = pdf(KDEs[i], x_new)
     return KDEs_new, x_new
 end
 
@@ -133,15 +135,16 @@ end
 Resample the densities within each sink so that like-measurements use the same scale.
 """
 function standardize_KDEs(
-    list_of_KDEs::AbstractVector{<:AbstractVector{UnivariateKDE}};
+    list_of_KDEs::AbstractVector{<:AbstractVector{<:UnivariateKDE}};
     n_samples=DEFAULT_N_SAMPLES,
     )
     # Use zip to ensure similar measurements across sinks are standardized,
-    # not different measurements within a sink.
-    list_of_KDEs, xs = myzip(standardize_KDEs.(myzip(list_of_KDEs);n_samples))
+    # and not different measurements within a sink.
+    list_of_KDEs, xs = zip((standardize_KDEs.(zip(list_of_KDEs...);n_samples))...)
     return collect(list_of_KDEs), collect(xs)
 end
 
-function myzip(list_of_lists)
-    return [[list[i] for list in list_of_lists] for i in eachindex(list_of_lists[begin])]
-end
+# """Custom zip to use vectors rather than tuples as the container"""
+# function myzip(list_of_lists)
+#     return [[list[i] for list in list_of_lists] for i in eachindex(list_of_lists[begin])]
+# end
