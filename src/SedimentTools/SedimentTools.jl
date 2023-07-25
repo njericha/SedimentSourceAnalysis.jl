@@ -9,7 +9,7 @@ using OrderedCollections: OrderedDict
 using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!, dimnames
 #using ReusePatterns: @forward, forward # need to add the regular function `forward` because it is called by the macro @forward
 using KernelDensity: UnivariateKDE, kde, pdf
-using Plots: plot
+using Plots: plot, plot!
 using Base: AbstractVecOrTuple
 
 # Method extentions

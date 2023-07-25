@@ -67,7 +67,7 @@ function plot_densities(D::DensityTensor, measurement::String; kwargs...) # may 
     domain = getdomain(D, measurement)
     p = plot()
     for (source_name, density) in zip(sources(D), eachdensity(D, measurement))
-        plot!(domain, density; label=source_name, kw...)
+        plot!(domain, density; label=source_name, kwargs...)
     end
     return p
 end
