@@ -8,23 +8,16 @@ measurements(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{V
 
 # Very hand-wavey stuff so you can call Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String})
 """Main constructor for a Grain"""
-function (::Type{S})(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where {S<:NamedArray{P,1} where P, T<:Real}
+function (::Type{S})(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where {S<:Grain, T<:Real}
     return NamedArray(v, (measurement_names,), ("measurement",))::Grain{T}
 end
-
-# measurements(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
-
-# """Main constructor for a Grain"""
-# function Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where T<:Real
-#     return NamedVector(v, (measurement_names,), ("measurement",))::Grain{T}
-# end
 
 #################
 # Sinks / Rocks #
 #################
 
 """Struct to hold sink level data"""
-Sink = Vector{Grain{T} where T<:Real} # Using vector and not a set to preserve order
+Sink{T} = Vector{Grain{T}} # TODO could use NamedMatrix
 
 """Gets the names of measurements from a Sink"""
 measurements(s::Sink) = iszero(length(s)) ? String[] : measurements(s[1])
@@ -41,16 +34,11 @@ Collects a list of Grains into a Rock/Sink.
 
 Ensures all Grains have the same names and are in the same order.
 """
-# function (::Type{Vector{Grain{T}}})(vec_of_grains::AbstractVector{Grain{T}}) where T <: Real # each element is a grain
-#     @assert allequal(measurements.(vec_of_grains))
-#     return collect(vec_of_grains)::Sink
-# end
-#(::Type{Vector{Grain}})(vec_of_grains::AbstractVector{Grain}...) = Sink(vec_of_grains)
-
 function (::Type{S})(vec_of_grains::AbstractVector{Grain}) where S <: Sink # each element is a grain
     @assert allequal(measurements.(vec_of_grains))
     return collect(vec_of_grains)::Sink
 end
+(::Type{S})(vec_of_grains::AbstractVector{Grain}...) where S <: Sink = Sink(vec_of_grains)
 
 # Define aliases so Rock or Source can be used in place of Sink when those terms make more
 # sense in those contexts.
@@ -65,7 +53,7 @@ Source = Sink
 
 # Idealy this would be a plain NamedArray, where we store the domain as
 # the names along the third axis. But we have a different domain for each
-# lateral slice j :( This means we must wrap the named array in a new type
+# lateral slice j :( This means we can wrap the named array in a new type
 # since Julia can only subtype abstract types...
 
 # Attempted to use the @forward macro from ReusePatterns, but it is having issues with
@@ -91,54 +79,13 @@ function (::Type{D})(
     densitytensor = NamedArray(array; names, kw...)
     setdimnames!(densitytensor, "measurement", 2)
     setdimnames!(densitytensor, "density", 3)
-    #setnames!(densitytensor, measurements, 2)
-    #setnames!(densitytensor, collect(zip(domains...)), 3)
     return densitytensor::DensityTensor
-end
-
-function getdomains(D::DensityTensor)
-    return collect.(zip(names(D, "density")...))
 end
 
 namedarray(D::DensityTensor) = D
 array(D::DensityTensor) = array(namedarray(D))
 array(N::NamedArray) = N.array
 
-#=
-"""
-    DensityTensor(array; domains, measurements)
-    DensityTensor(
-    KDEs::AbstractVector{<: AbstractVector{UnivariateKDE}},
-    domains::AbstractVector{<: AbstractVector{T}},
-    sinks::AbstractVector{Sink},
-    )
-
-An order 3 array to hold the density distributions for multiple sinks.
-"""
-struct DensityTensor{T <: Real} <: AbstractArray{T, 3}
-    tensor::NamedArray{T, 3}
-    domains::AbstractVector{<: AbstractVector{T}} # inner vector needs to be abstract to hold intervals ex. 1:10
-    function DensityTensor(array::AbstractArray{U, 3}, args...; domains, measurements, kw...) where U <: Real
-        #array = args[begin]
-        #typeT = typeof(array[begin,begin,begin])
-        namedarray = NamedArray(array, args...; kw...)
-        setnames!(namedarray, measurements, 2)
-        setdimnames!(namedarray, "measurement", 2)
-        setdimnames!(namedarray, "density", 3)
-        #init_domains = [[]] #TODO initialize with the correct size
-        #I, J, K = size(array)
-        #init_xs = Vector{Vector{typeT}}(Vector{typeT}(undef, K), J)
-        return new{U}(namedarray, domains)
-    end
-end
-getdomains(D::DensityTensor) = D.domains
-namedarray(D::DensityTensor) = D.tensor
-array(D::DensityTensor) = array(namedarray(D))
-array(N::NamedArray) = N.array
-# ...but with ReusePatterns, DensityTensor can now be used like a NamedArray!
-# Note (DensityTensor <: NamedArray == false) formally.
-@forward((DensityTensor, :tensor), NamedArray);
-=#
 function (::Type{D})(
     KDEs::AbstractVecOrTuple{AbstractVecOrTuple{AbstractVecOrTuple{T}}},#UnivariateKDE
     domains::AbstractVector{<: AbstractVector{U}},
@@ -159,18 +106,13 @@ function (::Type{D})(
 
     # TODO make this line more legible, possible by wrapping the KDEs in a struct so they're named
     # Magic line to turn the KDEs into an order-3 tensor
-    #data = permutedims(cat(cat(map.(k -> k.density, KDEs)..., dims=2)..., dims=3), [3,2,1])
     data = permutedims(cat(cat.(KDEs..., dims=2)..., dims=3), [3,2,1])
 
     # Confirm all the dimentions are in the right order
-    #n_density_samples = length(KDEs[begin][begin])
     @assert size(data) == (length(sinks), length(measurement_names), length(domains[begin]))
-
-    # Wrap in a NamedArray
 
     # Wrap again in a DensityTensor to store the domains
     densitytensor = DensityTensor(data, domains, measurement_names)
-    #setsourcename!(densitytensor, "sink")
 
     return densitytensor
 end
@@ -184,7 +126,6 @@ the axis number.
 function Base.names(n::NamedArray, dimname::Union{String,Symbol})
     return names(n, findfirst(dimnames(n) .== dimname))
 end
-#Base.names(n::NamedArray, dimname::Name) = names(n, findfirst(dimnames(n) .== dimname.names))
 
 # Getters for useful quantities
 measurements(D::DensityTensor) = names(D, "measurement")
@@ -193,8 +134,27 @@ function _getmeasurementindex(D::DensityTensor, measurement::String)
     return findfirst(names(D, "measurement") .== measurement)
 end
 
-getdomain(D::DensityTensor, measurement::String) = getdomains(D)[_getmeasurementindex(D, measurement)]
+"""
+    getdomain(D::DensityTensor, measurement::String)
+
+Gets the domain for the `measurement` density, the locations where the density was
+sampled.
+See [`getdomains`](@ref).
+"""
+getdomain(D::DensityTensor, measurement::String) = getdomain(D, _getmeasurementindex(D, measurement))
 getdomain(D::DensityTensor, j::Integer) = getdomains(D)[j]
+
+"""
+    getdomains(D::DensityTensor{T})::Vector{Vector{T}}
+
+Gets the domain for every measurement's density, the locations where each density was
+sampled.
+See [`getdomains`](@ref).
+"""
+function getdomains(D::DensityTensor)
+    return collect.(zip(names(D, "density")...))
+end
+
 getsource(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
 getsink = getsource
 getstepsizes(D::DensityTensor) = [d[begin+1] - d[begin] for d in getdomains(D)]
