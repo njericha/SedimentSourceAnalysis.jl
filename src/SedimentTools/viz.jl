@@ -4,7 +4,7 @@
 Automatically grabs the names in axis to label the x and y plot axis
 """
 function Plots.heatmap(M::NamedMatrix; kwargs...) # may clash when looking at a subarray of a DensityTensor
-    return Plots.heatmap(names(M,2), names(M,1), M.array; yflip=true, kw...)
+    return Plots.heatmap(names(M,2), names(M,1), M.array; yflip=true, kwargs...)
 end
 
 """
@@ -27,8 +27,8 @@ function source_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when
             xticks=([1, domain_length],["min", "max"]),
             xlabel="Typical Range of Values",
             yflip=true,
-            title=title * name,
-            kw...
+            title=full_title,
+            kwargs...
             )
         push!(plots, h)
     end
@@ -43,14 +43,16 @@ Returns heatmaps for each measurement (lateral slices) of D.
 function measurement_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when looking at a subarray of a DensityTensor
     plots = []
     # No need to normalize since every distribution on the same plot has the same scale
-    measurements = getmeasurements(D)
     sources = getsourcenames(D)
+    sourcename = getsourcename(D)
     for (name, measurement, domain) in zip(getmeasurements(D), eachmeasurement(D), getdomains(D))
         h = heatmap(
             domain, sources, array(measurement);
+            yticks=(eachindex(sources), sources),
             yflip=true,
             title=title * name,
-            kw...
+            ylabel=sourcename,
+            kwargs...
             )
         push!(plots, h)
     end

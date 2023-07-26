@@ -38,9 +38,10 @@ read_raw_data
 array
 getdomain
 getdomains
+getmeasurements
 getsourcename
 getsourcenames
-getmeasurements
+getstepsizes
 nammedarray
 sink
 source

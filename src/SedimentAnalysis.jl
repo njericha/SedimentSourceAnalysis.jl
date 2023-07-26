@@ -13,7 +13,7 @@ export combined_norm, nnmtf, plot_factors, rel_error # matrixtensorfactorization
 
 export Grain, DensityTensor, Rock, Sink, Source # Types
 export array, getdomain, getdomains, getsourcename, getsourcenames, getmeasurements
-export nammedarray, sink, source # Getters
+export getstepsizes, nammedarray, sink, source # Getters
 export normalize_density_sums!, normalize_density_sums, setsourcename! # Setters
 export eachdensity, eachmeasurement, eachsink, eachsource # Iterators
 

@@ -71,6 +71,7 @@ Note the distributions before rescaling have a row_sum equal to 1/stepsize
 with stepsize being the intervel width used in scale.
 """
 function _estimate_prob(grain::Grain, source, domains, stepsizes)
+    n_measurements = length(getmeasurements(grain))
     measurement_probabilities = zeros(n_measurements)
     for (j, (grain_value, density, domain, stepsize)) ∈ enumerate(zip(grain, eachrow(source), domains, stepsizes))
         subinterval_k = _find_subinterval(domain, grain_value)
@@ -84,21 +85,39 @@ function _estimate_prob(grain::Grain, source, domains, stepsizes)
 end
 
 """
-    (source_index, likelyhoods) = estimate_which_source(grain::Grain, F::DensityTensor)
+    estimate_which_source(grain::Grain, F::DensityTensor; kwargs...)
 
 Returns the likelyhood and source index of the mostly likely factor
 the grain vector came from.
+
+# Returns
+- (Default) `source_index::Integer`: The index of the most likely source
+- (when `max_likelyhoods==true`) `(maxlikelyhood, source_index)`: The most likely source and its likelyhood
+- (when `all_likelyhoods==true`) `likelyhoods::Vector{Real}`: Likelyhood grain came from each source
+- (when both are true) `((maxlikelyhood, source_index), likelyhoods)`
 """
-function estimate_which_source(grain::Grain, F::DensityTensor)
+function estimate_which_source(grain::Grain, F::DensityTensor; max_likelyhoods=false, all_likelyhoods=false)
     getmeasurements(grain) == getmeasurements(F) ||
         ArgumentError("Grain and F don't have matching measurements")
     sources = eachsource(F)
     likelyhoods = zeros(length(sources))
     domains = getdomains(F)
-    stepsizes = stepsizes(F)
+    stepsizes = getstepsizes(F)
+
     for (i, source) ∈ enumerate(sources)
-        prob = estimate_prob(grain, source, domains, stepsizes)
+        prob = _estimate_prob(grain, source, domains, stepsizes)
         likelyhoods[i] = prob
     end
-    return findmax(likelyhoods), likelyhoods #find the one with the highest probability
+
+    if max_likelyhoods && all_likelyhoods
+        return findmax(likelyhoods), likelyhoods
+    elseif max_likelyhoods
+        return findmax(likelyhoods)
+    elseif all_likelyhoods
+        return findmax(likelyhoods)[2], likelyhoods
+    else
+        return findmax(likelyhoods)[2]
+    end
 end
+
+function likelyhood

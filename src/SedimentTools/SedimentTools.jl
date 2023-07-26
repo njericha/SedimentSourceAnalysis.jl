@@ -4,6 +4,7 @@ Import, store, and visualize sediment data.
 module SedimentTools
 # Required packages
 using Statistics: std, quantile
+using LinearAlgebra: norm
 using XLSX: readxlsx, sheetnames
 using OrderedCollections: OrderedDict
 using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!, dimnames
@@ -20,7 +21,7 @@ using NamedArrays: NamedArrays#, NamedArray
 # Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
 export array, getdomain, getdomains, getsourcename, getsourcenames,  getmeasurements
-export nammedarray, sink, source # Getters
+export getstepsizes, nammedarray, sink, source # Getters
 export normalize_density_sums!, normalize_density_sums, setsourcename! # Setters
 export eachdensity, eachmeasurement, eachsink, eachsource # Iterators
 include("structs.jl")

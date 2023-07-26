@@ -81,11 +81,9 @@ function make_densities(
     inner_percentile::Integer=100,
     bandwidths::AbstractVector{<:Real}=default_bandwidth(s,DEFAULT_ALPHA,inner_percentile),
     )
-    # Argument Handeling
-    # Check input is in the correct range
+    # Argument Handeling: check inner_percentile is a percentile
     (0 < inner_percentile <= 100) ||
         ArgumentError("inner_percentile must be between 0 and 100, got $inner_percentile")
-
 
     # Loop setup
     _eachmeasurement = eachmeasurement(s)
@@ -132,16 +130,22 @@ function standardize_KDEs(KDEs::AbstractVecOrTuple{<:UnivariateKDE}; n_samples=D
 end
 
 """
-Resample the densities within each sink so that like-measurements use the same scale.
+Resample the densities within each sink/source so that like-measurements use the same scale.
 """
 function standardize_KDEs(
-    list_of_KDEs::AbstractVector{<:AbstractVector{<:UnivariateKDE}};
+    KDEs_by_source::AbstractVector{<:AbstractVector{<:UnivariateKDE}};
     n_samples=DEFAULT_N_SAMPLES,
     )
-    # Use zip to ensure similar measurements across sinks are standardized,
-    # and not different measurements within a sink.
-    list_of_KDEs, xs = zip((standardize_KDEs.(zip(list_of_KDEs...);n_samples))...)
-    return collect(list_of_KDEs), collect(xs)
+    # Group same measurements from different sources
+    KDEs_by_measurement = zip(KDEs_by_source...)
+
+    # Standardize each measurement, use zip to unpack the (KDEs_new, x_new) pairs
+    KDEs_by_measurement, xs = zip((standardize_KDEs.(KDEs_by_measurement; n_samples))...)
+
+    # Group different measurements from the same source back together
+    KDEs_by_source = zip(KDEs_by_measurement...)
+
+    return collect(KDEs_by_source), collect(xs)
 end
 
 # """Custom zip to use vectors rather than tuples as the container"""

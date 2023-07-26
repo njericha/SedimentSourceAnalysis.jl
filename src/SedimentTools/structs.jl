@@ -75,27 +75,44 @@ Source = Sink
 """An order 3 array to hold the density distributions for multiple sinks."""
 DensityTensor{T} = NamedArray{T, 3} where T <: Real
 
-"""Constructor for DensityTensor"""
+"""
+    DensityTensor(array, domains, measurement_names; kw...)
+
+Low level wrapper for DensityTensor.
+
+Call [`setsourcename!`](@ref) to set the source name (name of first dimention).
+"""
 function (::Type{D})(
     array::AbstractArray{T, 3},
     domains::AbstractVector{<:AbstractVector{T}},
-    measurements::AbstractVector{String};
+    measurement_names::AbstractVector{String};
     kw...
     ) where {D <: DensityTensor, T <: Real}
+
+    # Make names for each index
     source_names = collect(eachindex(array[:,begin,begin]))
-    measurement_names = measurements
     density_names = collect(zip(domains...))
     names = (source_names, measurement_names, density_names)
+
+    # Wrap in a named array
     densitytensor = NamedArray(array; names, kw...)
+
+    # Set axis/dimention names
     setdimnames!(densitytensor, "measurement", 2)
     setdimnames!(densitytensor, "density", 3)
+
     return densitytensor::DensityTensor
 end
 
 namedarray(D::DensityTensor) = D::NamedArray
 array(D::DensityTensor) = D.array
-#array(N::NamedArray) = N.array
+array(N::NamedArray) = N.array
 
+"""
+    DensityTensor(KDEs, domains, sinks)
+
+High level constructor which checks there is the correct number of sinks and measurements
+"""
 function (::Type{D})(
     KDEs::AbstractVecOrTuple{AbstractVecOrTuple{AbstractVecOrTuple{T}}},#UnivariateKDE
     domains::AbstractVector{<: AbstractVector{U}},
@@ -107,6 +124,21 @@ function (::Type{D})(
     length(sinks) == length(KDEs) ||
         ArgumentError("Must be the same number of sinks as there are lists of KDEs.")
     measurement_names = getmeasurements(sinks[begin])
+
+    return DensityTensor(KDEs, domains, measurement_names)
+end
+
+"""
+    DensityTensor(KDEs, domains, measurement_names)
+
+Main high level constructor for DensityTensor
+"""
+function (::Type{D})(
+    KDEs::AbstractVecOrTuple{AbstractVecOrTuple{AbstractVecOrTuple{T}}},#UnivariateKDE
+    domains::AbstractVector{<: AbstractVector{U}},
+    measurement_names::AbstractVector{String},
+    ) where {D <: DensityTensor, T <: Real, U <: Real}
+    # Argument Handeling
     length(measurement_names) == length(KDEs[begin]) ||
         ArgumentError("Must be the same number of measurements as there are KDEs for each sink.")
     allequal(length.(domains)) ||
@@ -116,10 +148,10 @@ function (::Type{D})(
 
     # TODO make this line more legible, possible by wrapping the KDEs in a struct so they're named
     # Magic line to turn the KDEs into an order-3 tensor
-    data = permutedims(cat(cat.(KDEs..., dims=2)..., dims=3), [3,2,1])
+    data = permutedims(cat(cat.(KDEs..., dims=2)..., dims=3), [2,3,1])
 
     # Confirm all the dimentions are in the right order
-    @assert size(data) == (length(sinks), length(measurement_names), length(domains[begin]))
+    @assert size(data) == (length(KDEs), length(measurement_names), length(domains[begin]))
 
     # Wrap again in a DensityTensor to store the domains
     densitytensor = DensityTensor(data, domains, measurement_names)
@@ -134,14 +166,22 @@ Extend the names function from NamedArray to get the names given the axis name r
 the axis number.
 """
 function Base.names(n::NamedArray, dimname::Union{String,Symbol})
-    return names(n, findfirst(dimnames(n) .== dimname))
+    index = findfirst(dimnames(n) .== dimname)
+    if isnothing(index)
+        KeyError("Dimention $dimname not found in array.")
+    end
+    return names(n, index)
 end
 
 # Getters for useful quantities
 getmeasurements(D::DensityTensor) = names(D, "measurement")
 
 function _getmeasurementindex(D::DensityTensor, measurement::String)
-    return findfirst(names(D, "measurement") .== measurement)
+    index = findfirst(names(D, "measurement") .== measurement)
+    if isnothing(index)
+        KeyError("Measurment $measurement not found in DensityTensor.")
+    end
+    return index
 end
 
 """
@@ -196,7 +236,7 @@ getsourcename(D::DensityTensor) = dimnames(D)[1]
 Gets the list of all sources' names. For example, `["Sink 1", "Sink 2", ...]`.
 See [`getsourcenames`](@ref).
 """
-getsourcenames(D::DensityTensor) = ["$(getsourcename(D)) $s" for s in names(D, 1)]
+getsourcenames(D::DensityTensor) = names(D, 1)#["$(getsourcename(D)) $s" for s in ]
 
 # Setters
 """
@@ -220,7 +260,7 @@ Use [`normalize_densities`](@ref) to avoid mutation.
 """
 function normalize_density_sums!(D::DensityTensor)
     for (slice, x) in zip(eachmeasurement(D), getstepsizes(D))
-        slice ./= x
+        slice .*= x
     end
 end
 
@@ -237,7 +277,7 @@ end
 
 Iterates D over each density vector. These are the 3 fibers of D.
 """
-eachdensity(D::DensityTensor) = eachslice(D, dims=3)
+eachdensity(D::DensityTensor) = eachslice(D, dims=(2,1))
 eachdensity(D::DensityTensor, measurement::String) = eachrow(D[:, measurement, :])
 
 """
@@ -245,7 +285,7 @@ eachdensity(D::DensityTensor, measurement::String) = eachrow(D[:, measurement, :
 
 Iterates D over each measurement slice. These are the lateral slices.
 """
-eachmeasurement(D::DensityTensor) = eachslice(D, dims=(1,3))
+eachmeasurement(D::DensityTensor) = eachslice(D, dims=2)
 
 """
     eachsource(D::DensityTensor)
@@ -254,5 +294,5 @@ eachmeasurement(D::DensityTensor) = eachslice(D, dims=(1,3))
 Iterates D over each source/sink slice. These are the horizontal slices.
 See [`getsource`](@ref).
 """
-eachsource(D::DensityTensor) = eachslice(D, dims=(2,3))
+eachsource(D::DensityTensor) = eachslice(D, dims=1)
 const eachsink = eachsource
