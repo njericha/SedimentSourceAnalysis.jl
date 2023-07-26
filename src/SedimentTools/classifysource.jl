@@ -119,5 +119,3 @@ function estimate_which_source(grain::Grain, F::DensityTensor; max_likelyhoods=f
         return findmax(likelyhoods)[2]
     end
 end
-
-function likelyhood
