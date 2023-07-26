@@ -14,7 +14,7 @@ sinks = read_raw_data(filename)::Vector{Sink}
 ## Look at a grain
 sink1 = sinks[begin]
 grain1 = sink1[begin]
-@show grain1
+println("grain 1 in sink 1", grain1)
 
 # Estimate the densities of each sink
 

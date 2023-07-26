@@ -34,8 +34,8 @@ Note there may NOT be a unique optimal solution
 function nnmtf(
     Y::Abstract3Tensor,
     R::Integer;
-    maxiter::Integer=100,
-    tol::Real=1e-3,
+    maxiter::Integer=1000,
+    tol::Real=1e-4,
     rescale::Bool=true,
     plot_F::Integer=0,
     names::AbstractVector{String}=String[],
@@ -51,7 +51,7 @@ function nnmtf(
 
     # Scale Y if desired
     if rescale
-        Y_input = copy(Y)
+        # Y_input = copy(Y)
         Y, avg_factor_sums = rescaleY(Y)
     end
 
@@ -167,15 +167,19 @@ function calc_gradient(C, F, Y)
     return grad_C, grad_F
 end
 
-function rescaleCF!(C, F) # TODO optimize so the scaling is done in-place
-    fiber_sums = sum.(eachslice(F,dims=(1,2)))
-    avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
-    F .= avg_factor_sums^(-1) * F
-    C .= C * avg_factor_sums
+function rescaleCF!(C, F)
+    fiber_sums = sum.(eachslice(F, dims=(1,2)))
+    avg_factor_sums = mean.(eachcol(fiber_sums))
+
+    F_lateral_slices = eachslice(F, dims=2)
+    F_lateral_slices ./= avg_factor_sums
+
+    C_rows = eachrow(C)
+    C_rows .*= avg_factor_sums
 end
 
 function rescaleY(Y)
-    fiber_sums = sum.(eachslice(Y,dims=(1,2)))
+    fiber_sums = sum.(eachslice(Y, dims=(1,2)))
     avg_factor_sums = mean.(eachcol(fiber_sums))
     Yscaled = copy(Y)
     Y_lateral_slices = eachslice(Yscaled, dims=2)
