@@ -3,7 +3,7 @@
 #########
 
 """Struct to hold grain level data"""
-Grain{T} = NamedVector{T} where T <: Real
+Grain = NamedVector{T} where T <: Real
 
 """
     getmeasurements(g::Grain)
@@ -17,15 +17,15 @@ getmeasurements(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vecto
 # Very hand-wavey stuff so you can call Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String})
 """Main constructor for a Grain"""
 function (::Type{S})(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where {S<:Grain, T<:Real}
-    return NamedArray(v, (measurement_names,), ("measurement",))::Grain{T}
+    return NamedArray(v, (measurement_names,), ("measurement",))::Grain
 end
 
 #################
 # Sinks / Rocks #
 #################
-
+# TODO add cleaner printing of Sinks
 """Struct to hold sink level data"""
-Sink{T} = Vector{Grain{T}} # TODO could use NamedMatrix
+Sink = Vector{Grain} # TODO could use NamedMatrix
 
 """Gets the names of measurements from a Sink"""
 getmeasurements(s::Sink) = iszero(length(s)) ? String[] : getmeasurements(s[1])
@@ -45,7 +45,7 @@ Collects a list of Grains into a Rock/Sink.
 Ensures all Grains have the same names and are in the same order.
 """
 function (::Type{S})(vec_of_grains::AbstractVector{Grain}) where S <: Sink # each element is a grain
-    @assert allequal(measurements.(vec_of_grains))
+    @assert allequal(getmeasurements.(vec_of_grains))
     return collect(vec_of_grains)::Sink
 end
 (::Type{S})(vec_of_grains::AbstractVector{Grain}...) where S <: Sink = Sink(vec_of_grains)
@@ -92,9 +92,9 @@ function (::Type{D})(
     return densitytensor::DensityTensor
 end
 
-namedarray(D::DensityTensor) = D
-array(D::DensityTensor) = array(namedarray(D))
-array(N::NamedArray) = N.array
+namedarray(D::DensityTensor) = D::NamedArray
+array(D::DensityTensor) = D.array
+#array(N::NamedArray) = N.array
 
 function (::Type{D})(
     KDEs::AbstractVecOrTuple{AbstractVecOrTuple{AbstractVecOrTuple{T}}},#UnivariateKDE
@@ -102,7 +102,7 @@ function (::Type{D})(
     sinks::AbstractVector{Sink},
     ) where {D <: DensityTensor, T <: Real, U <: Real}
     # Argument Handeling
-    allequal(measurements.(sinks)) ||
+    allequal(getmeasurements.(sinks)) ||
         ArgumentError("All sinks must have the same measurements in the same order.")
     length(sinks) == length(KDEs) ||
         ArgumentError("Must be the same number of sinks as there are lists of KDEs.")

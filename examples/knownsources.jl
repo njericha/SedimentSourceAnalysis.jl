@@ -42,12 +42,13 @@ densitytensor = DensityTensor(densities, domains, sinks);
 setsourcename!(densitytensor, "sink");
 
 # Visualize the data in the tensor by plotting the densities for the first measurement
-plot_densities(densitytensor, getmeasurements(densitytensor)[1])
+measurement_names = getmeasurements(densitytensor) # ["ages", ...]
+plot_densities(densitytensor, "ages")
 
 # Perform the nonnegative decomposition Y=CF
-Y = array(densitytensor) # plain Array{T, 3} type for faster factorization
+Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
 rank = 3
-C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank)
+C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
 
 # Compare learned C and F to the known sources
 # Import data for ground truth F
@@ -55,12 +56,12 @@ filename = "./data/sundell2022/3Sources from Sundell et al 2022.xlsx"
 sources = read_raw_data(filename)::Vector{Source}
 
 ## Confirm the measurements are the same and in the same order
-@assert getmeasurements(sources[begin]) == getmeasurements(sink[begin])
+@assert getmeasurements(sources[begin]) == getmeasurements(sinks[begin])
 
 ## Estimate densities for the known sources
 ## We pass in the previously calculated domains to ensure the densities are
 ## estimated on the same grid.
-true_densities = make_densities.(sources; domains, bandwidths, inner_percentile)
+true_densities = make_densities.(sources, domains; bandwidths, inner_percentile)
 
 ## Wrap in DensityTensor
 factortensor_true = DensityTensor(true_densities, domain, getmeasurements(densitytensor))

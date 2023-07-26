@@ -4,6 +4,7 @@ Matrix-Tensor Factorization
 module MTF
 using LinearAlgebra # TODO annotate which functions are used
 using Plots
+using Statistics: mean
 using Random
 using Einsum
 

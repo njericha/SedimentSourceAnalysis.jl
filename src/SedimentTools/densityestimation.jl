@@ -101,15 +101,15 @@ function make_densities(
     return density_estimates
 end
 
-# function make_densities(
-#     sinks::Sink,
-#     domains::AbstractVector{<:AbstractVector};
-#     kwargs...
-#     )
-#     KDEs = make_densities(sinks; kwargs...)
-#     KDEs_new = pdf.(KDEs, domains)
-#     return KDEs_new
-# end
+function make_densities(
+    sinks::Sink,
+    domains::AbstractVector{<:AbstractVector};
+    kwargs...
+    )
+    KDEs = make_densities(sinks; kwargs...)
+    KDEs_new = pdf.(KDEs, domains)
+    return KDEs_new
+end
 
 """Number of samples to use when standardizing a vector of density estimates."""
 const DEFAULT_N_SAMPLES = 64::Integer

@@ -65,7 +65,7 @@ Returns one plot will all distributions for a given measurement (lateral slice) 
 function plot_densities(D::DensityTensor, measurement::String; kwargs...) # may clash when looking at a subarray of a DensityTensor
     # No need to normalize since every distribution on the same plot has the same scale
     domain = getdomain(D, measurement)
-    p = plot()
+    p = plot(ylabel="density")
     for (source_name, density) in zip(getsourcenames(D), eachdensity(D, measurement))
         plot!(domain, density; label=source_name, kwargs...)
     end

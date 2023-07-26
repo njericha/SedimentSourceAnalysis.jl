@@ -103,7 +103,8 @@ function nnmtf(
         # If F_rescaled := avg_factor_sums * F,
         # Y_input ≈ C * F_rescaled
         #       Y ≈ C * F (Here, Y and F have normalized fibers)
-        F .= avg_factor_sums * F
+        F_lateral_slices = eachslice(F, dims=2)
+        F_lateral_slices .*= avg_factor_sums
     end
 
     return C, F, rel_errors, norm_grad, dist_Ncone
@@ -166,7 +167,7 @@ function calc_gradient(C, F, Y)
     return grad_C, grad_F
 end
 
-function rescaleCF!(C, F)
+function rescaleCF!(C, F) # TODO optimize so the scaling is done in-place
     fiber_sums = sum.(eachslice(F,dims=(1,2)))
     avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
     F .= avg_factor_sums^(-1) * F
@@ -175,6 +176,9 @@ end
 
 function rescaleY(Y)
     fiber_sums = sum.(eachslice(Y,dims=(1,2)))
-    avg_factor_sums = Diagonal(mean.(eachrow(fiber_sums)))
-    return avg_factor_sums^(-1) * Y, avg_factor_sums
+    avg_factor_sums = mean.(eachcol(fiber_sums))
+    Yscaled = copy(Y)
+    Y_lateral_slices = eachslice(Yscaled, dims=2)
+    Y_lateral_slices ./= avg_factor_sums
+    return Yscaled, avg_factor_sums
 end
