@@ -14,7 +14,8 @@ sinks = read_raw_data(filename)::Vector{Sink}
 ## Look at a grain
 sink1 = sinks[begin]
 grain1 = sink1[begin]
-println("grain 1 in sink 1", grain1)
+println("grain 1 in sink 1")
+println(grain1)
 
 # Estimate the densities of each sink
 
@@ -88,21 +89,25 @@ coefficientmatrix = NamedArray(C, dimnames=("sink", "learned source"))
 
 # Visualize and compare the coefficientmatrix and factortensor
 # Note display should be called after all plots have been finalized
-p = heatmap(coefficientmatrix; title="Learned Coefficients")
-display.(p)
-p = heatmap(coefficientmatrix_true; title="True Coefficients")
-display.(p)
+p = heatmap(coefficientmatrix; title="Learned Coefficients");
+display(p)
+p = heatmap(coefficientmatrix_true; title="True Coefficients");
+display(p)
 
-plots = source_heatmaps(factortensor; title="Learned Densities for ");
+learned_source_plots = source_heatmaps(factortensor; title="Learned Densities for ");
+true_source_plots = source_heatmaps(factortensor_true; title="True Densities for ");
+
+# Alternate learned and true plot so you can compare similar plots side-by-side
+for (l, t) in zip(learned_source_plots, true_source_plots)
+    display(l)
+    display(t)
+end
+
+plots = measurement_heatmaps(factortensor; title="Learned Densities for ");
 display.(plots);
-plots = source_heatmaps(factortensor_true; title="True Densities for ");
-display.(plots);
 
-plots = measurement_heatmaps(factortensor; title="Learned Densities for ")
-display.(plots)
-
-rel_error(coefficientmatrix, coefficientmatrix_true)
-rel_error(factortensor, factortensor_true)
+rel_error(coefficientmatrix, coefficientmatrix_true);
+rel_error(factortensor, factortensor_true);
 
 # Now go back and classify each grain as source 1, 2, or 3 based on the learned sources
 ## Start with just the first sink

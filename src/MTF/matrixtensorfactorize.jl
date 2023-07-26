@@ -52,7 +52,7 @@ function nnmtf(
     # Scale Y if desired
     if rescale
         # Y_input = copy(Y)
-        Y, avg_factor_sums = rescaleY(Y)
+        Y, avg_fiber_sums = rescaleY(Y)
     end
 
     # Initialize Looping
@@ -104,7 +104,7 @@ function nnmtf(
         # Y_input ≈ C * F_rescaled
         #       Y ≈ C * F (Here, Y and F have normalized fibers)
         F_lateral_slices = eachslice(F, dims=2)
-        F_lateral_slices .*= avg_factor_sums
+        F_lateral_slices .*= avg_fiber_sums
     end
 
     return C, F, rel_errors, norm_grad, dist_Ncone
@@ -167,22 +167,23 @@ function calc_gradient(C, F, Y)
     return grad_C, grad_F
 end
 
+"""Rescales C and F so each factor (horizontal slices) of F has similar magnitude."""
 function rescaleCF!(C, F)
     fiber_sums = sum.(eachslice(F, dims=(1,2)))
-    avg_factor_sums = mean.(eachcol(fiber_sums))
+    avg_factor_sums = mean.(eachrow(fiber_sums))
 
-    F_lateral_slices = eachslice(F, dims=2)
-    F_lateral_slices ./= avg_factor_sums
+    F_horizontal_slices = eachslice(F, dims=1)
+    F_horizontal_slices ./= avg_factor_sums
 
-    C_rows = eachrow(C)
+    C_rows = eachcol(C)
     C_rows .*= avg_factor_sums
 end
 
 function rescaleY(Y)
     fiber_sums = sum.(eachslice(Y, dims=(1,2)))
-    avg_factor_sums = mean.(eachcol(fiber_sums))
+    avg_fiber_sums = mean.(eachcol(fiber_sums))
     Yscaled = copy(Y)
     Y_lateral_slices = eachslice(Yscaled, dims=2)
-    Y_lateral_slices ./= avg_factor_sums
-    return Yscaled, avg_factor_sums
+    Y_lateral_slices ./= avg_fiber_sums
+    return Yscaled, avg_fiber_sums
 end
