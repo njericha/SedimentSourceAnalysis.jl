@@ -14,8 +14,12 @@ sinks = read_raw_data(filename)::Vector{Sink}
 ## Look at a grain
 sink1 = sinks[begin]
 grain1 = sink1[begin]
-println("grain 1 in sink 1")
-println(grain1)
+println("Grain 1 in Sink 1")
+display(grain1)
+
+## Here we see each measurement displayed as well as the sampled value
+## To get the names of each measurement, use getmeasurements(.)
+@show getmeasurements(grain1)
 
 # Estimate the densities of each sink
 
@@ -24,7 +28,11 @@ println(grain1)
 sink1 = sinks[begin]
 inner_percentile = 95 # Filter outliers; ignore values outside the inner percentile
 alpha = 1.5 # smooth density estimate, 0.9 is the default
+            # I find extra smoothing helps denoise the density estimation
 bandwidths = default_bandwidth.(collect(eachmeasurement(sink1)), alpha, inner_percentile)
+
+## Note getmeasurements() gets the *names* of each measurement,
+## whereas eachmeasurement() is an iterator for the *values* for each measurement
 
 ## Obtain the raw densities estimates
 ## The same measurement could (and likely!) have different supports for different sinks...
@@ -43,14 +51,56 @@ densities, domains = standardize_KDEs(raw_densities) #Made it to here so far
 densitytensor = DensityTensor(densities, domains, sinks);
 setsourcename!(densitytensor, "sink");
 
+# Can see the structure of the tensor by showing different slices
+
+## This contains the first density sample for each sink and measurment
+## The "density=(-103.994,...)" gives the "x" value each density was sampled at
+println("densitytensor first density sample (frontal slice)")
+display(densitytensor[:, :, 1])
+
+## Similarly slice by measurement...
+println("densitytensor Age density (lateral slice)")
+display(densitytensor[:, "Age", :])
+
+## ..or by sink
+println("densitytensor Sink 1 (horizontal slice)")
+display(densitytensor[1, :, :])
+
 # Visualize the data in the tensor by plotting the densities for the first measurement
 measurement_names = getmeasurements(densitytensor) # ["ages", ...]
-plot_densities(densitytensor, "Age")
+p = plot_densities(densitytensor, "Age");
+display(p)
 
 # Perform the nonnegative decomposition Y=CF
 Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
 rank = 3
 C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
+
+# Plot Convergence
+# TODO make these into functions in SedimentTools/viz.jl
+p = plot(
+    rel_errors;
+    title="Relative error between Y and C*F Convergence",
+    xlabel="iteration #",
+    yscale=:log10
+);
+display(p)
+
+p = plot(
+    norm_grad;
+    title="Norm of Full Gradient Convergence",
+    xlabel="iteration #",
+    yscale=:log10
+);
+display(p)
+
+p = plot(
+    dist_Ncone;
+    title="Distance Between Full Gradient and Normal Cone",
+    xlabel="iteration #",
+    yscale=:log10
+);
+display(p)
 
 # Compare learned C and F to the known sources
 # Import data for ground truth F
@@ -106,12 +156,28 @@ end
 plots = measurement_heatmaps(factortensor; title="Learned Densities for ");
 display.(plots);
 
-rel_error(coefficientmatrix, coefficientmatrix_true);
-rel_error(factortensor, factortensor_true);
+# Show the relative error between the learned and true matrix/tensor
+# ex. 0.15 relative error can be thought of as 85% similarity
+# TODO use other metrics like RMSE and SNR
+@show rel_error(coefficientmatrix, coefficientmatrix_true) # The warning that names are different is O.K.
+@show rel_error(factortensor, factortensor_true)
+@show rel_error(coefficientmatrix * factortensor, densitytensor)
 
 # Now go back and classify each grain as source 1, 2, or 3 based on the learned sources
 ## Start with just the first sink
 
 source_indexes = map(g -> estimate_which_source(g, factortensor), sinks[1])
 
-scatter(source_indexes)
+## We should see a nice step pattern since the sinks have grains order by the source they
+## came from. You would not expect to have this perfect ordering for real data.
+scatter(
+    source_indexes;
+    title="Estimated Source for Each Grain",
+    xlabel="Grain Index",
+    ylabel="Source",
+    yticks=1:3,
+    legend=false
+) # TODO make this a function in SedimentTools/viz.jl
+  # and add ratio of maximum/2nd likelyhood
+  # Idealy the "misses" have smaller likelyhoods
+  #i.e. we are less confident which source the grain came from.
