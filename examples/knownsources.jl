@@ -55,16 +55,17 @@ setsourcename!(densitytensor, "sink");
 
 ## This contains the first density sample for each sink and measurment
 ## The "density=(-103.994,...)" gives the "x" value each density was sampled at
+## Most of these are zero since it is the left side of the distributions' support
 println("densitytensor first density sample (frontal slice)")
-display(densitytensor[:, :, 1])
+display(densitytensor[:, :, 1:1])
 
 ## Similarly slice by measurement...
 println("densitytensor Age density (lateral slice)")
-display(densitytensor[:, "Age", :])
+display(densitytensor[:, "Age", 1:1]) #just the first 1 sample
 
 ## ..or by sink
 println("densitytensor Sink 1 (horizontal slice)")
-display(densitytensor[1, :, :])
+display(densitytensor[1, :, 1]) #just the first sample
 
 # Visualize the data in the tensor by plotting the densities for the first measurement
 measurement_names = getmeasurements(densitytensor) # ["ages", ...]
