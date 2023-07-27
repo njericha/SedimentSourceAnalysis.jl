@@ -1,9 +1,5 @@
 # Sediment Analysis Tools
 
-```@contents
-depth = 3
-```
-
 ## Types
 ```@docs
 Grain

@@ -2,17 +2,17 @@
 Matrix-Tensor Factorization
 """
 module MTF
-using LinearAlgebra # TODO annotate which functions are used
-using Plots
+using LinearAlgebra: norm
+using Plots: plot
 using Statistics: mean
-using Random
-using Einsum
+using Random: randn
+using Einsum: @einsum
 
 # Method extentions
 using Base: *
 
 export Abstract3Tensor # Types
-export combined_norm, nnmtf, plot_factors, rel_error # Functions
+export combined_norm, d2_dx2, dist_to_Ncone, nnmtf, plot_factors, rel_error # Functions
 
 include("utils.jl")
 include("matrixtensorfactorize.jl")

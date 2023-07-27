@@ -1,8 +1,5 @@
 # Matrix Tensor Factorization
 
-```@contents
-```
-
 ## Types
 ```@docs
 Abstract3Tensor
@@ -13,6 +10,7 @@ Abstract3Tensor
 ```@docs
 *(::AbstractMatrix, ::Abstract3Tensor)
 combined_norm
+d2_dx2
 dist_to_Ncone
 nnmtf
 plot_factors
