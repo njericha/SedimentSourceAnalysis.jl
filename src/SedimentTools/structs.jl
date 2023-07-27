@@ -104,7 +104,10 @@ function (::Type{D})(
     return densitytensor::DensityTensor
 end
 
+"""Turn a DensityTensor into a NamedArray type."""
 namedarray(D::DensityTensor) = D::NamedArray
+
+"""Turn a DensityTensor or NamedArray into a plain Array type."""
 array(D::DensityTensor) = D.array
 array(N::NamedArray) = N.array
 
@@ -264,7 +267,7 @@ function normalize_density_sums!(D::DensityTensor)
     end
 end
 
-"""See [normalize_density_sums!](@ref)"""
+"""See [`normalize_density_sums!`](@ref)"""
 function normalize_density_sums(D::DensityTensor)
     D_copy = deepcopy(D)
     normalize_density_sums!(D_copy)

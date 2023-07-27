@@ -25,10 +25,11 @@ display(grain1)
 
 ## Select the bandwidth for the estimation
 ## Uses Silverman's rule of thumb
+#n_density_samples = 2^7
 sink1 = sinks[begin]
 inner_percentile = 95 # Filter outliers; ignore values outside the inner percentile
-alpha = 1.5 # smooth density estimate, 0.9 is the default
-            # I find extra smoothing helps denoise the density estimation
+#alpha = 0.9 # bandwidth "alpha" smooths the density estimate, 0.9 is the default
+             # this can denoise estimation
 bandwidths = default_bandwidth.(collect(eachmeasurement(sink1)), alpha, inner_percentile)
 
 ## Note getmeasurements() gets the *names* of each measurement,
@@ -79,29 +80,8 @@ C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
 
 # Plot Convergence
 # TODO make these into functions in SedimentTools/viz.jl
-p = plot(
-    rel_errors;
-    title="Relative error between Y and C*F Convergence",
-    xlabel="iteration #",
-    yscale=:log10
-);
-display(p)
-
-p = plot(
-    norm_grad;
-    title="Norm of Full Gradient Convergence",
-    xlabel="iteration #",
-    yscale=:log10
-);
-display(p)
-
-p = plot(
-    dist_Ncone;
-    title="Distance Between Full Gradient and Normal Cone",
-    xlabel="iteration #",
-    yscale=:log10
-);
-display(p)
+plots = plot_convergence(rel_errors, norm_grad, dist_Ncone)
+display.(plots)
 
 # Compare learned C and F to the known sources
 # Import data for ground truth F
@@ -171,14 +151,19 @@ source_indexes = map(g -> estimate_which_source(g, factortensor), sinks[1])
 
 ## We should see a nice step pattern since the sinks have grains order by the source they
 ## came from. You would not expect to have this perfect ordering for real data.
-scatter(
-    source_indexes;
-    title="Estimated Source for Each Grain",
-    xlabel="Grain Index",
-    ylabel="Source",
-    yticks=1:3,
-    legend=false
-) # TODO make this a function in SedimentTools/viz.jl
-  # and add ratio of maximum/2nd likelyhood
-  # Idealy the "misses" have smaller likelyhoods
-  #i.e. we are less confident which source the grain came from.
+## Idealy the "misses" have smaller likelyhoods
+## i.e. we are less confident which source the grain came from.
+
+## For each grain, get the source index estimate, and the list of likelyhoods for each source
+source_indexes, source_likelyhoods = zip(
+    map(g -> estimate_which_source(g, factortensor, all_likelyhoods=true), sinks[1])...)
+
+## Sort the likelyhoods, and find the log of the max/2nd highest likelyhood
+sort!.(source_likelyhoods, rev=true)
+loglikelyhood_ratios = [log10(s_likelyhoods[1] / (s_likelyhoods[2] + eps())) for s_likelyhoods in source_likelyhoods]
+
+p = plot_source_index(
+    source_indexes, loglikelyhood_ratios;
+    title="Grains' Estimated Source and Log Likelyhood Ratio"
+)
+display(p)

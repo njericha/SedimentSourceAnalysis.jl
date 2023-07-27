@@ -73,3 +73,73 @@ function plot_densities(D::DensityTensor, measurement::String; kwargs...) # may 
     end
     return p
 end
+
+"""
+    plot_source_index(
+    indexes::AbstractVector{<:Integer},
+    loglikelyhood_ratios::AbstractVector{<:Real};
+    kwargs...
+    )
+
+Returns one scatter plot of dots (eachindex(indexes), indexes) with brighter colours
+corresponding to higher loglikelyhood_ratios.
+"""
+function plot_source_index(
+    indexes::AbstractVector{<:Integer},
+    loglikelyhood_ratios::AbstractVector{<:Real};
+    kwargs...
+    )
+    p = scatter(
+            indexes;
+            marker_z=loglikelyhood_ratios,
+            clabel="log likelyhood ratio",
+            colorbar_ticks=(0:0.5:1, ["0", "0.5", ">1.0"]),
+            clim=(0,1),
+            xlabel="Grain Index",
+            ylabel="Source",
+            yticks=sort([Set(source_indexes)...]), # sort the unique indexes that appear
+            kwargs...
+    )
+    return p
+end
+
+"""
+    plot_convergence(rel_errors, norm_grad, dist_Ncone)
+
+Returns 3 separate plots for the three convergence metrics on a log10-y scale.
+"""
+function plot_convergence(rel_errors, norm_grad, dist_Ncone)
+    return plot_convergence((rel_errors, norm_grad, dist_Ncone))
+end
+
+"""
+    plot_convergence((rel_errors, norm_grad, dist_Ncone))
+"""
+function plot_convergence(all_series::NTuple{3, AbstractVector{<:Real}})
+    titles = (
+        "Relative Error Between Y and C*F Convergence",
+        "Norm of Full Gradient Convergence",
+        "Distance Between Negative Gradient and Normal Cone",
+    )
+
+    ylabels = (
+        "Relative Error",
+        "Norm of Gradient",
+        "Distance to Normal Cone",
+    )
+
+    plots = []
+    for (series, title, ylabel) in zip(all_series, titles, ylabels)
+        p = plot(
+            series;
+            ylabel,
+            title,
+            xlabel="iteration #",
+            yscale=:log10,
+            legend=false,
+        )
+        push!(plots, p)
+    end
+
+    return plots
+end

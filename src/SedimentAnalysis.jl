@@ -24,6 +24,6 @@ export default_bandwidth, make_densities, standardize_KDEs # Functions
 
 export estimate_which_source, match_sources!
 
-export measurement_heatmaps, plot_densities, source_heatmaps
+export measurement_heatmaps, plot_densities, source_heatmaps, plot_convergence, plot_source_index
 
 end # module SedimentAnalysis

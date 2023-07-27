@@ -76,6 +76,8 @@ standardize_KDEs
 measurement_heatmaps
 plot_densities
 source_heatmaps
+plot_convergence
+plot_source_index
 ```
 
 ## Index

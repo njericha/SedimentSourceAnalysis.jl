@@ -36,7 +36,7 @@ include("densityestimation.jl")
 export estimate_which_source, match_sources!
 include("classifysource.jl")
 
-export measurement_heatmaps, plot_densities, source_heatmaps
+export measurement_heatmaps, plot_densities, source_heatmaps, plot_convergence, plot_source_index
 include("viz.jl")
 
 end # module SedimentTools
