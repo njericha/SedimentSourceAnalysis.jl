@@ -79,7 +79,6 @@ rank = 3
 C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
 
 # Plot Convergence
-# TODO make these into functions in SedimentTools/viz.jl
 plots = plot_convergence(rel_errors, norm_grad, dist_Ncone)
 display.(plots)
 
