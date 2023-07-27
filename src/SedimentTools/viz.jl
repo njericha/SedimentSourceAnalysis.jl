@@ -97,7 +97,7 @@ function plot_source_index(
             clim=(0,1),
             xlabel="Grain Index",
             ylabel="Source",
-            yticks=sort([Set(source_indexes)...]), # sort the unique indexes that appear
+            yticks=sort([Set(indexes)...]), # sort the unique indexes that appear
             kwargs...
     )
     return p

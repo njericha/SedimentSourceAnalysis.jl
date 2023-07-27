@@ -28,9 +28,9 @@ display(grain1)
 #n_density_samples = 2^7
 sink1 = sinks[begin]
 inner_percentile = 95 # Filter outliers; ignore values outside the inner percentile
-#alpha = 0.9 # bandwidth "alpha" smooths the density estimate, 0.9 is the default
+alpha_ = 0.9 # bandwidth "alpha" smooths the density estimate, 0.9 is the default
              # this can denoise estimation
-bandwidths = default_bandwidth.(collect(eachmeasurement(sink1)), alpha, inner_percentile)
+bandwidths = default_bandwidth.(collect(eachmeasurement(sink1)), alpha_, inner_percentile)
 
 ## Note getmeasurements() gets the *names* of each measurement,
 ## whereas eachmeasurement() is an iterator for the *values* for each measurement
@@ -162,7 +162,7 @@ sort!.(source_likelyhoods, rev=true)
 loglikelyhood_ratios = [log10(s_likelyhoods[1] / (s_likelyhoods[2] + eps())) for s_likelyhoods in source_likelyhoods]
 
 p = plot_source_index(
-    source_indexes, loglikelyhood_ratios;
+    collect(source_indexes), loglikelyhood_ratios;
     title="Grains' Estimated Source and Log Likelyhood Ratio"
 )
 display(p)
