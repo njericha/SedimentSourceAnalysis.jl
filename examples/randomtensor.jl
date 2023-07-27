@@ -40,7 +40,8 @@ match_sources!(C, F, C_true, F_true) # Because the order of sources could be dif
 @show rel_error(F, F_true)
 @show rel_error(C * F, Y)
 
-# TODO repeat for rank in 1:10 and show how 5 is "optimal" in some sense
+# Repeat for rank in {1, 2, ..., 10}
+# Note rank = 5 is the smallest rank where the relative error plateaus
 ranks = 1:10
 final_rel_error = zeros(length(ranks))
 final_norm_grad = zeros(length(ranks))
@@ -53,6 +54,16 @@ for rank in ranks
     @show final_rel_error[rank], final_norm_grad[rank], final_dist_Ncone[rank]
 end
 
-plot(final_rel_error) # Can see that the relative error flatlines at rank = 5
-plot(final_norm_grad) # No corrolation with the final norm of gradient
-plot(final_dist_Ncone) # Gradually increases because ??
+# Visualizing convergence
+## Can see that the relative error flatlines at rank = 5
+options = (:label => false, :xlabel => "rank")
+p = plot(final_rel_error; ylabel="final relative error", options...)
+display(p)
+
+## No corrolation with the final norm of gradient
+p = plot(final_norm_grad; ylabel="final norm of gradient", options...)
+display(p)
+
+## Gradually increases because ??
+p = plot(final_dist_Ncone; ylabel="final distance to normal cone", options...)
+display(p)
