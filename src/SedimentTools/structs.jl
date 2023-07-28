@@ -2,7 +2,11 @@
 # Grain #
 #########
 
-"""Struct to hold grain level data"""
+"""
+    Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String})
+
+Struct to hold grain level data
+"""
 const Grain = NamedVector{T} where T <: Real
 
 """
@@ -14,8 +18,12 @@ Getter for the measurement names.
 """
 getmeasurements(g::Grain) = names(g, 1) # names(g) from NamedArray returns Vector{Vector{T}}
 
-# Very hand-wavey stuff so you can call Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String})
-"""Main constructor for a Grain"""
+# Very hand-wavey stuff so you can call Grain(...)
+"""
+    Grain(v::AbstractVector{T}, measurement_names::AbstractVector{String})
+
+Main constructor for a Grain.
+"""
 function (::Type{S})(v::AbstractVector{T}, measurement_names::AbstractVector{String}) where {S<:Grain, T<:Real}
     return NamedArray(v, (measurement_names,), ("measurement",))::Grain
 end
@@ -24,7 +32,15 @@ end
 # Sinks / Rocks #
 #################
 # TODO add cleaner printing of Sinks
-"""Struct to hold sink level data"""
+"""
+    Sink(grain1, grain2, ...)
+    Sink([grain1, grain2, ...])
+
+Collects a list of Grains into a Rock/Sink.
+
+Ensures all Grains have the same names and are in the same order.
+Struct to hold sink level data
+"""
 const Sink = Vector{Grain} # TODO could use NamedMatrix?
 
 """Gets the names of measurements from a Sink"""
