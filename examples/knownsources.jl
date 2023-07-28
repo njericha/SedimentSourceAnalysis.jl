@@ -69,7 +69,7 @@ println("densitytensor Sink 1 (horizontal slice)")
 display(densitytensor[1, :, 1]) #just the first sample
 
 # Visualize the data in the tensor by plotting the densities for the first measurement
-measurement_names = getmeasurements(densitytensor) # ["ages", ...]
+measurement_names = getmeasurements(densitytensor) # ["Age", ...]
 p = plot_densities(densitytensor, "Age");
 display(p)
 
