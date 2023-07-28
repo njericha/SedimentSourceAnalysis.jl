@@ -14,7 +14,7 @@ using Plots: plot, plot!, scatter
 using Base: AbstractVecOrTuple
 
 # Method extentions
-using Base: getindex, names
+using Base: getindex, names, show
 using Plots: Plots, heatmap
 using NamedArrays: NamedArrays#, NamedArray
 

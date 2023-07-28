@@ -31,7 +31,6 @@ end
 #################
 # Sinks / Rocks #
 #################
-# TODO add cleaner printing of Sinks
 """
     Sink(grain1, grain2, ...)
     Sink([grain1, grain2, ...])
@@ -41,7 +40,14 @@ Collects a list of Grains into a Rock/Sink.
 Ensures all Grains have the same names and are in the same order.
 Struct to hold sink level data
 """
-const Sink = Vector{Grain} # TODO could use NamedMatrix?
+const Sink = Vector{Grain}
+
+function Base.show(io::IO, x::MIME"text/plain", S::Sink)
+    S_named = hcat(S...)
+    setdimnames!(S_named, "grain", 2)
+    println("$(length(S))-element Vector{Grain} with data:")
+    show(io::IO, x::MIME"text/plain", S_named)
+end
 
 """Gets the names of measurements from a Sink"""
 getmeasurements(s::Sink) = iszero(length(s)) ? String[] : getmeasurements(s[1])
@@ -88,7 +94,16 @@ const Source = Sink
 
 # SO we will use a plain NamedArray where we hide the domains in the 3rd axis names
 
-"""An order 3 array to hold the density distributions for multiple sinks."""
+"""
+    DensityTensor(KDEs, domains, sinks)
+    DensityTensor(array, domains, measurement_names; kw...)
+
+An order 3 array to hold the density distributions for multiple sinks.
+
+KDEs is a Vector{Vector{Vector{T}}} like type whereas array is an Array{T,3} like type.
+
+Call [`setsourcename!`](@ref) to set the source name (name of first dimention).
+"""
 const DensityTensor{T} = NamedArray{T, 3} where T <: Real
 
 """

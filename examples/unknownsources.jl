@@ -11,9 +11,11 @@ using SedimentAnalysis
 filename = "./data/lee2021/Lee et al 2021 All Measurements.xlsx"
 sinks = read_raw_data(filename)::Vector{Sink}
 
-## Look at a grain
+## Look at a sink and grain
 sink1 = sinks[begin]
 grain1 = sink1[begin]
+println("Sink 1")
+display(sink1)
 println("Grain 1 in Sink 1")
 display(grain1)
 
@@ -62,11 +64,11 @@ display(densitytensor[:, :, 1:1])
 
 ## Similarly slice by measurement...
 println("densitytensor Age density (lateral slice)")
-display(densitytensor[:, "Age", 1:1]) #just the first 1 sample
+display(densitytensor[:, 1:1, 1:1]) #just the first sample
 
 ## ..or by sink
 println("densitytensor Sink 1 (horizontal slice)")
-display(densitytensor[1, :, 1]) #just the first sample
+display(densitytensor[1:1, :, 1:1]) #just the first sample
 
 # Visualize the data in the tensor by plotting the densities for the first measurement
 measurement_names = getmeasurements(densitytensor) # ["Ages", ...]
