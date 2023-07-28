@@ -19,7 +19,7 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 ## How to use
 
 ### In Browser
-1. Go to https://github.dev/njericha/Sediment-Source-Analysis.jl
+1. Go to https://njericha-friendly-trout-qv6vq4pq9jq3xgq4.github.dev/
 
 Note you can start a terminal with `Ctrl+Shift+C` (Windows) or `Cmd+Shift+C` (Mac).
 
