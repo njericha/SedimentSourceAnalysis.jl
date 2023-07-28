@@ -19,7 +19,7 @@ DEFAULT_N_SAMPLES
 ```@docs
 getindex(::Sink, ::String)
 names(::NamedArray, ::Union{String,Symbol})
-heatmap(::NamedArray)
+heatmap(::NamedMatrix)
 ```
 
 ## Functions

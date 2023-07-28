@@ -4,7 +4,6 @@ authors = ["Nicholas Richardson <njericha@math.ubc.ca>"]
 version = "0.1.0"
 
 [deps]
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 Einsum = "b7d42ee7-0b51-5a75-98ca-779d3107e4c0"
 KernelDensity = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"

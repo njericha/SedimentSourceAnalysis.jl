@@ -240,7 +240,7 @@ const getsink = getsource
 """
     getstepsizes(D::DensityTensor)
 
-Gets the step sizes used for each domain. See [`domains`](@ref).
+Gets the step sizes used for each domain. See [`getdomains`](@ref).
 """
 getstepsizes(D::DensityTensor) = [x[begin+1] - x[begin] for x in getdomains(D)]
 
@@ -278,7 +278,7 @@ This is in constrast to the usualy normalization for density functions where the
 density curve is 1. In the case of an evenly sampled density, this area is
 `sum(density_samples)*step_size`.
 
-Use [`normalize_densities`](@ref) to avoid mutation.
+Use [`normalize_density_sums`](@ref) to avoid mutation.
 """
 function normalize_density_sums!(D::DensityTensor)
     for (slice, x) in zip(eachmeasurement(D), getstepsizes(D))
