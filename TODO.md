@@ -4,4 +4,4 @@
   - 20sinks from 3Sources from Sundell et al 2022_DISTRIBUTIONS.xlsx
 - [ ] consider making Jupyter/Pluto/Google collab versions of the examples for easier interation
 - [ ] regenerate figures using the new examples and code
-- [ ] clean up unused packages
+- [x] clean up unused packages

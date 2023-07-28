@@ -5,11 +5,12 @@ using SedimentAnalysis
 using SedimentAnalysis.MTF
 using SedimentAnalysis.SedimentTools
 using NamedArrays
+using Plots
 
 DocMeta.setdocmeta!(
     SedimentAnalysis,
     :DocTestSetup,
-    :(using SedimentAnalysis; using NamedArrays: NamedArray);
+    :(using SedimentAnalysis; using NamedArrays: NamedArray; using Plots: heatmap);
     recursive=true
 )
 

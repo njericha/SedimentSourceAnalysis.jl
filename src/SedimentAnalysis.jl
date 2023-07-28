@@ -13,7 +13,7 @@ export combined_norm, d2_dx2, dist_to_Ncone, nnmtf, plot_factors, rel_error # ma
 
 export Grain, DensityTensor, Rock, Sink, Source # Types
 export array, getdomain, getdomains, getsourcename, getsourcenames, getmeasurements
-export getstepsizes, nammedarray, sink, source # Getters
+export getstepsizes, namedarray, getsink, getsource # Getters
 export normalize_density_sums!, normalize_density_sums, setsourcename! # Setters
 export eachdensity, eachmeasurement, eachsink, eachsource # Iterators
 

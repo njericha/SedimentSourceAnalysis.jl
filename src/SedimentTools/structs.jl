@@ -25,7 +25,7 @@ end
 #################
 # TODO add cleaner printing of Sinks
 """Struct to hold sink level data"""
-const Sink = Vector{Grain} # TODO could use NamedMatrix
+const Sink = Vector{Grain} # TODO could use NamedMatrix?
 
 """Gets the names of measurements from a Sink"""
 getmeasurements(s::Sink) = iszero(length(s)) ? String[] : getmeasurements(s[1])
@@ -52,10 +52,10 @@ end
 
 # Define aliases so Rock or Source can be used in place of Sink when those terms make more
 # sense in those contexts.
-"""Alias for Sink"""
-Rock = Sink
-"""Alias for Sink"""
-Source = Sink
+"""Alias for [`Sink`](@ref)"""
+const Rock = Sink
+"""Alias for [`Sink`](@ref)"""
+const Source = Sink
 
 #################
 # DensityTensor #
@@ -149,8 +149,9 @@ function (::Type{D})(
     length(KDEs[begin][begin]) == length(domains[begin]) ||
         ArgumentError("Number of density samples in KDEs does not match number of domain samples.")
 
-    # TODO make this line more legible, possible by wrapping the KDEs in a struct so they're named
     # Magic line to turn the KDEs into an order-3 tensor
+    # First two `cat`s take the list of list of list of T into an Array{T, 3} type
+    # permutedims transposes the tensor to the right ordering of dimentions
     data = permutedims(cat(cat.(KDEs..., dims=2)..., dims=3), [2,3,1])
 
     # Confirm all the dimentions are in the right order
@@ -216,7 +217,9 @@ end
 Gets source/sink i from D. See [`eachsource`](@ref).
 """
 getsource(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
-getsink = getsource
+
+"""Alias for [`getsource`](@ref)"""
+const getsink = getsource
 
 """
     getstepsizes(D::DensityTensor)
@@ -298,4 +301,6 @@ Iterates D over each source/sink slice. These are the horizontal slices.
 See [`getsource`](@ref).
 """
 eachsource(D::DensityTensor) = eachslice(D, dims=1)
+
+"""Alias for [`eachsource`](@ref)."""
 const eachsink = eachsource

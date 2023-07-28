@@ -38,9 +38,9 @@ getmeasurements
 getsourcename
 getsourcenames
 getstepsizes
-nammedarray
-sink
-source
+namedarray
+getsink
+getsource
 ```
 
 ### Setters and Manipulators
