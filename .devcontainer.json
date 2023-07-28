@@ -5,8 +5,8 @@
 		"version": "1.9"
 	    }
 	},
-	"name": "Julia (Community)",
-	"image": "ghcr.io/julia-vscode/julia-devcontainer",
+	"name": "Julia",//"Julia (Community)",
+// 	"image": "ghcr.io/julia-vscode/julia-devcontainer",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -19,7 +19,7 @@
 		}
 	},
 
-	"postCreateCommand": "/julia-devcontainer-scripts/postcreate.jl",
+// 	"postCreateCommand": "/julia-devcontainer-scripts/postcreate.jl",
 
-	"remoteUser": "vscode"
+// 	"remoteUser": "vscode"
 }
