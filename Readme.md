@@ -19,10 +19,12 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 ## How setup the environment
 
 ### In Browser
-1. Go to TODO UPDATE: https://njericha-friendly-trout-qv6vq4pq9jq3xgq4.github.dev/
+1. Go to TODO UPDATE: https://github.com/codespaces/njericha-expert-space-goggles-96w695j9q5g274r7
 2. Open the command palett with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
-3. Enter `>julia: Start REPL`
+3. Enter `>Julia: Start REPL`
 4. In the REPL, resolve any dependency issues with `pkg> resolve` (use `julia> ]` to get to the package manager)
+
+Run one of the example files by opening the file and pressing the triangular "run" button, or `>Julia: Execute active File in REPL`.
 
 **OR**
 ### On your own device
@@ -35,6 +37,11 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 Type `julia> using SedimentAnalysis` load both submodules (`MTF` and `SedimentTools`), or if only one of the modules is desired, type `using SedimentAnalysis.XXX`.
 
 The modules are built to be independent of each other so that (eventually) the MTF could be moved to an separate package altogether.
+
+## Examples
+`knownsources.jl`: Uses data from Sundel et al where we know the sources of each Grain. Use this to see how well the factorization performs with realistic data.
+`unknownsources.jl`: Uses data from Lee et al where we don't have a ground truth. Showcases how the method would be used in practice.
+`randomtensor`: Factorizes a random 50x50x50 tensor. See how the factorization performs in theory when a perfect factorization exists.
 
 ## Submodules
 The two main submodules are MTF (**M**atrix **T**ensor **F**actorization) and SedimentTools.
