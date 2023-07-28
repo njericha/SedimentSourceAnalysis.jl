@@ -3,7 +3,7 @@
 #########
 
 """Struct to hold grain level data"""
-Grain = NamedVector{T} where T <: Real
+const Grain = NamedVector{T} where T <: Real
 
 """
     getmeasurements(g::Grain)
@@ -25,7 +25,7 @@ end
 #################
 # TODO add cleaner printing of Sinks
 """Struct to hold sink level data"""
-Sink = Vector{Grain} # TODO could use NamedMatrix
+const Sink = Vector{Grain} # TODO could use NamedMatrix
 
 """Gets the names of measurements from a Sink"""
 getmeasurements(s::Sink) = iszero(length(s)) ? String[] : getmeasurements(s[1])
@@ -73,7 +73,7 @@ Source = Sink
 # SO we will use a plain NamedArray where we hide the domains in the 3rd axis names
 
 """An order 3 array to hold the density distributions for multiple sinks."""
-DensityTensor{T} = NamedArray{T, 3} where T <: Real
+const DensityTensor{T} = NamedArray{T, 3} where T <: Real
 
 """
     DensityTensor(array, domains, measurement_names; kw...)
