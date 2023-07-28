@@ -19,7 +19,7 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 ## How setup the environment
 
 ### In Browser
-1. Go to TODO UPDATE: https://github.com/codespaces/njericha-expert-space-goggles-96w695j9q5g274r7
+1. Go to https://github.com/codespaces/njericha-expert-space-goggles-96w695j9q5g274r7
 2. Open the command palett with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
 3. Enter `>Julia: Start REPL`
 4. In the REPL, resolve any dependency issues with `pkg> resolve` (use `julia> ]` to get to the package manager)
