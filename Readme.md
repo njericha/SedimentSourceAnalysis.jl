@@ -16,21 +16,23 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://njericha.github.io/Sediment-Source-Analysis.jl/dev/)
 
-## How to use
+## How setup the environment
 
 ### In Browser
-1. Go to https://njericha-friendly-trout-qv6vq4pq9jq3xgq4.github.dev/
-
-Note you can start a terminal with `Ctrl+Shift+C` (Windows) or `Cmd+Shift+C` (Mac).
+1. Go to TODO UPDATE: https://njericha-friendly-trout-qv6vq4pq9jq3xgq4.github.dev/
+2. Open the command palett with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
+3. Enter `>julia: Start REPL`
+4. In the REPL, resolve any dependency issues with `pkg> resolve` (use `julia> ]` to get to the package manager)
 
 **OR**
 ### On your own device
-1. Clone the repo at https://github.com/njericha/Sediment-Source-Analysis.jl 
+1. Clone the repo at https://github.com/njericha/Sediment-Source-Analysis.jl
+2. Navigate to the root of the repository in a terminal and run `julia`
+3. Activate the project with `pkg> activate .` (use `julia> ]` to get to the package manager)
+4. resolve any dependency issues with `pkg> resolve`
 
 ### Importing the package
-2. Install with `julia> ] add SedimentAnalysis`.
-3. To import into a file or in the REPL, type `using SedimentAnalysis` load both submodules (`MTF` and `SedimentTools`).
-4. If only one of the modules is desired, type `using SedimentAnalysis.XXX`.
+Type `julia> using SedimentAnalysis` load both submodules (`MTF` and `SedimentTools`), or if only one of the modules is desired, type `using SedimentAnalysis.XXX`.
 
 The modules are built to be independent of each other so that (eventually) the MTF could be moved to an separate package altogether.
 
