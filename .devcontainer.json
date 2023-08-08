@@ -1,8 +1,12 @@
 // Copied from https://github.com/matsui528/julia_codespace_template
 // See https://github.com/julia-vscode/julia-devcontainer/blob/master/Dockerfile for image contents
-{
-	"name": "Julia (Community)",
-	"image": "ghcr.io/julia-vscode/julia-devcontainer",
+{	"features": {
+	    "ghcr.io/eitsupi/devcontainer-features/julia:0": {
+		"version": "1.9"
+	    }
+	},
+	"name": "Julia",//"Julia (Community)",
+// 	"image": "ghcr.io/julia-vscode/julia-devcontainer",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -15,7 +19,7 @@
 		}
 	},
 
-	"postCreateCommand": "/julia-devcontainer-scripts/postcreate.jl",
+// 	"postCreateCommand": "/julia-devcontainer-scripts/postcreate.jl",
 
-	"remoteUser": "vscode"
+// 	"remoteUser": "vscode"
 }
