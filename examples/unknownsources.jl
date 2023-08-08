@@ -6,6 +6,7 @@ using XLSX
 using NamedArrays
 using Plots
 using SedimentAnalysis
+using Printf
 
 # Import data from excel file
 filename = "./data/lee2021/Lee et al 2021 All Measurements.xlsx"
@@ -88,7 +89,7 @@ for rank in ranks
         (C, F, rel_errors, norm_grad, dist_Ncone)
     )
     @printf("%4i | %12i | %3.3g\n",
-        rank, length(rel_errors), final_rel_error[rank])
+        rank, length(rel_errors), rel_errors[end])
 end
 
 # Plot Convergence
@@ -96,6 +97,7 @@ end
 #display.(plots)
 
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
+options = (:label => false, :xlabel => "rank")
 p = plot(d2_dx2(map(x -> x[end],all_rel_errors)); ylabel="2nd derivative of relative error", options...)
 display(p)
 
