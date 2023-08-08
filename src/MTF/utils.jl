@@ -73,6 +73,7 @@ respectively. The remaining interior points use five point differences.
 Force only the third order approximation with third_order=true.
 """
 function d2_dx2(y::AbstractVector{<:Real}, third_order::Bool=false)
+    length(y) < 5 ? third_order=true : nothing
     return third_order ? _d2_dx2_3(y) : _d2_dx2_5(y)
 end
 # TODO is there a package that does this? The ones I've seen require the forward function.
@@ -90,17 +91,21 @@ end
 
 function _d2_dx2_5(y::AbstractVector{<:Real})
     d = zero(y)
-    for i in eachindex(y)[begin+2:end-2]
-        d[i] = (-y[i-1] + 16*y[i-1] - 30*y[i] + 16*y[i+1] - y[i+2])/12
+    each_i = eachindex(y)
+
+    # Interior Ppints
+    for i in each_i[begin+2:end-2]
+        d[i] = (-y[i-2] + 16*y[i-1] - 30*y[i] + 16*y[i+1] - y[i+2])/12
     end
 
-    # Third order for the next-to-end points
-    for i in eachindex(y)[[begin+1, end-1]]
-        d[i] = y[i-1] - 2*y[i] + y[i+1]
-    end
+    # Boundary and next-to boundary points
+    i = each_i[begin+2]
+    d[i-2] = (35*y[i-2] - 104*y[i-1] + 114*y[i] - 56*y[i+1] + 11*y[i+2])/12
+    d[i-1] = (11*y[i-2] - 20*y[i-1] + 6*y[i] + 4*y[i+1] - y[i+2])/12
 
-    # Assume the same curvature at the end points
-    d[begin] = d[begin+1]
-    d[end] = d[end-1]
+    i = each_i[end-2]
+    d[i+1] = (-y[i-2] + 4*y[i-1] + 6*y[i] - 20*y[i+1] + 11*y[i+2])/12
+    d[i+2] = (11*y[i-2] - 56*y[i-1] + 114*y[i] - 104*y[i+1] + 35*y[i+2])/12
+
     return d
 end

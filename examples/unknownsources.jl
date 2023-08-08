@@ -7,6 +7,11 @@ using NamedArrays
 using Plots
 using SedimentAnalysis
 using Printf
+using Random
+
+# set random seed for repeatability
+# does not randomize data, but the initialization for nnmtf
+Random.seed!(314159265)
 
 # Import data from excel file
 filename = "./data/lee2021/Lee et al 2021 All Measurements.xlsx"
@@ -78,7 +83,7 @@ display(p)
 
 # Perform the nonnegative decomposition Y=CF
 Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
-ranks = 1:9
+ranks = 1:length(getmeasurements(grain1))
 Cs, Fs, all_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:5)
 
 println("rank | n_iterations | relative error")
@@ -101,7 +106,7 @@ options = (:label => false, :xlabel => "rank")
 p = plot(d2_dx2(map(x -> x[end],all_rel_errors)); ylabel="2nd derivative of relative error", options...)
 display(p)
 
-p = plot((map(x -> x[end],all_rel_errors)); ylabel="2nd derivative of relative error", options...)
+p = plot((map(x -> x[end],all_rel_errors)); ylabel="relative error", options...)
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
