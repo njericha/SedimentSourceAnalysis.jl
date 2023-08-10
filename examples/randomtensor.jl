@@ -25,7 +25,7 @@ Y = C_true * F_true # set Y[i,j,k] = \sum_r C[i,r] * F[r,j,k]
 
 # Perform the nonnegative decomposition Y=CF
 rank = 5
-C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank, tol=1, maxiter=1500; rescale_Y=false);
+C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank, tol=3e-1, maxiter=2000; rescale_Y=false);
 
 # Plot Convergence
 plots = plot_convergence(rel_errors, norm_grad, dist_Ncone)
@@ -53,7 +53,7 @@ final_norm_grad = zeros(length(ranks))
 final_dist_Ncone = zeros(length(ranks))
 println("rank | n_iterations | relative error")
 for rank in ranks
-    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank, tol=1, maxiter=1500; rescale_Y=false);
+    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank, tol=3e-1, maxiter=2000; rescale_Y=false);
     final_rel_error[rank] = rel_errors[end]
     final_norm_grad[rank] = norm_grad[end]
     final_dist_Ncone[rank] = dist_Ncone[end]
