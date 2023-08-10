@@ -97,10 +97,6 @@ for rank in ranks
         rank, length(rel_errors), rel_errors[end])
 end
 
-# Plot Convergence
-#plots = plot_convergence(rel_error, norm_grad, dist_Ncone)
-#display.(plots)
-
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
 options = (:label => false, :xlabel => "rank")
 p = plot(d2_dx2(map(x -> x[end],all_rel_errors)); ylabel="2nd derivative of relative error", options...)
@@ -116,6 +112,11 @@ C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
     best_rank
 )
+
+# Plot Convergence
+plots = plot_convergence(rel_errors, norm_grad, dist_Ncone)
+display.(plots)
+
 F = DensityTensor(F, domains, getmeasurements(densitytensor))
 setsourcename!(F, "learned source")
 
