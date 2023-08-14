@@ -198,19 +198,19 @@ source_indexes = map(g -> estimate_which_source(g, factortensor), sinks[1])
 
 ## We should see a nice step pattern since the sinks have grains order by the source they
 ## came from. You would not expect to have this perfect ordering for real data.
-## Idealy the "misses" have smaller likelyhoods
+## Idealy the "misses" have smaller likelihoods
 ## i.e. we are less confident which source the grain came from.
 
-## For each grain, get the source index estimate, and the list of likelyhoods for each source
-source_indexes, source_likelyhoods = zip(
-    map(g -> estimate_which_source(g, factortensor, all_likelyhoods=true), sinks[1])...)
+## For each grain, get the source index estimate, and the list of likelihoods for each source
+source_indexes, source_likelihoods = zip(
+    map(g -> estimate_which_source(g, factortensor, all_likelihoods=true), sinks[1])...)
 
-## Sort the likelyhoods, and find the log of the max/2nd highest likelyhood
-sort!.(source_likelyhoods, rev=true) # descending order
-loglikelyhood_ratios = [log10(s_likelyhoods[1] / (s_likelyhoods[2] + eps())) for s_likelyhoods in source_likelyhoods]
+## Sort the likelihoods, and find the log of the max/2nd highest likelihood
+sort!.(source_likelihoods, rev=true) # descending order
+loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
 
 p = plot_source_index(
-    collect(source_indexes), loglikelyhood_ratios;
-    title="Grains' Estimated Source and Log Likelyhood Ratio"
+    collect(source_indexes), loglikelihood_ratios;
+    title="Grains' Estimated Source and Log Likelihood Ratio"
 )
 display(p)

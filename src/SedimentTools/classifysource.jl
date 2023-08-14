@@ -87,35 +87,35 @@ end
 """
     estimate_which_source(grain::Grain, F::DensityTensor; kwargs...)
 
-Returns the likelyhood and source index of the mostly likely factor
+Returns the likelihood and source index of the mostly likely factor
 the grain vector came from.
 
 # Returns
 - (Default) `source_index::Integer`: The index of the most likely source
-- (when `max_likelyhoods==true`) `(maxlikelyhood, source_index)`: The most likely source and its likelyhood
-- (when `all_likelyhoods==true`) `likelyhoods::Vector{Real}`: Likelyhood grain came from each source
-- (when both are true) `((maxlikelyhood, source_index), likelyhoods)`
+- (when `max_likelihoods==true`) `(maxlikelihood, source_index)`: The most likely source and its likelihood
+- (when `all_likelihoods==true`) `likelihoods::Vector{Real}`: Likelihood grain came from each source
+- (when both are true) `((maxlikelihood, source_index), likelihoods)`
 """
-function estimate_which_source(grain::Grain, F::DensityTensor; max_likelyhoods=false, all_likelyhoods=false)
+function estimate_which_source(grain::Grain, F::DensityTensor; max_likelihoods=false, all_likelihoods=false)
     getmeasurements(grain) == getmeasurements(F) ||
         ArgumentError("Grain and F don't have matching measurements")
     sources = eachsource(F)
-    likelyhoods = zeros(length(sources))
+    likelihoods = zeros(length(sources))
     domains = getdomains(F)
     stepsizes = getstepsizes(F)
 
     for (i, source) ∈ enumerate(sources)
         prob = _estimate_prob(grain, source, domains, stepsizes)
-        likelyhoods[i] = prob
+        likelihoods[i] = prob
     end
 
-    if max_likelyhoods && all_likelyhoods
-        return findmax(likelyhoods), likelyhoods
-    elseif max_likelyhoods
-        return findmax(likelyhoods)
-    elseif all_likelyhoods
-        return findmax(likelyhoods)[2], likelyhoods
+    if max_likelihoods && all_likelihoods
+        return findmax(likelihoods), likelihoods
+    elseif max_likelihoods
+        return findmax(likelihoods)
+    elseif all_likelihoods
+        return findmax(likelihoods)[2], likelihoods
     else
-        return findmax(likelyhoods)[2]
+        return findmax(likelihoods)[2]
     end
 end

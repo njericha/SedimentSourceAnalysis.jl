@@ -77,22 +77,22 @@ end
 """
     plot_source_index(
     indexes::AbstractVector{<:Integer},
-    loglikelyhood_ratios::AbstractVector{<:Real};
+    loglikelihood_ratios::AbstractVector{<:Real};
     kwargs...
     )
 
 Returns one scatter plot of dots (eachindex(indexes), indexes) with brighter colours
-corresponding to higher loglikelyhood_ratios.
+corresponding to higher loglikelihood_ratios.
 """
 function plot_source_index(
     indexes::AbstractVector{<:Integer},
-    loglikelyhood_ratios::AbstractVector{<:Real};
+    loglikelihood_ratios::AbstractVector{<:Real};
     kwargs...
     )
     p = scatter(
             indexes;
-            marker_z=loglikelyhood_ratios,
-            clabel="log likelyhood ratio",
+            marker_z=loglikelihood_ratios,
+            clabel="log likelihood ratio",
             colorbar_ticks=(0:0.5:1, ["0", "0.5", ">1.0"]),
             clim=(0,1),
             xlabel="Grain Index",
