@@ -7,7 +7,7 @@ using NamedArrays
 using Plots
 using Printf
 using Random
-using Statistics
+using Statistics: mean
 using SedimentAnalysis
 
 # set random seed for repeatability
@@ -192,9 +192,6 @@ display.(plots);
 @show rel_error(coefficientmatrix * factortensor, densitytensor)
 
 # Now go back and classify each grain as source 1, 2, or 3 based on the learned sources
-## Start with just the first sink
-
-source_indexes = map(g -> estimate_which_source(g, factortensor), sinks[1])
 
 ## We should see a nice step pattern since the sinks have grains order by the source they
 ## came from. You would not expect to have this perfect ordering for real data.
@@ -202,6 +199,7 @@ source_indexes = map(g -> estimate_which_source(g, factortensor), sinks[1])
 ## i.e. we are less confident which source the grain came from.
 
 ## For each grain, get the source index estimate, and the list of likelihoods for each source
+## Start with just the first sink
 source_indexes, source_likelihoods = zip(
     map(g -> estimate_which_source(g, factortensor, all_likelihoods=true), sinks[1])...)
 
@@ -214,3 +212,20 @@ p = plot_source_index(
     title="Grains' Estimated Source and Log Likelihood Ratio"
 )
 display(p)
+
+# Compare against classification using the true densities
+source_indexes, source_likelihoods = zip(
+    map(g -> estimate_which_source(g, factortensor_true, all_likelihoods=true), sinks[1])...)
+
+## Sort the likelihoods, and find the log of the max/2nd highest likelihood
+sort!.(source_likelihoods, rev=true) # descending order
+loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
+
+p = plot_source_index(
+    collect(source_indexes), loglikelihood_ratios;
+    title="Grains' Estimated True Source and Log Likelihood Ratio"
+)
+display(p)
+
+## Can also see that some grains are mislabelled using the true densities,
+## Where there are 3 common grains that are mislablled using either true or learned densities

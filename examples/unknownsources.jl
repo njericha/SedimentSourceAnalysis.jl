@@ -84,11 +84,13 @@ display(p)
 # Perform the nonnegative decomposition Y=CF
 Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
 ranks = 1:length(getmeasurements(grain1))
+maxiter = 5000
+tol = 1e-5
 Cs, Fs, all_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:5)
 
 println("rank | n_iterations | relative error")
 for rank in ranks
-    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
+    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol);
     push!.(
         (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
         (C, F, rel_errors, norm_grad, dist_Ncone)
@@ -136,9 +138,6 @@ display.(plots);
 @show rel_error(C * F, densitytensor)
 
 # Now go back and classify each grain as source 1, 2, or 3 based on the learned sources
-## Start with just the first sink
-
-source_indexes = map(g -> estimate_which_source(g, F), sinks[1])
 
 ## We should see a nice step pattern since the sinks have grains order by the source they
 ## came from. You would not expect to have this perfect ordering for real data.
@@ -146,6 +145,8 @@ source_indexes = map(g -> estimate_which_source(g, F), sinks[1])
 ## i.e. we are less confident which source the grain came from.
 
 ## For each grain, get the source index estimate, and the list of likelihoods for each source
+
+## Start with just the first sink
 source_indexes, source_likelihoods = zip(
     map(g -> estimate_which_source(g, F, all_likelihoods=true), sinks[1])...)
 
