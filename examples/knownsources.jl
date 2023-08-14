@@ -5,7 +5,14 @@ Use data from /data/sundell2022
 using XLSX
 using NamedArrays
 using Plots
+using Printf
+using Random
+using Statistics
 using SedimentAnalysis
+
+# set random seed for repeatability
+# does not randomize data, but the initialization for nnmtf
+Random.seed!(314159265)
 
 # Import data from excel file
 filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
@@ -73,10 +80,42 @@ measurement_names = getmeasurements(densitytensor) # ["Age", ...]
 p = plot_densities(densitytensor, "Age");
 display(p)
 
-# Perform the nonnegative decomposition Y=CF
+# Find the best rank and perform the nonnegative decomposition Y=CF
 Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
-rank = 3
-C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
+maxiter = 5000
+tol = 1e-5
+#rank = 3
+#C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
+
+ranks = 1:length(getmeasurements(grain1))
+Cs, Fs, all_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:5)
+
+println("rank | n_iterations | relative error")
+for rank in ranks
+    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol);
+    push!.(
+        (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
+        (C, F, rel_errors, norm_grad, dist_Ncone)
+    )
+    @printf("%4i | %12i | %3.3g\n",
+        rank, length(rel_errors), rel_errors[end])
+end
+
+## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
+options = (:label => false, :xlabel => "rank")
+p = plot((map(x -> x[end],all_rel_errors)); ylabel="relative error", options...)
+display(p)
+
+p = plot(d2_dx2(map(x -> x[end],all_rel_errors)); ylabel="2nd derivative of relative error", options...)
+display(p)
+
+## Extract the variables corresponding to the optimal rank
+best_rank = argmax(d2_dx2(map(x -> x[end],all_rel_errors)))
+@show best_rank
+C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
+    (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
+    best_rank
+)
 
 # Plot Convergence
 plots = plot_convergence(rel_errors, norm_grad, dist_Ncone)
@@ -119,10 +158,19 @@ coefficientmatrix = NamedArray(C, dimnames=("sink", "learned source"))
 
 # Visualize and compare the coefficientmatrix and factortensor
 # Note display should be called after all plots have been finalized
-p = heatmap(coefficientmatrix; title="Learned Coefficients");
+options = (:xlabel => "source", :ylabel => "sink")
+p = heatmap(coefficientmatrix; title="Learned Coefficients", clims = (0,1), options...);
 display(p)
-p = heatmap(coefficientmatrix_true; title="True Coefficients");
+p = heatmap(coefficientmatrix_true; title="True Coefficients", clims = (0,1), options...);
 display(p)
+
+diff_coefficientmatrix = NamedArray(abs.(coefficientmatrix_true - coefficientmatrix),
+    dimnames=("sink", "source"))
+p = heatmap(diff_coefficientmatrix; title="Absolute Difference Between Learned and True Coefficients",
+    clims = (0,0.15), options...);
+display(p)
+
+@show mean(diff_coefficientmatrix)
 
 learned_source_plots = source_heatmaps(factortensor; title="Learned Densities for ");
 true_source_plots = source_heatmaps(factortensor_true; title="True Densities for ");
@@ -158,7 +206,7 @@ source_indexes, source_likelyhoods = zip(
     map(g -> estimate_which_source(g, factortensor, all_likelyhoods=true), sinks[1])...)
 
 ## Sort the likelyhoods, and find the log of the max/2nd highest likelyhood
-sort!.(source_likelyhoods, rev=true)
+sort!.(source_likelyhoods, rev=true) # descending order
 loglikelyhood_ratios = [log10(s_likelyhoods[1] / (s_likelyhoods[2] + eps())) for s_likelyhoods in source_likelyhoods]
 
 p = plot_source_index(
