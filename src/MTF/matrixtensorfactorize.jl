@@ -87,7 +87,7 @@ function nnmtf(
 
         # Calculate relative error and norm of gradient
         i += 1
-        rel_errors[i] = rel_error(Y, C*F)
+        rel_errors[i] = rel_error(C*F, Y)
         grad_C, grad_F = calc_gradient(C, F, Y)
         norm_grad[i] = combined_norm(grad_C, grad_F)
         dist_Ncone[i] = dist_to_Ncone(grad_C, grad_F, C, F)
@@ -148,19 +148,19 @@ end
 function updateC!(C, F, Y)
     @einsum FF[i,j] := F[i,p,q]*F[j,p,q]
     @einsum GG[i,j] := Y[i,p,q]*F[j,p,q]
-    L = norm(FF) # TODO Optimize calculation to take advantage of symmetry of FF
+    L = norm(FF)
     grad = C*FF .- GG
     #L = 2 * norm(grad*FF) / norm(grad)
-    C .-= grad ./ L * 1.9 # gradient step
+    C .-= grad ./ (L * 1.9) # gradient step
     C .= ReLU.(C) # project
 end
 
 function updateF!(C, F, Y)
     CC = C'C
-    L = norm(CC) # TODO Optimize calculation to take advantage of symmetry of CC
+    L = norm(CC)
     grad = CC*F .- C'*Y
     #L = 2 * norm(CC*grad) / norm(grad)
-    F .-= grad ./ L * 1.9 # gradient step
+    F .-= grad ./ (L * 1.9) # gradient step
     F .= ReLU.(F) # project
 end
 
