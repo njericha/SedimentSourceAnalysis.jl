@@ -32,7 +32,6 @@ display(grain1)
 
 ## Select the bandwidth for the estimation
 ## Uses Silverman's rule of thumb
-#n_density_samples = 2^7
 sink1 = sinks[begin]
 inner_percentile = 95 # Filter outliers; ignore values outside the inner percentile
 alpha_ = 0.9 # bandwidth "alpha" smooths the density estimate, 0.9 is the default
@@ -82,35 +81,37 @@ display(p)
 
 # Find the best rank and perform the nonnegative decomposition Y=CF
 Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
-maxiter = 5000
+maxiter = 7000
 tol = 1e-5
 #rank = 3
 #C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
 
 ranks = 1:length(getmeasurements(grain1))
-Cs, Fs, all_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:5)
+Cs, Fs, all_rel_errors, final_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
 
 println("rank | n_iterations | relative error")
 for rank in ranks
     C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol);
+    final_rel_error = rel_errors[end]
     push!.(
-        (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
-        (C, F, rel_errors, norm_grad, dist_Ncone)
+        (Cs, Fs, all_rel_errors, final_rel_errors, norm_grads, dist_Ncones),
+        (C, F, rel_errors, final_rel_error, norm_grad, dist_Ncone)
     )
     @printf("%4i | %12i | %3.3g\n",
-        rank, length(rel_errors), rel_errors[end])
+        rank, length(rel_errors), final_rel_error)
 end
+final_rel_errors = convert(Vector{Float64}, final_rel_errors)
 
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
 options = (:label => false, :xlabel => "rank")
-p = plot((map(x -> x[end],all_rel_errors)); ylabel="relative error", options...)
+p = plot(final_rel_errors; ylabel="relative error", options...)
 display(p)
 
-p = plot(d2_dx2(map(x -> x[end],all_rel_errors)); ylabel="2nd derivative of relative error", options...)
+p = plot(d2_dx2(final_rel_errors); ylabel="2nd derivative of relative error", options...)
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
-best_rank = argmax(d2_dx2(map(x -> x[end],all_rel_errors)))
+best_rank = argmax(d2_dx2(final_rel_errors))
 @show best_rank
 C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
@@ -200,8 +201,10 @@ display.(plots);
 
 ## For each grain, get the source index estimate, and the list of likelihoods for each source
 ## Start with just the first sink
+domains = getdomains(factortensor) # extract domains and stepsizes once to speed up code
+stepsizes = getstepsizes(factortensor)
 source_labels, source_likelihoods = zip(
-    map(g -> estimate_which_source(g, factortensor, all_likelihoods=true), sinks[1])...)
+    map(g -> estimate_which_source(g, factortensor; domains, stepsizes, all_likelihoods=true), sinks[1])...)
 
 ## Sort the likelihoods, and find the log of the max/2nd highest likelihood
 sort!.(source_likelihoods, rev=true) # descending order
@@ -215,7 +218,7 @@ display(p)
 
 # Compare against classification using the true densities
 source_labels, source_likelihoods = zip(
-    map(g -> estimate_which_source(g, factortensor_true, all_likelihoods=true), sinks[1])...)
+    map(g -> estimate_which_source(g, factortensor_true; domains, stepsizes, all_likelihoods=true), sinks[1])...)
 
 ## Sort the likelihoods, and find the log of the max/2nd highest likelihood
 sort!.(source_likelihoods, rev=true) # descending order
@@ -232,11 +235,12 @@ display(p)
 
 # Label every grain in every sink
 ## Use the learned distributions first
-source_labels = [map(g -> estimate_which_source(g, factortensor), sink) for sink in sinks]
+label_grains(factortensor) = [map(g -> estimate_which_source(g, factortensor; domains, stepsizes), sink) for sink in sinks]
+source_labels = label_grains(factortensor)
 n_correct_eachsink, n_total_labels, accuracy = label_accuracy(source_labels, source_amounts)
 
 ## Then the distributions from the sources
-true_source_labels = [map(g -> estimate_which_source(g, factortensor_true), sink) for sink in sinks]
+true_source_labels = label_grains(factortensor_true)
 true_source_n_correct_eachsink, _, true_source_accuracy = label_accuracy(true_source_labels, source_amounts)
 
 @show accuracy

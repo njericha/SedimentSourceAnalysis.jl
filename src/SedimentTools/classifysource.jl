@@ -45,27 +45,36 @@ end
 """
     _find_subinterval(domain, value)
 
-Find which subinterval the data lies in for each measurement
+Find which subinterval the data lies in for each measurement.
+
+Assumes the domain is in increasing order. Returns the first intervel (1, 2) and if the
+value is less than every element in the domain, returns the last intervel
+(length(domain)-1 , length(domain)).
 
 ```jdocstest
 julia> test_scale = 1:10
 1:10
 
 julia> find_subinterval(test_scale, 4.8)
-5
+(4, 5)
 ```
 """
 function _find_subinterval(domain, value)
-    val, k = findmin(x -> abs(x - value), domain)
-    return k
+    left = findlast(domain .<= value)
+    if isnothing(left)
+        left = 1
+    elseif left == length(domain)
+        left -= 1
+    end
+    return left, left + 1
 end
 
 """
     _estimate_prob(source, domains, grain)
 
 Estimates the probability of observing grain from the single factor
-This assumes the distributions are normalized in the sence that
-they carry equal weight e.i. the row_sums are 1.
+This assumes the distributions are normalized in the sense that
+they carry equal weight i.e. the row_sums are 1.
 
 Note the distributions before rescaling have a row_sum equal to 1/stepsize
 with stepsize being the intervel width used in scale.
@@ -74,10 +83,9 @@ function _estimate_prob(grain::Grain, source, domains, stepsizes)
     n_measurements = length(getmeasurements(grain))
     measurement_probabilities = zeros(n_measurements)
     for (j, (grain_value, density, domain, stepsize)) ∈ enumerate(zip(grain, eachrow(source), domains, stepsizes))
-        subinterval_k = _find_subinterval(domain, grain_value)
-        density_k = density[subinterval_k] # Get the density for observing a measurement on that intervel
+        left, right = _find_subinterval(domain, grain_value)
+        density_k = (density[left] + density[right])/2 # Get the density for observing a measurement on that intervel
         measurement_probabilities[j] = density_k * stepsize # estimate the probability by 0th order area
-        # TODO estimate the probability with 1st order trapizoid
     end
     ## Multiply the probabilities to get the overall probability of
     ## observing the data in that volume
@@ -96,13 +104,18 @@ the grain vector came from.
 - (when `all_likelihoods==true`) `likelihoods::Vector{Real}`: Likelihood grain came from each source
 - (when both are true) `((maxlikelihood, source_index), likelihoods)`
 """
-function estimate_which_source(grain::Grain, F::DensityTensor; max_likelihoods=false, all_likelihoods=false)
+function estimate_which_source(
+    grain::Grain,
+    F::DensityTensor;
+    max_likelihoods=false,
+    all_likelihoods=false,
+    domains = getdomains(F),
+    stepsizes = getstepsizes(F)
+ )
     getmeasurements(grain) == getmeasurements(F) ||
         ArgumentError("Grain and F don't have matching measurements")
     sources = eachsource(F)
     likelihoods = zeros(length(sources))
-    domains = getdomains(F)
-    stepsizes = getstepsizes(F)
 
     for (i, source) ∈ enumerate(sources)
         prob = _estimate_prob(grain, source, domains, stepsizes)
