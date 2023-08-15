@@ -230,10 +230,18 @@ display(p)
 ## Can also see that some grains are mislabelled using the true densities,
 ## Where there are 3 common grains that are mislablled using either true or learned densities
 
+# Label every grain in every sink
+## Use the learned distributions first
 source_labels = [map(g -> estimate_which_source(g, factortensor), sink) for sink in sinks]
-true_source_labels = [map(g -> estimate_which_source(g, factortensor_true), sink) for sink in sinks]
 n_correct_eachsink, n_total_labels, accuracy = label_accuracy(source_labels, source_amounts)
+
+## Then the distributions from the sources
+true_source_labels = [map(g -> estimate_which_source(g, factortensor_true), sink) for sink in sinks]
 true_source_n_correct_eachsink, _, true_source_accuracy = label_accuracy(true_source_labels, source_amounts)
 
 @show accuracy
 @show true_source_accuracy
+
+## Can see similar accuracy which implies it is not the learned densities that are
+## innaccurate, but about 10% of the grains are simply "unlikely" to be from the source they
+## came from.

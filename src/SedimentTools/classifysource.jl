@@ -152,7 +152,7 @@ function label_accuracy(labels, true_amounts::AbstractMatrix{T}) where T <: Inte
 end
 
 function label_accuracy(labels, true_amounts::AbstractMatrix{Any})
-    return label_accuracy(labels, convert(Matrix{Integer}, source_amounts))
+    return label_accuracy(labels, convert(Matrix{Integer}, true_amounts))
 end
 
 """
