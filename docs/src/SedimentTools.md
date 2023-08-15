@@ -60,8 +60,9 @@ eachsource
 
 ### Density and Source Estimation
 ```@docs
-estimate_which_source
 default_bandwidth
+estimate_which_source
+label_accuracy
 make_densities
 match_sources!
 standardize_KDEs

@@ -200,7 +200,7 @@ display.(plots);
 
 ## For each grain, get the source index estimate, and the list of likelihoods for each source
 ## Start with just the first sink
-source_indexes, source_likelihoods = zip(
+source_labels, source_likelihoods = zip(
     map(g -> estimate_which_source(g, factortensor, all_likelihoods=true), sinks[1])...)
 
 ## Sort the likelihoods, and find the log of the max/2nd highest likelihood
@@ -208,13 +208,13 @@ sort!.(source_likelihoods, rev=true) # descending order
 loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
 
 p = plot_source_index(
-    collect(source_indexes), loglikelihood_ratios;
+    collect(source_labels), loglikelihood_ratios;
     title="Grains' Estimated Source and Log Likelihood Ratio"
 )
 display(p)
 
 # Compare against classification using the true densities
-source_indexes, source_likelihoods = zip(
+source_labels, source_likelihoods = zip(
     map(g -> estimate_which_source(g, factortensor_true, all_likelihoods=true), sinks[1])...)
 
 ## Sort the likelihoods, and find the log of the max/2nd highest likelihood
@@ -222,10 +222,18 @@ sort!.(source_likelihoods, rev=true) # descending order
 loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
 
 p = plot_source_index(
-    collect(source_indexes), loglikelihood_ratios;
+    collect(source_labels), loglikelihood_ratios;
     title="Grains' Estimated True Source and Log Likelihood Ratio"
 )
 display(p)
 
 ## Can also see that some grains are mislabelled using the true densities,
 ## Where there are 3 common grains that are mislablled using either true or learned densities
+
+source_labels = [map(g -> estimate_which_source(g, factortensor), sink) for sink in sinks]
+true_source_labels = [map(g -> estimate_which_source(g, factortensor_true), sink) for sink in sinks]
+n_correct_eachsink, n_total_labels, accuracy = label_accuracy(source_labels, source_amounts)
+true_source_n_correct_eachsink, _, true_source_accuracy = label_accuracy(true_source_labels, source_amounts)
+
+@show accuracy
+@show true_source_accuracy
