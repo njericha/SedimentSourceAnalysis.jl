@@ -15,6 +15,7 @@ dist_to_Ncone
 nnmtf
 plot_factors
 rel_error
+mean_rel_error
 ```
 
 ## Index

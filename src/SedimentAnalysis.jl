@@ -9,7 +9,7 @@ include("SedimentTools/SedimentTools.jl")
 using .MTF
 using .SedimentTools
 
-export combined_norm, d2_dx2, dist_to_Ncone, nnmtf, plot_factors, rel_error # matrixtensorfactorization
+export combined_norm, d2_dx2, dist_to_Ncone, nnmtf, plot_factors, rel_error, mean_rel_error # matrixtensorfactorization
 
 export Grain, DensityTensor, Rock, Sink, Source # Types
 export array, getdomain, getdomains, getsourcename, getsourcenames, getmeasurements

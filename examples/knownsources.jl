@@ -111,7 +111,7 @@ p = plot(d2_dx2(final_rel_errors); ylabel="2nd derivative of relative error", op
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
-best_rank = argmax(d2_dx2(final_rel_errors))
+best_rank = 3#argmax(d2_dx2(final_rel_errors))
 @show best_rank
 C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
@@ -189,8 +189,8 @@ display.(plots);
 # ex. 0.15 relative error can be thought of as 85% similarity
 # TODO use other metrics like RMSE and SNR
 @show rel_error(coefficientmatrix, coefficientmatrix_true) # The warning that names are different is O.K.
-@show rel_error(factortensor, factortensor_true)
-@show rel_error(coefficientmatrix * factortensor, densitytensor)
+@show mean_rel_error(factortensor, factortensor_true)
+@show mean_rel_error(coefficientmatrix * factortensor, densitytensor)
 
 # Now go back and classify each grain as source 1, 2, or 3 based on the learned sources
 

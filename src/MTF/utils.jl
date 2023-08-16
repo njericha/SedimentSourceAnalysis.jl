@@ -56,9 +56,28 @@ The relative error is given by:
 ```math
 \\frac{\\lVert \\hat{x} - x \\rVert}{\\lVert x \\rVert}
 ```
+See also [`mean_rel_error`](@ref).
 """
-rel_error(xhat, x) = norm(xhat - x) / norm(x)
-# TODO use Distances.jl to define more robust errors
+function rel_error(xhat, x)
+    return norm(xhat - x) / norm(x)
+end
+
+"""
+    mean_rel_error(X, Xhat; dims=2)
+
+Compute the mean relative error between the dims-order slices of X and Xhat.
+
+The mean relative error is given by:
+```math
+\\frac{1}{N}\\sum_{j=1}^N\\frac{\\lVert \\hat{X}_j - X_j \\rVert}{\\lVert X_j \\rVert}
+```
+See also [`rel_error`](@ref).
+"""
+function mean_rel_error(Xhat, X; dims=2)
+    hatslices = eachslice(Xhat; dims)
+    slices = eachslice(X; dims)
+    return mean(@. norm(hatslices - slices) / (norm(slices)))
+end
 
 """
     d2_dx2(y::AbstractVector{<:Real})

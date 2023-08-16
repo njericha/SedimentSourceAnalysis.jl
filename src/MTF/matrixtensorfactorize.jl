@@ -87,7 +87,7 @@ function nnmtf(
 
         # Calculate relative error and norm of gradient
         i += 1
-        rel_errors[i] = rel_error(C*F, Y)
+        rel_errors[i] = mean_rel_error(C*F, Y)
         grad_C, grad_F = calc_gradient(C, F, Y)
         norm_grad[i] = combined_norm(grad_C, grad_F)
         dist_Ncone[i] = dist_to_Ncone(grad_C, grad_F, C, F)
