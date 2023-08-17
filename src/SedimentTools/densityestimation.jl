@@ -79,7 +79,8 @@ bulk of the data is.
 function make_densities(
     s::Sink;
     inner_percentile::Integer=100,
-    bandwidths::AbstractVector{<:Real}=default_bandwidth(s,DEFAULT_ALPHA,inner_percentile),
+    bandwidths::AbstractVector{<:Real}=default_bandwidth.(
+        collect(eachmeasurement(s)),DEFAULT_ALPHA,inner_percentile),
     )
     # Argument Handeling: check inner_percentile is a percentile
     (0 < inner_percentile <= 100) ||
