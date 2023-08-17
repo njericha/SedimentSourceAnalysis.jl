@@ -150,8 +150,7 @@ function updateC!(C, F, Y)
     @einsum GG[i,j] := Y[i,p,q]*F[j,p,q]
     L = norm(FF)
     grad = C*FF .- GG
-    #L = 2 * norm(grad*FF) / norm(grad)
-    C .-= grad ./ (L * 1.9) # gradient step
+    C .-= grad ./ L # gradient step
     C .= ReLU.(C) # project
 end
 
@@ -159,8 +158,7 @@ function updateF!(C, F, Y)
     CC = C'C
     L = norm(CC)
     grad = CC*F .- C'*Y
-    #L = 2 * norm(CC*grad) / norm(grad)
-    F .-= grad ./ (L * 1.9) # gradient step
+    F .-= grad ./ L # gradient step
     F .= ReLU.(F) # project
 end
 
