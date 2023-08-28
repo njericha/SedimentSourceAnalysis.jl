@@ -311,10 +311,12 @@ end
 # Iterators
 """
     eachdensity(D::DensityTensor)
+    eachdensity(D::DensityTensor, measurement::String)
 
 Iterates D over each density vector. These are the 3 fibers of D.
+If a measurement is given, iterates over the densities for that measurement.
 """
-eachdensity(D::DensityTensor) = eachslice(D, dims=(2,1))
+eachdensity(D::DensityTensor) = eachslice(D, dims=(1,2))
 eachdensity(D::DensityTensor, measurement::String) = eachrow(D[:, measurement, :])
 
 """
