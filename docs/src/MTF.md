@@ -10,12 +10,19 @@ Abstract3Tensor
 ```@docs
 *(::AbstractMatrix, ::Abstract3Tensor)
 combined_norm
-d2_dx2
 dist_to_Ncone
 nnmtf
 plot_factors
 rel_error
 mean_rel_error
+```
+
+## Approximations
+```@docs
+d_dx
+d2_dx2
+curvature
+standard_curvature
 ```
 
 ## Index

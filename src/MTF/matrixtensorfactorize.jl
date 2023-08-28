@@ -49,6 +49,8 @@ function nnmtf(
     C = abs.(randn((M, R)))
     F = abs.(randn((R, N, P)))
 
+    rescaleCF!(C, F)
+
     problem_size = R*(M + N*P)
 
     # Scale Y if desired
@@ -120,7 +122,7 @@ Calculate the distance of the -gradient to the normal cone of the positive ortha
 function dist_to_Ncone(grad_C, grad_F, C, F)
     grad_C_restricted = grad_C[(C .> 0) .|| (grad_C .< 0)]
     grad_F_restricted = grad_F[(F .> 0) .|| (grad_F .< 0)]
-    return sqrt(norm(grad_C_restricted)^2 + norm(grad_F_restricted)^2)
+    return combined_norm(grad_C_restricted, grad_F_restricted)
 end
 
 # TODO move this ploting function to SedimentTools? Or seperate viz.jl file?
@@ -146,8 +148,8 @@ function plot_factors(F, names=string.(eachindex(F[1,:,1])); appendtitle="")
 end
 
 function updateC!(C, F, Y)
-    @einsum FF[i,j] := F[i,p,q]*F[j,p,q]
-    @einsum GG[i,j] := Y[i,p,q]*F[j,p,q]
+    @einsum FF[s,r] := F[s,j,k]*F[r,j,k]
+    @einsum GG[i,r] := Y[i,j,k]*F[r,j,k]
     L = norm(FF)
     grad = C*FF .- GG
     C .-= grad ./ L # gradient step
@@ -160,16 +162,27 @@ function updateF!(C, F, Y)
     grad = CC*F .- C'*Y
     F .-= grad ./ L # gradient step
     F .= ReLU.(F) # project
+    #F_fibres = eachslice(F, dims=(1,2))
+    #F_fibres .= projsplx.(F_fibres) # Simplex projection for each fibre in stead of ReLU
 end
 
 function calc_gradient(C, F, Y)
-    @einsum FF[i,j] := F[i,p,q]*F[j,p,q]
-    @einsum GG[i,j] := Y[i,p,q]*F[j,p,q]
+    @einsum FF[s,r] := F[s,j,k]*F[r,j,k]
+    @einsum GG[i,r] := Y[i,j,k]*F[r,j,k]
     CC = C'C
     grad_C = C*FF .- GG
     grad_F = CC*F .- C'*Y
     return grad_C, grad_F
 end
+
+# Could compute the gradients this way to reuse CF-Y,
+# but the first way is still faster!
+#=
+CFY = C*F .- Y
+@einsum grad_C[i,r] := CFY[i,j,k]*F[r,j,k]
+@einsum grad_F[r,j,k] := C[i,r]*CFY[i,j,k]
+return grad_C, grad_F
+=#
 
 """Rescales C and F so each factor (horizontal slices) of F has similar magnitude."""
 function rescaleCF!(C, F)

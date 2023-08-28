@@ -80,18 +80,20 @@ p = plot_densities(densitytensor, "Age");
 display(p)
 
 # Find the best rank and perform the nonnegative decomposition Y=CF
-Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
+Y = copy(array(densitytensor)); # plain Array{T, 3} type for faster factorization
+
+Y_lateral_slices = eachslice(Y, dims=2)
+Y_lateral_slices .*= getstepsizes(densitytensor)
+
 maxiter = 7000
 tol = 1e-5
-#rank = 3
-#C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank);
 
 ranks = 1:length(getmeasurements(grain1))
 Cs, Fs, all_rel_errors, final_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
 
 println("rank | n_iterations | relative error")
 for rank in ranks
-    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol);
+    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol, rescale_Y=false);
     final_rel_error = rel_errors[end]
     push!.(
         (Cs, Fs, all_rel_errors, final_rel_errors, norm_grads, dist_Ncones),
@@ -110,13 +112,20 @@ display(p)
 p = plot(d2_dx2(final_rel_errors); ylabel="2nd derivative of relative error", options...)
 display(p)
 
+p = plot(standard_curvature(final_rel_errors); ylabel="standard curvature of relative error", options...)
+display(p)
+
 ## Extract the variables corresponding to the optimal rank
-best_rank = 3#argmax(d2_dx2(final_rel_errors))
+best_rank = 3 # argmax(standard_curvature(final_rel_errors))
 @show best_rank
 C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
     best_rank
 )
+
+# Rescale F to match the original scaling for densitytensor
+F_lateral_slices = eachslice(F, dims=2)
+F_lateral_slices ./= getstepsizes(densitytensor)
 
 # Plot Convergence
 plots = plot_convergence(rel_errors, norm_grad, dist_Ncone)
@@ -135,6 +144,7 @@ sources = read_raw_data(filename)::Vector{Source}
 ## estimated on the same grid.
 ## They are wrapped in a tuple so the broadcasting is only on the sources.
 true_densities = make_densities.(sources, (domains,); bandwidths, inner_percentile)
+#true_densities = make_densities.(sources, (domains,); inner_percentile) # possibly different bandwidths
 
 ## Wrap in DensityTensor
 factortensor_true = DensityTensor(true_densities, domains, getmeasurements(densitytensor));
