@@ -4,102 +4,59 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 90219b4a-b620-488c-bdb6-d4533721a5da
-begin
-    import Pkg
-    # activate the shared project environment
-    Pkg.activate(Base.current_project())
-    # instantiate, i.e. make sure that all packages are downloaded
-    Pkg.instantiate()
+# ╔═╡ 05aeff39-5221-4261-9732-a20893f92335
+using Pkg
 
-    import SedimentAnalysis
-	#import SedimentTools
+# ╔═╡ 97c93b24-f145-4814-a733-92cca1e9d142
+Pkg.add(url="https://github.com/njericha/Sediment-Source-Analysis.jl")
+
+# ╔═╡ f7acb584-bdbc-4fa7-a96a-e5e217454af7
+begin
+	Pkg.add("XLSX")
+	Pkg.add("NamedArrays")
+	Pkg.add("Plots")
+	Pkg.add("Printf")
+	Pkg.add("Random")
+	Pkg.add("OrderedCollections")
 end
 
-# ╔═╡ 9ce69737-69a1-4577-9a96-359b3d580fbf
+# ╔═╡ da27d62e-84e9-499d-afe1-90ccd61ae5f8
+using SedimentAnalysis
+
+# ╔═╡ 0d218304-0758-41d7-8f2f-580c46553769
+# note: depending on the environment that Pluto links to (and what packages are already installed there) you may need to also run Pkg.add("package_name") before running this cell.
+
 begin
-	using XLSX: readxlsx, sheetnames
-	using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!, dimnames
+	using XLSX
+	using NamedArrays
 	using Plots
+	using Printf
+	using Random
+	#using Statistics: mean
 	using OrderedCollections: OrderedDict
-	#using Base: AbstractVecOrTuple
 end
 
-# ╔═╡ 9a468615-3ce4-4b33-a9e8-5e9f89f01e7b
-include("./src/SedimentTools/importing.jl")
-
-# ╔═╡ ec3fd2dc-a07e-4615-8f55-aaf68e8f0d73
-include("./src/SedimentTools/structs.jl")
-
-# ╔═╡ 464e30a2-38bb-4b73-896a-4e7a162a86ce
-# ╠═╡ disabled = true
-#=╠═╡
-#import Pkg
-  ╠═╡ =#
-
-# ╔═╡ f8b90b60-ae77-4041-9a41-a529e54fbfda
-# ╠═╡ disabled = true
-#=╠═╡
-include("./src/SedimentTools/SedimentTools.jl")
-#/Users/naomi/Desktop/NTD/Sediment-Source-Analysis.jl/src/SedimentTools
-#/Users/naomi/Desktop/NTD/Sediment-Source-Analysis.jl/src/SedimentTools.jl
-  ╠═╡ =#
-
-# ╔═╡ 3ad8323d-f53c-447d-9d1c-3793d707b3c5
-
-
-# ╔═╡ d18c3684-dd84-4b53-af7a-5c4b87cea70b
-# ╠═╡ disabled = true
-#=╠═╡
-#using SedimentTools
-#Pkg.add("SedimentTools")
-  ╠═╡ =#
-
-# ╔═╡ 1b8c5969-65fe-4175-88b7-b76d80063a23
+# ╔═╡ 9eb825f8-1bc7-411e-ac73-9ed77ab69013
 begin
 	# Import data from excel file
 	filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 	sinks = read_raw_data(filename)::Vector{Sink}
 end
 
-# ╔═╡ cb573e26-5068-4105-a307-a50fcf1b20c3
-# ╠═╡ disabled = true
-#=╠═╡
-#include("./src/SedimentAnalysis.jl")
-  ╠═╡ =#
-
-# ╔═╡ 4a9d6b6a-36d8-11ee-2c7d-fbc5a9b6bd29
-# ╠═╡ disabled = true
-#=╠═╡
-
-#begin
-#	using XLSX
-#	using NamedArrays
-#	using Plots
-#end
-
-  ╠═╡ =#
-
-# ╔═╡ cec5b85d-1a48-4c8a-9cce-d4b4e2bd702d
-# ╠═╡ disabled = true
-#=╠═╡
-#begin
-#	Pkg.add("XLSX")
-#	Pkg.add("NamedArrays")
-#	Pkg.add("Plots")
-#end
-  ╠═╡ =#
+# ╔═╡ 3ad8323d-f53c-447d-9d1c-3793d707b3c5
+begin
+	## Look at a grain
+	sink1 = sinks[begin]
+	grain1 = sink1[begin]
+	println("Grain 1 in Sink 1")
+	display(grain1)
+end
 
 # ╔═╡ Cell order:
-# ╠═464e30a2-38bb-4b73-896a-4e7a162a86ce
-# ╠═90219b4a-b620-488c-bdb6-d4533721a5da
-# ╠═f8b90b60-ae77-4041-9a41-a529e54fbfda
-# ╠═9ce69737-69a1-4577-9a96-359b3d580fbf
+# ╠═05aeff39-5221-4261-9732-a20893f92335
+# ╠═97c93b24-f145-4814-a733-92cca1e9d142
+# ╠═da27d62e-84e9-499d-afe1-90ccd61ae5f8
+# ╠═f7acb584-bdbc-4fa7-a96a-e5e217454af7
+# ╠═0d218304-0758-41d7-8f2f-580c46553769
+# ╠═9eb825f8-1bc7-411e-ac73-9ed77ab69013
 # ╠═3ad8323d-f53c-447d-9d1c-3793d707b3c5
-# ╠═9a468615-3ce4-4b33-a9e8-5e9f89f01e7b
-# ╠═ec3fd2dc-a07e-4615-8f55-aaf68e8f0d73
-# ╠═d18c3684-dd84-4b53-af7a-5c4b87cea70b
-# ╠═1b8c5969-65fe-4175-88b7-b76d80063a23
-# ╠═cb573e26-5068-4105-a307-a50fcf1b20c3
-# ╠═4a9d6b6a-36d8-11ee-2c7d-fbc5a9b6bd29
-# ╠═cec5b85d-1a48-4c8a-9cce-d4b4e2bd702d
