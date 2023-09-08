@@ -68,7 +68,7 @@ p = plot(final_rel_error; ylabel="final relative error", options...)
 display(p)
 
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
-p = plot(d2_dx2(final_rel_error); ylabel="2nd derivative of relative error", options...)
+p = plot(standard_curvature(final_rel_error); ylabel="curvature of relative error", options...)
 display(p)
 
 ## Rank does not really have a corrolation with the final norm of gradient

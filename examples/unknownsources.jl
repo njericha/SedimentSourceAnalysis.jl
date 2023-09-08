@@ -101,14 +101,14 @@ end
 
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
 options = (:label => false, :xlabel => "rank")
-p = plot(d2_dx2(map(x -> x[end],all_rel_errors)); ylabel="2nd derivative of relative error", options...)
+p = plot(standard_curvature(map(x -> x[end],all_rel_errors)); ylabel="curvature of relative error", options...)
 display(p)
 
 p = plot((map(x -> x[end],all_rel_errors)); ylabel="relative error", options...)
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
-best_rank = argmax(d2_dx2(map(x -> x[end],all_rel_errors)))
+best_rank = argmax(standard_curvature(map(x -> x[end],all_rel_errors)))
 @show best_rank
 C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
