@@ -46,8 +46,9 @@ function nnmtf(
     M, N, P = size(Y)
 
     # Initialize C, F
-    C = abs.(randn((M, R)))
-    F = abs.(randn((R, N, P)))
+    init(x...) = abs.(randn(x...))
+    C = init(M, R)
+    F = init(R, N, P)
 
     rescaleCF!(C, F)
 
