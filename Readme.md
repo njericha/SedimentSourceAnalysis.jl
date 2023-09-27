@@ -19,10 +19,11 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 ## How setup the environment
 
 ### In Browser
-1. Go to https://github.com/codespaces/njericha-expert-space-goggles-96w695j9q5g274r7
-2. Open the command palett with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
-3. Enter `>Julia: Start REPL`
-4. In the REPL, resolve any dependency issues with `pkg> resolve` (use `julia> ]` to get to the package manager)
+1. Go to https://github.com/njericha/Sediment-Source-Analysis.jl
+2. Click "<> Code" and press "+" to "Create a codespace on main". It make take a few moments to set up.
+3. Open the command palett with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
+4. Enter `>Julia: Start REPL`
+5. In the REPL, resolve any dependency issues with `pkg> resolve` and `pkg> instantiate` (use `julia> ]` to get to the package manager). It may take a few minutes to download dependencies.
 
 Run one of the example files by opening the file and pressing the triangular "run" button, or `>Julia: Execute active File in REPL`.
 
