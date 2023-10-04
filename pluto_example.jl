@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.29
+# v0.19.27
 
 using Markdown
 using InteractiveUtils
@@ -90,7 +90,11 @@ begin
 end
 
 # ╔═╡ 75f05c85-931a-479c-abd6-59b85e01c591
-Y = copy(array(densitytensor));
+begin
+	Y = copy(array(densitytensor));
+	Y_lateral_slices = eachslice(Y, dims=2)
+	Y_lateral_slices .*= getstepsizes(densitytensor)
+end
 
 # ╔═╡ de6b747c-4a73-4117-a5db-3efc3acd0e45
 C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol, rescale_Y=false)
@@ -141,8 +145,11 @@ begin
 	coefficientmatrix = NamedArray(C, dimnames=("sink", "learned source"))
 end
 
-# ╔═╡ 4cc9bfbd-4d11-418d-91c9-3de580920b33
+# ╔═╡ 8455eba8-9975-43e6-87b7-ccdc938f8a56
+coefficientmatrix
 
+# ╔═╡ 95e7aba4-a2ee-4f0c-a9cd-e5fd2dc861b3
+coefficientmatrix_true
 
 # ╔═╡ Cell order:
 # ╠═05aeff39-5221-4261-9732-a20893f92335
@@ -163,6 +170,5 @@ end
 # ╠═ca51b1ef-d348-4ccb-9ee6-29014b447257
 # ╠═e861c3a5-fa55-448f-9b18-6342680265e9
 # ╠═581299c2-7344-4429-9ec8-d9a8b358b50b
-# ╠═4cc9bfbd-4d11-418d-91c9-3de580920b33
-# ╠═df7590c7-706c-47e5-a7a7-4dbbe92cbcb7
-# ╠═02ccd6ea-aa2b-4872-8e9d-151d8398f0e9
+# ╠═8455eba8-9975-43e6-87b7-ccdc938f8a56
+# ╠═95e7aba4-a2ee-4f0c-a9cd-e5fd2dc861b3
