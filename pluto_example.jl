@@ -151,6 +151,46 @@ coefficientmatrix
 # ╔═╡ 95e7aba4-a2ee-4f0c-a9cd-e5fd2dc861b3
 coefficientmatrix_true
 
+# ╔═╡ adb3667e-b778-4c87-b04f-068574c0c91b
+begin
+	# Visualize and compare the coefficientmatrix and factortensor
+	# Note display should be called after all plots have been finalized
+	options = (:xlabel => "source", :ylabel => "sink")
+	p1 = heatmap(coefficientmatrix; title="Learned Coefficients", clims = (0,1), options...);
+	display(p1)
+	#savefig(p1, "learned_c_heatmap.png")
+end
+
+# ╔═╡ 4a1d4ef8-91ff-453f-b458-0c08c14fb1b8
+begin
+	p2 = heatmap(coefficientmatrix_true; title="True Coefficients", clims = (0,1), options...);
+	display(p2)
+	savefig(p2,"true_c_heatmap.png")
+end
+
+# ╔═╡ cee7e1e3-ca84-4289-8d36-07c46a356ad0
+begin
+	learned_source_plots = source_heatmaps(factortensor; title="Learned Densities for ");
+	true_source_plots = source_heatmaps(factortensor_true; title="True Densities for ");
+
+
+	count = 1
+	# Alternate learned and true plot so you can compare similar plots side-by-side
+	for (l, t) in zip(learned_source_plots, true_source_plots)
+    	display(l)
+		savefig(l,"learned_$count.png")
+    	display(t)
+		savefig(t,"true_$count.png")
+		count+=1
+	end
+	
+	#plots = measurement_heatmaps(factortensor; title="Learned Densities for ");
+	#display.(plots);
+end
+
+# ╔═╡ 83cb4123-eeb6-4605-a577-7d4e69d6a753
+count
+
 # ╔═╡ Cell order:
 # ╠═05aeff39-5221-4261-9732-a20893f92335
 # ╠═97c93b24-f145-4814-a733-92cca1e9d142
@@ -172,3 +212,7 @@ coefficientmatrix_true
 # ╠═581299c2-7344-4429-9ec8-d9a8b358b50b
 # ╠═8455eba8-9975-43e6-87b7-ccdc938f8a56
 # ╠═95e7aba4-a2ee-4f0c-a9cd-e5fd2dc861b3
+# ╠═adb3667e-b778-4c87-b04f-068574c0c91b
+# ╠═4a1d4ef8-91ff-453f-b458-0c08c14fb1b8
+# ╠═cee7e1e3-ca84-4289-8d36-07c46a356ad0
+# ╠═83cb4123-eeb6-4605-a577-7d4e69d6a753
