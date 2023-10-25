@@ -107,6 +107,7 @@ final_rel_errors = convert(Vector{Float64}, final_rel_errors)
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
 options = (:label => false, :xlabel => "rank")
 p = plot(final_rel_errors; ylabel="relative error", options...)
+#plot(final_rel_errors; ylabel="relative error", linewidth=5, markershape=:circle, markersize=8, options...)
 display(p)
 
 p = plot(d2_dx2(final_rel_errors); ylabel="2nd derivative of relative error", options...)
