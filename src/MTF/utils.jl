@@ -221,7 +221,7 @@ Projects (in Euclidian distance) the vector y into the simplex.
 [1] Yunmei Chen and Xiaojing Ye, "Projection Onto A Simplex", 2011
 """
 function projsplx(y)
-    y_sorted = sort(y)
+    y_sorted = sort(y[:])
     n = length(y)
     i = n - 1
     t = 0 # need to ensure t has scope outside the while loop
