@@ -48,15 +48,19 @@ function BCD(Y, r, updateAB!; maxiter=1000, tol=1e-2, seed=123)
     return A, B, loss_pre_proj, loss_post_proj
 end
 
-function grad_stepA!(A, B, Y)
+max_abs_eigval(A) = maximum(abs.(eigvals(A)))
+
+function grad_stepA!(A, B, Y;w=1)
     BB = B*B'
-    L = norm(BB)
+    L = w*norm(BB)
+    #L = 0.5*max_abs_eigval(BB)
     A .-= (A*BB .- Y*B') ./ L
 end
 
-function grad_stepB!(A, B, Y)
+function grad_stepB!(A, B, Y;w=1)
     AA = A'A
-    L = norm(AA)
+    L = w*norm(AA)
+    #L = 0.5*max_abs_eigval(AA)
     B .-= (AA*B - A'Y) ./ L
 end
 
@@ -66,11 +70,11 @@ ReLU(x) = max(0, x)
 
 Gradient step, then Nonnegative project, then jointly rescale
 """
-function nnp!(A, B, Y)
-    grad_stepA!(A, B, Y)
+function nnp!(A, B, Y;w=1)
+    grad_stepA!(A, B, Y;w=w)
     A .= ReLU.(A)
 
-    grad_stepB!(A, B, Y)
+    grad_stepB!(A, B, Y;w=w)
     loss_pre = norm(A*B - Y) # get loss before B is projected
     B .= ReLU.(B)
 
@@ -89,11 +93,11 @@ end
 
 Gradient step, then simplex project
 """
-function sxp!(A, B, Y)
-    grad_stepA!(A, B, Y)
+function sxp!(A, B, Y;w=1)
+    grad_stepA!(A, B, Y;w=w)
     A .= ReLU.(A)
 
-    grad_stepB!(A, B, Y)
+    grad_stepB!(A, B, Y;w=w)
     loss_pre = norm(A*B - Y) # get loss before B is projected
     B .= projsplx(B)
 
@@ -133,6 +137,28 @@ function projsplx(y)
     return ReLU.(y .- t)
 end
 
+"""
+Same as projsplx, but optimized inner loop
+"""
+function projsplx2(y)
+    y_sorted = sort(y[:])
+    n = length(y)
+    i = n - 1
+    t = 0 # need to ensure t has scope outside the while loop
+    while true
+        t = (sum(y_sorted[i+1:end]) - 1) / (n-i)
+        if t >= y_sorted[i]
+            break
+        elseif i == 1
+            t = (sum(y_sorted) - 1) / n
+            break
+        end
+
+        i -= 1
+    end
+    return ReLU.(y .- t)
+end
+
 ###################
 # Start of Script #
 ###################
@@ -164,7 +190,7 @@ p = plot(
     ylabel = "‖Y - AB‖",
     xlabel = "iteration",
     linewidth = 4,
-    linestyle = [ :solid :dash :solid :dash],
+    linestyle = [:solid :dash :solid :dash],
     yaxis=:log10)
 display(p)
 
@@ -173,7 +199,7 @@ println(sum(B_true),"\n")
 display(B_nnp)
 println(sum(B_nnp),"\n")
 display(B_sxp)
-println(sum(B_nnp),"\n")
+println(sum(B_sxp),"\n")
 
 @show norm(A_true*B_true - Y_true)
 @show norm(A_nnp*B_nnp - Y_true)
@@ -181,3 +207,13 @@ println(sum(B_nnp),"\n")
 
 @show norm(B_true - B_nnp)
 @show norm(B_true - B_sxp)
+[5, 2, 1, 3, 4]
+scatter(B_true[:], (B_nnp[[5, 2, 1, 3, 4],:])[:])
+scatter(B_nnp[:], B_sxp[:])
+
+@show norm(B_true - B_nnp)
+@show norm(B_true - B_nnp[[5, 2, 1, 3, 4],:])
+
+
+@show norm(B_true - B_sxp)
+@show norm(B_true - B_sxp[[5, 2, 1, 3, 4],:])
