@@ -2,5 +2,6 @@
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 MatrixTensorFactor = "b7339fc4-c5a0-4c8f-934d-9fd05475ae37"
 NamedArrays = "86f7a689-2022-50b4-a561-43c23ac3c673"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 SedimentAnalysis = "ec7d977d-20c2-4b4d-b160-abe0d9e86f32"
