@@ -74,9 +74,49 @@ display(densitytensor[:, "Age", 1:1]) #just the first 1 sample
 println("densitytensor Sink 1 (horizontal slice)")
 display(densitytensor[1, :, 1]) #just the first sample
 
+# Vizualize the first sink's KDE for the first measurement (Age)
+raw_data_ages_sink1 = [grain["Age"] for grain in sink1]
+KDE_ages_sink1 = densitytensor[1, "Age", :] #sink 1
+p = histogram(raw_data_ages_sink1;
+    normalize=true,
+    bins=range(0, 200, length=6),
+    label="histogram",
+    alpha=0.25,
+    color=:black,
+    )
+plot!(getdomain(densitytensor, "Age"), KDE_ages_sink1;
+    label="KDE",
+    color=:blue,
+    linewidth=5,
+    alpha=1
+    )
+scatter!(raw_data_ages_sink1, zeros(length(raw_data_ages_sink1));
+    marker=:vline,
+    markersize=15,
+    label="grain sample",
+    color=:black,
+    xlabel="age (millions of years)",
+    ylabel="probability density",
+    )
+display(p) # TODO move this rug plot to vizualization.jl ?
+
 # Visualize the data in the tensor by plotting the densities for the first measurement
 measurement_names = getmeasurements(densitytensor) # ["Age", ...]
 p = plot_densities(densitytensor, "Age");
+plot!(xlabel="age (millions of years)", ylabel="probability density")
+display(p)
+
+# Vizualize the first sink's KDE and sample points
+p = plot(getdomain(densitytensor, "Age"), KDE_ages_sink1;
+label="continuous KDE",
+color=:blue,
+xlabel="age (millions of years)",
+ylabel="probability density"
+)
+scatter!(getdomain(densitytensor, "Age"), KDE_ages_sink1;
+marker=:circ,
+markercolor=:blue,
+label="KDE discretization")
 display(p)
 
 # Find the best rank and perform the nonnegative decomposition Y=CF
