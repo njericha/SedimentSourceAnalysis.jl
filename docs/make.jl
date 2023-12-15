@@ -13,7 +13,7 @@ using Plots
 DocMeta.setdocmeta!(
     SedimentAnalysis,
     :DocTestSetup,
-    :(using SedimentAnalysis; using MatrixTensorFactor; using NamedArrays: NamedArray; using Plots: heatmap);
+    :(using SedimentAnalysis; using Pkg; Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git"); using MatrixTensorFactor; using NamedArrays: NamedArray; using Plots: heatmap);
     recursive=true
 )
 
