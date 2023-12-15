@@ -5,6 +5,7 @@ Use data from /data/lee2021
 using XLSX
 using NamedArrays
 using Plots
+using MatrixTensorFactor
 using SedimentAnalysis
 using Printf
 using Random

@@ -8,6 +8,11 @@ using Plots
 using Printf
 using Random
 using Statistics: mean
+
+#using Pkg
+#Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git")
+using MatrixTensorFactor
+
 using SedimentAnalysis
 
 # set random seed for repeatability

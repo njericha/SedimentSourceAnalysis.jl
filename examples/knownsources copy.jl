@@ -11,6 +11,8 @@ using Plots
 using Printf
 using Random
 using Statistics: mean, median
+
+using MatrixTensorFactor
 using SedimentAnalysis
 
 # set random seed for repeatability
