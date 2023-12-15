@@ -32,9 +32,9 @@ The modules are built to be independent of each other so that (eventually) the M
 `randomtensor`: Factorizes a random 50x50x50 tensor. See how the factorization performs in theory when a perfect factorization exists.
 
 ## Submodules
-The two main submodules are MTF (**M**atrix **T**ensor **F**actorization) and SedimentTools.
+The main submodule is SedimentTools. SedimentAnalysis also builds off of MatrixTensorFactor.jl.
 
-### MTF
+### MatrixTensorFactor
 Defines the main factorization function [`nnmtf`](@ref) and related mathematical functions. See the full documentation here [Matrix Tensor Factorization](@ref).
 
 ### SedimentTools
