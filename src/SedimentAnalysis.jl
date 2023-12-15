@@ -3,10 +3,11 @@ factorization and data handling modules =#
 
 module SedimentAnalysis #TODO check if these files should be included or imported instead
 
-include("MTF/MTF.jl")
+#include("MTF/MTF.jl")
+
 include("SedimentTools/SedimentTools.jl")
 
-using .MTF
+#using .MTF
 using .SedimentTools
 
 export combined_norm, dist_to_Ncone, nnmtf, plot_factors, rel_error, mean_rel_error # matrixtensorfactorization
@@ -20,8 +21,8 @@ export eachdensity, eachmeasurement, eachsink, eachsource # Iterators
 
 export read_raw_data
 
-export DEFAULT_ALPHA, DEFAULT_N_SAMPLES # Constants
-export default_bandwidth, make_densities, standardize_KDEs # Functions
+#export DEFAULT_ALPHA, DEFAULT_N_SAMPLES # Constants
+#export default_bandwidth, make_densities, standardize_KDEs # Functions
 
 export estimate_which_source, label_accuracy, match_sources!
 

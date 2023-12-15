@@ -3,7 +3,6 @@ Import, store, and visualize sediment data.
 """
 module SedimentTools
 # Required packages
-using Statistics: std, quantile
 using LinearAlgebra: norm
 using XLSX: readxlsx, sheetnames
 using OrderedCollections: OrderedDict
@@ -13,10 +12,15 @@ using KernelDensity: UnivariateKDE, kde, pdf
 using Plots: plot, plot!, scatter
 using Base: AbstractVecOrTuple
 
+#using Pkg
+#Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git")
+using MatrixTensorFactor: default_bandwidth, DEFAULT_ALPHA, filter_inner_percentile
+
 # Method extentions
 using Base: getindex, names, show
 using Plots: Plots, heatmap
 using NamedArrays: NamedArrays#, NamedArray
+using MatrixTensorFactor: MatrixTensorFactor, make_densities
 
 # Exports
 export Grain, DensityTensor, Rock, Sink, Source # Types
@@ -29,8 +33,7 @@ include("structs.jl")
 export read_raw_data
 include("importing.jl")
 
-export DEFAULT_ALPHA, DEFAULT_N_SAMPLES # Constants
-export default_bandwidth, make_densities, standardize_KDEs # Functions
+#export make_densities # Method extention to Sink
 include("densityestimation.jl")
 
 export estimate_which_source, label_accuracy, match_sources!

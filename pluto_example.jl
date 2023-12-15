@@ -183,7 +183,7 @@ begin
 		savefig(t,"true_$count.png")
 		count+=1
 	end
-	
+
 	#plots = measurement_heatmaps(factortensor; title="Learned Densities for ");
 	#display.(plots);
 end
