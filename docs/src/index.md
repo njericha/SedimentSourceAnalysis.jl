@@ -4,7 +4,14 @@
 Depth = 3
 ```
 ## How setup the environment
+## Prefered Method
+1. Run `julia`
+2. Add the package with `pkg> add https://github.com/njericha/Sediment-Source-Analysis.jl.git`
+(use `julia> ]` to get to the package manager)
+3. Resolve dependency issues with `pkg> resolve` and check it works with `pkg> precompile`
+3. Import with `using SedimentAnalysis`
 
+**OR**
 ### In Browser
 1. Go to https://github.com/njericha/Sediment-Source-Analysis.jl
 2. Click "<> Code" and press "+" to "Create a codespace on main". It make take a few moments to set up.
@@ -22,9 +29,7 @@ Run one of the example files by opening the file and pressing the triangular "ru
 4. resolve any dependency issues with `pkg> resolve`
 
 ### Importing the package
-Type `julia> using SedimentAnalysis` load both submodules (`MTF` and `SedimentTools`), or if only one of the modules is desired, type `using SedimentAnalysis.XXX`.
-
-The modules are built to be independent of each other so that (eventually) the MTF could be moved to an separate package altogether.
+Type `julia> using SedimentAnalysis` to load all submodules (currently only `SedimentTools`), or if only one of the modules is desired, type `using SedimentAnalysis.XXX`.
 
 ## Examples
 `knownsources.jl`: Uses data from Sundel et al where we know the sources of each Grain. Use this to see how well the factorization performs with realistic data.
@@ -35,7 +40,7 @@ The modules are built to be independent of each other so that (eventually) the M
 The main submodule is SedimentTools. SedimentAnalysis also builds off of MatrixTensorFactor.jl.
 
 ### MatrixTensorFactor
-Defines the main factorization function [`nnmtf`](@ref) and related mathematical functions. See the full documentation here [Matrix Tensor Factorization](@ref).
+Defines the main factorization function and related mathematical functions. See the full documentation here [Matrix Tensor Factorization](@ref).
 
 ### SedimentTools
 Holds various types at the [`Grain`], and [`Sink`] level, importing ([`read_raw_data`]) and processing data ([`make_densities`]) functions, and additional methods of some [Plots.jl](https://docs.juliaplots.org/stable/) functions for visualization with these custom types.

@@ -9,17 +9,12 @@ Sink
 Source
 ```
 
-## Constants
-```@docs
-DEFAULT_ALPHA
-DEFAULT_N_SAMPLES
-```
-
 ## Method Extentions
 ```@docs
 getindex(::Sink, ::String)
 names(::NamedArray, ::Union{String,Symbol})
 heatmap(::NamedMatrix)
+SedimentAnalysis.make_densities(::Sink)
 ```
 
 ## Functions
@@ -56,16 +51,6 @@ eachdensity
 eachmeasurement
 eachsink
 eachsource
-```
-
-### Density and Source Estimation
-```@docs
-default_bandwidth
-estimate_which_source
-label_accuracy
-make_densities
-match_sources!
-standardize_KDEs
 ```
 
 ### Visualizers
