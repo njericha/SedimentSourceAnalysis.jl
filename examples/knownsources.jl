@@ -15,6 +15,12 @@ using MatrixTensorFactor
 
 using SedimentAnalysis
 
+# Plot settings
+Plots.resetfontsizes(); Plots.scalefontsizes(1.5)
+plotfont="Computer Modern"
+plotfontsize=13
+default(legendfontsize=plotfontsize, plot_titlefontsize=plotfontsize+1, titlefont=plotfontsize, legendtitlefontsize=plotfontsize, fontfamily=plotfont, legendfont=plotfont)
+
 # set random seed for repeatability
 # does not randomize data, but the initialization for nnmtf
 Random.seed!(314159265)
@@ -108,7 +114,11 @@ display(p) # TODO move this rug plot to vizualization.jl ?
 # Visualize the data in the tensor by plotting the densities for the first measurement
 measurement_names = getmeasurements(densitytensor) # ["Age", ...]
 p = plot_densities(densitytensor, "Age");
-plot!(xlabel="age (millions of years)", ylabel="probability density")
+plot!(xlabel="age (millions of years)",
+    ylabel="probability density",
+    legendtitle = "Sink",
+    legend_columns=2,
+    )
 display(p)
 
 # Vizualize the first sink's KDE and sample points

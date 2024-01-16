@@ -9,6 +9,12 @@ using SedimentAnalysis
 using Plots
 using Printf
 
+# Plot settings
+Plots.resetfontsizes(); Plots.scalefontsizes(1.5)
+plotfont="Computer Modern"
+plotfontsize=13
+default(legendfontsize=plotfontsize, plot_titlefontsize=plotfontsize+1, titlefont=plotfontsize, legendtitlefontsize=plotfontsize, fontfamily=plotfont, legendfont=plotfont)
+
 # set random seed for repeatability
 Random.seed!(314159265)
 
