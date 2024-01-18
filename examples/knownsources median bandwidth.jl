@@ -11,6 +11,7 @@ using Plots
 using Printf
 using Random
 using Statistics: mean, median
+using LinearAlgebra: norm
 
 using MatrixTensorFactor
 using SedimentAnalysis
@@ -94,6 +95,50 @@ display(densitytensor[1, :, 1]) #just the first sample
 # Visualize the data in the tensor by plotting the densities for the first measurement
 measurement_names = getmeasurements(densitytensor) # ["Age", ...]
 p = plot_densities(densitytensor, "Age");
+plot!(xlabel="age (millions of years)",
+    ylabel="probability density",
+    legendtitle = "Sink",
+    legend_columns=2,
+    )
+display(p)
+
+# Vizualize the first sink's KDE for the first measurement (Age)
+raw_data_ages_sink1 = [grain["Age"] for grain in sink1]
+KDE_ages_sink1 = densitytensor[1, "Age", :] #sink 1
+p = histogram(raw_data_ages_sink1;
+    normalize=true,
+    bins=range(0, 200, length=6),
+    label="histogram",
+    alpha=0.25,
+    color=:black,
+    )
+plot!(getdomain(densitytensor, "Age"), KDE_ages_sink1;
+    label="KDE",
+    color=:blue,
+    linewidth=5,
+    alpha=1
+    )
+scatter!(raw_data_ages_sink1, zeros(length(raw_data_ages_sink1));
+    marker=:vline,
+    markersize=15,
+    label="grain sample",
+    color=:black,
+    xlabel="age (millions of years)",
+    ylabel="probability density",
+    )
+display(p)
+
+# Vizualize the first sink's KDE and sample points
+p = plot(getdomain(densitytensor, "Age"), KDE_ages_sink1;
+label="continuous KDE",
+color=:blue,
+xlabel="age (millions of years)",
+ylabel="probability density"
+)
+scatter!(getdomain(densitytensor, "Age"), KDE_ages_sink1;
+marker=:circ,
+markercolor=:blue,
+label="KDE discretization")
 display(p)
 
 # Find the best rank and perform the nonnegative decomposition Y=CF
@@ -108,10 +153,10 @@ tol = 1e-5
 ranks = 1:length(getmeasurements(grain1))
 Cs, Fs, all_rel_errors, final_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
 
-println("rank | n_iterations | relative error")
+println("rank | n_iterations | final loss")
 for rank in ranks
     C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol, rescale_Y=false);
-    final_rel_error = rel_errors[end]
+    final_rel_error = 0.5*norm(Y - C*F)^2 #rel_errors[end]
     push!.(
         (Cs, Fs, all_rel_errors, final_rel_errors, norm_grads, dist_Ncones),
         (C, F, rel_errors, final_rel_error, norm_grad, dist_Ncone)
@@ -123,14 +168,14 @@ final_rel_errors = convert(Vector{Float64}, final_rel_errors)
 
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
 options = (:label => false, :xlabel => "rank")
-p = plot(final_rel_errors; ylabel="relative error", options...)
+p = plot(final_rel_errors; ylabel="final loss", options...)
 #plot(final_rel_errors; ylabel="relative error", linewidth=5, markershape=:circle, markersize=8, options...)
 display(p)
 
-p = plot(d2_dx2(final_rel_errors); ylabel="2nd derivative of relative error", options...)
+p = plot(d2_dx2(final_rel_errors); ylabel="2nd derivative of final loss", options...)
 display(p)
 
-p = plot(standard_curvature(final_rel_errors); ylabel="standard curvature of relative error", options...)
+p = plot(standard_curvature(final_rel_errors); ylabel="standard curvature\nof final loss", options...)
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
@@ -188,9 +233,16 @@ coefficientmatrix = NamedArray(C, dimnames=("sink", "learned source"))
 # Visualize and compare the coefficientmatrix and factortensor
 # Note display should be called after all plots have been finalized
 options = (:xlabel => "source", :ylabel => "sink")
-p = heatmap(coefficientmatrix; title="Learned Coefficients", clims = (0,1), options...);
+p = heatmap(coefficientmatrix; clims = (0,1), options...);#title="Learned Proportions",
 display(p)
-p = heatmap(coefficientmatrix_true; title="True Coefficients", clims = (0,1), options...);
+p = heatmap(coefficientmatrix_true; clims = (0,1), options...); #title="True Proportions"
+display(p)
+
+p = scatter(coefficientmatrix_true[:], coefficientmatrix[:],
+    xlabel="true proportions",
+    ylabel="learned proportions",
+    label="(true, learned)")
+plot!([0, 1], [0, 1], label="y=x line")
 display(p)
 
 diff_coefficientmatrix = NamedArray(abs.(coefficientmatrix_true - coefficientmatrix),
@@ -213,11 +265,91 @@ end
 plots = measurement_heatmaps(factortensor; title="Learned Densities for ");
 display.(plots);
 
+D = normalize_density_sums(factortensor_true)
+max_density = maximum(D)
+function all_source_heatmaps(D::DensityTensor; kwargs...)
+    plots = []
+    D = normalize_density_sums(D)
+    measurements = getmeasurements(D)
+    #domain_length = length(getdomains(D)[begin])
+    for source in eachsource(D)
+        h = heatmap(
+            array(source);
+            yticks=(eachindex(measurements), measurements),
+            #xticks=([1, domain_length],["1", "$(size(array(source))[2])"]),
+            xlabel="sample index k",
+            yflip=true,
+            clims = (0, max_density),
+            kwargs...
+            )
+        push!(plots, h)
+    end
+    return plots
+end
+p_learned = all_source_heatmaps(factortensor)
+p_true = all_source_heatmaps(factortensor_true)
+for (l, t) in zip(p_learned, p_true)
+    display(l)
+    display(t)
+end
+# Plot learned vs true densities (in original units) by source
+for (i,(true_source, learned_source)) in enumerate(zip(eachsource(factortensor_true),eachsource(factortensor)))
+    p = scatter(true_source[:], learned_source[:];
+        xlabel="true densities",
+        ylabel="learned densities",
+        label="(true, learned)",
+        title= "Source $i")
+    xy_line = collect(extrema(true_source[:]))
+    plot!(xy_line, xy_line, label="y=x line")
+    display(p)
+end
+
+# Plot learned vs true densities (normalized) by source
+Δx = getstepsizes(densitytensor)
+for (i,(true_source, learned_source)) in enumerate(zip(eachsource(factortensor_true),eachsource(factortensor)))
+    true_source_normalized = true_source .* Δx
+    learned_source_normalized = learned_source .* Δx
+    p = scatter(true_source_normalized[:], learned_source_normalized[:];
+        xlabel="true densities",
+        ylabel="learned densities",
+        label="(true, learned)",)
+        #title= "Source $i")
+    xy_line = collect(extrema(true_source_normalized[:]))
+    plot!(xy_line, xy_line, label="y=x line")
+    display(p)
+end
+true_densities_normalized = factortensor_true .* Δx'
+learned_densities_normalized = factortensor .* Δx'
+p = scatter(true_densities_normalized[:], learned_densities_normalized[:];
+    xlabel="true densities",
+    ylabel="learned densities",
+    label="(true, learned)",)
+    #title= "Source $i")
+xy_line = collect(extrema(true_densities_normalized[:]))
+plot!(xy_line, xy_line, label="y=x line")
+display(p)
+
+# Plot learned vs true densities by measurement
+for (name,true_measurement, learned_measurement) in zip(measurement_names, eachmeasurement(factortensor_true),eachmeasurement(factortensor))
+    p = scatter(true_measurement[:], learned_measurement[:];
+        xlabel="true",
+        ylabel="learned",
+        label="(true, learned)",
+        title= "Density of $name")
+    xy_line = collect(extrema(true_measurement[:]))
+    plot!(xy_line, xy_line, label="y=x line")
+    display(p)
+end
+
 # Show the relative error between the learned and true matrix/tensor
 # ex. 0.15 relative error can be thought of as 85% similarity
 # TODO use other metrics like RMSE and SNR
 @show rel_error(coefficientmatrix, coefficientmatrix_true) # The warning that names are different is O.K.
+
+factortensor_normalized = factortensor .* Δx'
+factortensor_true_normalized = factortensor_true .* Δx'
 @show mean_rel_error(factortensor, factortensor_true)
+@show mean_rel_error(factortensor_normalized, factortensor_true_normalized)
 @show mean_rel_error(coefficientmatrix * factortensor, densitytensor)
 
 # Now go back and classify each grain as source 1, 2, or 3 based on the learned sources
@@ -242,6 +374,14 @@ p = plot_source_index(
     collect(source_labels), loglikelihood_ratios;
     title="Grains' Estimated Source and Log Likelihood Ratio"
 )
+grain_index = 0
+for n_grains in source_amounts[1,:][1:end-1]
+    grain_index += n_grains
+    plot!([grain_index+0.5, grain_index+0.5], [1, 3];color=:black,legend=false)
+end
+plot!(title="",
+xlabel="grain index n",
+ylabel="estimated source r",)
 display(p)
 
 # Compare against classification using the true densities

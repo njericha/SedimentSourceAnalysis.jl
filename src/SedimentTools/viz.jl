@@ -95,8 +95,8 @@ function plot_source_index(
             clabel="log likelihood ratio",
             colorbar_ticks=(0:0.5:1, ["0", "0.5", ">1.0"]),
             clim=(0,1),
-            xlabel="Grain Index",
-            ylabel="Source",
+            xlabel="grain index",
+            ylabel="source",
             yticks=sort([Set(indexes)...]), # sort the unique indexes that appear
             label="",
             kwargs...
