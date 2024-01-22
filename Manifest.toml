@@ -766,7 +766,7 @@ version = "1.25.1"
 
 [[deps.MatrixTensorFactor]]
 deps = ["Distances", "Distributions", "Einsum", "HDF5", "KernelDensity", "LinearAlgebra", "OptimalTransport", "Plots", "Random", "ReverseDiff", "SparseArrays", "Statistics"]
-git-tree-sha1 = "35857528db313d40a1228f51d7de8f269065e5d3"
+git-tree-sha1 = "1712555c8598e16ddc4a6b3657bb85c8865d43f6"
 repo-rev = "main"
 repo-url = "https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git"
 uuid = "b7339fc4-c5a0-4c8f-934d-9fd05475ae37"
