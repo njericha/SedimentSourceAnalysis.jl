@@ -175,8 +175,13 @@ display(p)
 p = plot(d2_dx2(final_rel_errors); ylabel="2nd derivative of final loss", options...)
 display(p)
 
-p = plot(standard_curvature(final_rel_errors); ylabel="standard curvature\nof final loss", options...)
+p = plot(standard_curvature(final_rel_errors[1:3]; order=3); ylabel="standard curvature\nof final loss", options...)
+plot!(standard_curvature(final_rel_errors[1:4]; order=4); label="4", options...)
+plot!(standard_curvature(final_rel_errors[1:5]; order=4); label="5", options...)
+plot!(standard_curvature(final_rel_errors[1:6]; order=4); label="6", options...)
+plot!(standard_curvature(final_rel_errors[1:7]; order=4); label="7", options...)
 display(p)
+
 
 ## Extract the variables corresponding to the optimal rank
 best_rank = 3 # argmax(standard_curvature(final_rel_errors))
@@ -186,8 +191,31 @@ C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     best_rank
 )
 
+C_simplex, F_simplex, rel_errors_simplex, norm_grad_simplex, dist_Ncone_simplex = nnmtf(Y, 3; projection=:simplex, maxiter, tol, rescale_Y=false)
+Yhat = C*F
+Yhat_simplex = C_simplex*F_simplex
+
+p = plot(rel_errors_simplex[2:length(rel_errors)];
+    yaxis=:log10,
+    label="simplex",
+    xlabel="iteration number",
+    ylabel="mean relative error")
+plot!(rel_errors[2:end], label="nonnegative & rescale")
+display(p)
+
+p = plot(dist_Ncone_simplex[2:length(rel_errors)];
+    yaxis=:log10,
+    label="simplex",
+    xlabel="iteration number",
+    ylabel="vector-set distance")
+plot!(dist_Ncone[2:end], label="nonnegative & rescale")
+display(p)
+
 # Rescale F to match the original scaling for densitytensor
 F_lateral_slices = eachslice(F, dims=2)
+F_lateral_slices ./= getstepsizes(densitytensor)
+
+F_lateral_slices = eachslice(F_simplex, dims=2)
 F_lateral_slices ./= getstepsizes(densitytensor)
 
 # Plot Convergence
@@ -221,6 +249,36 @@ coefficientmatrix_true = NamedArray(C_true, dimnames=("sink", "true source"))
 
 # Ensure the factors in C and F are in the same order as the true densities
 match_sources!(C, F, coefficientmatrix_true, factortensor_true)
+match_sources!(C_simplex, F_simplex, coefficientmatrix_true, factortensor_true)
+
+# Compare results between nnscale vs. simplex projection
+p = scatter(C[:], C_simplex[:];
+xlabel="nonnegative project & rescale",
+        ylabel="simplex",
+        label="(true, learned)")
+        xy_line = collect(extrema(C[:]))
+plot!(xy_line, xy_line, label="y=x line")
+display(p)
+
+p = scatter(F[:], F_simplex[:];
+xlabel="nonnegative project & rescale",
+    ylabel="simplex",
+    label="(true, learned)")
+    xy_line = collect(extrema(F[:]))
+plot!(xy_line, xy_line, label="y=x line")
+display(p)
+
+p = scatter(Yhat[:], Yhat_simplex[:];
+xlabel="nonnegative project & rescale",
+    ylabel="simplex",
+    label="(true, learned)")
+    xy_line = collect(extrema(Yhat[:]))
+plot!(xy_line, xy_line, label="y=x line")
+display(p)
+
+scatter(C[:], C_simplex[:]) |> display
+scatter(F[:], F_simplex[:]) |> display
+scatter(Yhat[:], Yhat_simplex[:]) |> display
 
 ## Package F into a DensityTensor with the same domain and measurements as Y
 ## Each collection of measurements is no longer a sink and is now a "factor"
