@@ -141,45 +141,108 @@ markercolor=:blue,
 label="KDE discretization")
 display(p)
 
+# Coarse Vizualize the first sink's KDE and sample points
+p = plot(getdomain(densitytensor, "Age"), KDE_ages_sink1;
+label="continuous KDE",
+color=:blue,
+xlabel="age (millions of years)",
+ylabel="probability density"
+)
+scatter!(getdomain(densitytensor, "Age")[1:4:end], KDE_ages_sink1[1:4:end];
+marker=:circ,
+markercolor=:blue,
+label="KDE discretization")
+display(p)
+
+# Coarse Vizualize the first sink's KDE and sample points
+p = plot(getdomain(densitytensor, "Age"), KDE_ages_sink1;
+label="continuous KDE",
+color=:blue,
+xlabel="age (millions of years)",
+ylabel="probability density"
+)
+
+display(p)
+
+# Get sample points
+scatter!(x_coarse, y_coarse, label="discretized KDE")
+
+display(p)
+
+n_boxes = 14
+step = length(KDE_ages_sink1) ÷ n_boxes
+y_coarse=KDE_ages_sink1[1:step:end]
+x_coarse=getdomain(densitytensor, "Age")[1:step:end]
+
+function make_intervals(xs)
+    return [[xs[i],xs[i+1]] for i in 1:length(xs)-1]
+end
+
+rectangle(x1, y1, x2, y2) = Shape([(x1, y1), (x2, y1), (x2, y2), (x1, y2)])
+
+# Plot Riemann Sums
+intervals = make_intervals(x_coarse)
+for (i, X) in enumerate(intervals)
+    i == 1 ? continue : nothing
+    Δx = (X[2]-X[1])/2
+	box = rectangle(X[1]-Δx,0,X[2]-Δx,y_coarse[i])
+    i == 2 ? label = "probability values" : label = nothing
+	plot!(box;c=:blue,label,alpha=.3)
+end
+
+display(p)
+
 # Find the best rank and perform the nonnegative decomposition Y=CF
 Y = copy(array(densitytensor)); # plain Array{T, 3} type for faster factorization
 
 Y_lateral_slices = eachslice(Y, dims=2)
 Y_lateral_slices .*= getstepsizes(densitytensor)
 
+### Finding optimal rank with singular values of (unfolded) Y
+n_sinks = size(Y)[1]
+Y_mat = reshape(Y, n_sinks, :)
+#σ = svdvals(Y_mat)
+#plot(σ)
+#partial_sum = [sum(σ[i:n_sinks].^2) .^ 0.5 for i in 2:n_sinks]
+#push!(partial_sum, 0)
+#plot(partial_sum)
+###
+
+
 maxiter = 7000
 tol = 1e-5
 
-ranks = 1:length(getmeasurements(grain1))
-Cs, Fs, all_rel_errors, final_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
+ranks = 1:size(Y)[1]
+Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
 
 println("rank | n_iterations | final loss")
 for rank in ranks
     C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol, rescale_Y=false);
-    final_rel_error = 0.5*norm(Y - C*F)^2 #rel_errors[end]
+    final_error = norm(Y - C*F) #rel_errors[end]
     push!.(
-        (Cs, Fs, all_rel_errors, final_rel_errors, norm_grads, dist_Ncones),
-        (C, F, rel_errors, final_rel_error, norm_grad, dist_Ncone)
+        (Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones),
+        (C, F, rel_errors, final_error, norm_grad, dist_Ncone)
     )
     @printf("%4i | %12i | %3.3g\n",
-        rank, length(rel_errors), final_rel_error)
+        rank, length(rel_errors), final_error)
 end
-final_rel_errors = convert(Vector{Float64}, final_rel_errors)
+final_rel_errors = convert(Vector{Float64}, final_errors)
 
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
 options = (:label => false, :xlabel => "rank")
 p = plot(final_rel_errors; ylabel="final loss", options...)
 #plot(final_rel_errors; ylabel="relative error", linewidth=5, markershape=:circle, markersize=8, options...)
 display(p)
-
-p = plot(d2_dx2(final_rel_errors); ylabel="2nd derivative of final loss", options...)
+order = 4
+p = plot(d_dx(final_rel_errors;order); ylabel="derivative of final loss", options...)
 display(p)
-
-p = plot(standard_curvature(final_rel_errors[1:3]; order=3); ylabel="standard curvature\nof final loss", options...)
-plot!(standard_curvature(final_rel_errors[1:4]; order=4); label="4", options...)
-plot!(standard_curvature(final_rel_errors[1:5]; order=4); label="5", options...)
-plot!(standard_curvature(final_rel_errors[1:6]; order=4); label="6", options...)
-plot!(standard_curvature(final_rel_errors[1:7]; order=4); label="7", options...)
+p = plot(d2_dx2(final_rel_errors;order=5); ylabel="2nd derivative of final loss", options...)
+display(p)
+p = plot(standard_curvature(final_rel_errors[1:4]; order); ylabel="standard curvature\nof final loss", options...)
+plot!(standard_curvature(final_rel_errors[1:4]; order); label="4", options...)
+plot!(standard_curvature(final_rel_errors[1:5]; order); label="5", options...)
+plot!(standard_curvature(final_rel_errors[1:6]; order); label="6", options...)
+plot!(standard_curvature(final_rel_errors[1:20]; order); label="7", options...)
 display(p)
 
 
@@ -454,6 +517,14 @@ p = plot_source_index(
     collect(source_labels), loglikelihood_ratios;
     title="Grains' Estimated True Source and Log Likelihood Ratio"
 )
+grain_index = 0
+for n_grains in source_amounts[1,:][1:end-1]
+    grain_index += n_grains
+    plot!([grain_index+0.5, grain_index+0.5], [1, 3];color=:black,legend=false)
+end
+plot!(title="",
+xlabel="grain index n",
+ylabel="estimated source r",)
 display(p)
 
 ## Can also see that some grains are mislabelled using the true densities,
