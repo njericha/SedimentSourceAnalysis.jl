@@ -16,7 +16,18 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://njericha.github.io/Sediment-Source-Analysis.jl/dev/)
 
-## How setup the environment
+## Repo organization
+
+Our main numerical experiment can be found in `knownsources median bandwidth.jl` under the `examples` folder.
+
+The data used in our main numerical experiment `knownsources median bandwidth.jl` can be found [here](https://github.com/njericha/Sediment-Source-Analysis.jl/tree/main/data/sundell2022) under `data/sundell2022`. The exact grains selected and number of grains from each sink can be found in `data/20sinks from 3Sources from Sundell et al 2022.xlsx`.
+
+The data handling and backend functions can be found in `src/SedimentTools`.
+
+Our main decomposition algorithm can be found in the more general repo [MatrixTensorFactor.jl](https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl).
+
+
+## How to run the code
 
 ### In Browser
 1. Go to https://github.com/njericha/Sediment-Source-Analysis.jl
@@ -35,20 +46,39 @@ Run one of the example files by opening the file and pressing the triangular "ru
 4. resolve any dependency issues with `pkg> resolve`
 
 ### Importing the package
-Type `julia> using SedimentAnalysis` load both submodules (`MTF` and `SedimentTools`), or if only one of the modules is desired, type `using SedimentAnalysis.XXX`.
-
-The modules are built to be independent of each other so that (eventually) the MTF could be moved to an separate package altogether.
+Type `julia> using SedimentAnalysis` load the package, or `using SedimentAnalysis.SedimentTools` to load the submodule directly.
 
 ## Examples
-`knownsources.jl`: Uses data from Sundel et al where we know the sources of each Grain. Use this to see how well the factorization performs with realistic data.
+See the `examples` folder for the following files.
+
+`knownsources median bandwidth.jl`: Uses data from Sundel et al where we know the sources of each Grain. Use this to see how well the factorization performs with realistic data.
+
+`knownsources.jl`: Similar to `knownsources median bandwidth.jl`, but uses the bandwidth from the first sink.
+
+`measurementcorrelation.jl`: Checks the validity of representing the grain distributions as a product distribution. In particular, we would like the measurements to be independent.
+
 `unknownsources.jl`: Uses data from Lee et al where we don't have a ground truth. Showcases how the method would be used in practice.
-`randomtensor`: Factorizes a random 50x50x50 tensor. See how the factorization performs in theory when a perfect factorization exists.
+
+`randomtensor.jl`: Factorizes a random 50x50x50 tensor. See how the factorization performs in theory when a perfect factorization exists.
 
 ## Submodules
-The two main submodules are MTF (**M**atrix **T**ensor **F**actorization) and SedimentTools.
-
-### MTF
-Defines the main factorization function [`nnmtf`](@ref) and related mathematical functions. See the full documentation here [Matrix Tensor Factorization](@ref).
+The main submodule of this repo is SedimentTools. The submodule MTF has been moved to a separate repo [MatrixTensorFactor](https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl).
 
 ### SedimentTools
 Holds various types at the [`Grain`], and [`Sink`] level, importing ([`read_raw_data`]) and processing data ([`make_densities`]) functions, and additional methods of some [Plots.jl](https://docs.juliaplots.org/stable/) functions for visualization with these custom types.
+
+### MatrixTensorFactor
+Defines the main factorization function [`nnmtf`](@ref) and related mathematical functions. See the repo here [MatrixTensorFactor.jl](https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl).
+
+# Citation
+
+If you find this repo helpful, please cite the associated paper:
+
+```
+@article{Richardson2024,
+  title = {Non-negative Matrix-Tensor Factorization for Sediment Source Analysis},
+  author = {Richardson, Nicholas and Graham, Naomi and Friedlander, Michael P. and Saylor, Joel},
+}
+```
+
+or feel free to reach out to us with an email to njericha at math.ubc.ca.
