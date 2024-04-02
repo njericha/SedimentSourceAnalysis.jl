@@ -198,64 +198,8 @@ Y = copy(array(densitytensor)); # plain Array{T, 3} type for faster factorizatio
 Y_lateral_slices = eachslice(Y, dims=2)
 Y_lateral_slices .*= getstepsizes(densitytensor)
 
-### Finding optimal rank with singular values of (unfolded) Y
-n_sinks = size(Y)[1]
-Y_mat = reshape(Y, n_sinks, :)
-#σ = svdvals(Y_mat)
-#plot(σ)
-#partial_sum = [sum(σ[i:n_sinks].^2) .^ 0.5 for i in 2:n_sinks]
-#push!(partial_sum, 0)
-#plot(partial_sum)
-###
-
-# 1 |            5 | 0.777
-#    2 |          337 | 0.506
-#    3 |         3001 | 0.324
-#    4 |         6591 | 0.282
-#    5 |         7000 | 0.255
-#    6 |         7000 | 0.229
-#    7 |         7000 | 0.199
-#    8 |         7000 | 0.179
-#    9 |         7000 | 0.166
-#   10 |         7000 | 0.148
-#   11 |         7000 | 0.136
-#   12 |         7000 | 0.123
-#   13 |         7000 | 0.112
-#   14 |         7000 | 0.0997
-#   15 |         7000 | 0.0909
-#   16 |         7000 | 0.0803
-#   17 |         7000 | 0.0711
-#   18 |         7000 | 0.0593
-#   19 |         7000 | 0.0568
-#   20 |         7000 | 0.0407
-
-final_errors_max_i7000_tol_1e6 = [
-    0.777,
-    0.506,
-    0.324,
-    0.282,
-    0.255,
-    0.229,
-    0.199,
-    0.179,
-    0.166,
-    0.148,
-    0.136,
-    0.123,
-    0.112,
-    0.0997,
-    0.0909,
-    0.0803,
-    0.0711,
-    0.0593,
-    0.0568,
-    0.0407,
-]
-v = final_errors_max_i7000_tol_1e6
-
-
 maxiter = 7000
-tol = 1e-6#1e-5
+tol = 1e-5
 
 ranks = 1:size(Y)[1]
 Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
