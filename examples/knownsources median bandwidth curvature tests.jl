@@ -281,10 +281,62 @@ display(p)
 order = 4
 p = plot(d_dx(final_rel_errors;order); ylabel="derivative of final loss", options...)
 display(p)
-p = plot(d2_dx2(final_rel_errors;order); ylabel="2nd derivative of final loss", options...)
+p = plot(d2_dx2(final_rel_errors;order=5); ylabel="2nd derivative of final loss", options...)
 display(p)
-p = plot(standard_curvature(final_rel_errors; order); ylabel="standard curvature\nof final loss", options...)
+p = plot(standard_curvature(final_rel_errors[1:4]; order); ylabel="standard curvature\nof final loss", options...)
+plot!(standard_curvature(final_rel_errors[1:4]; order); label="4", options...)
+plot!(standard_curvature(final_rel_errors[1:5]; order); label="5", options...)
+plot!(standard_curvature(final_rel_errors[1:6]; order); label="6", options...)
+plot!(standard_curvature(final_rel_errors[1:20]; order); label="7", options...)
 display(p)
+p = plot(final_rel_errors; ylabel="standard curvature\nof final loss", options...)
+p = plot(smooth(final_rel_errors); ylabel="standard curvature\nof final loss", options...)
+
+display(p)
+p = plot(d_dx(final_rel_errors |> smooth); ylabel="standard curvature\nof final loss", options...)
+p = plot(d2_dx2(final_rel_errors .^ 2  |> smooth;order=3); ylabel="standard curvature\nof final loss", options...)
+
+p = plot(standard_curvature2(final_rel_errors |> smooth;order=3); ylabel="derivative of final loss", options...)
+display(p)
+
+function smooth(y;α=0.5) # α=0 is no smoothing, α=1 is as three way average
+    z = copy(y)
+    b = 3 - 2*α
+    for i in eachindex(z)[begin+1:end-1]
+        z[i] = (α*y[i-1] + b*y[i] + α*y[i+1])/3
+    end
+    return z
+end
+
+x = 0:10
+Δx = x[2]-x[1]
+y = @. x^3
+
+y = y / 1000 # normalize
+
+x = x / 10
+
+plot(x,y)
+plot(x, d_dx(y) ./ Δx)
+plot(x, d2_dx2(y) ./ Δx^2)
+plot(x, curvature2(y; Δx))
+
+plot(x, standard_curvature(y))
+plot(x, standard_curvature2(y))
+
+function curvature2(y; Δx=1, kwargs...)
+    dy_dx = d_dx(y; kwargs...) ./ Δx
+    dy2_dx2 = d2_dx2(y; kwargs...) ./ Δx^2
+    return @. dy2_dx2 / (1 + dy_dx^2)^1.5
+end
+
+function standard_curvature2(y; kwargs...)
+    Δx = 1 / (length(y) - 1) # An interval 0:10 has length(0:10) = 11, but measure 10-0 = 10
+    y_max = maximum(y)
+    dy_dx = d_dx(y; kwargs...) / (Δx * y_max)
+    dy2_dx2 = d2_dx2(y; kwargs...) / (Δx^2 * y_max)
+    return @. dy2_dx2 / (1 + dy_dx^2)^1.5
+end
 
 ## Extract the variables corresponding to the optimal rank
 best_rank = 3 # argmax(standard_curvature(final_rel_errors))
