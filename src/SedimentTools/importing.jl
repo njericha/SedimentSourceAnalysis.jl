@@ -34,6 +34,8 @@ function read_raw_data(filename; skip_sheets=Set(["source proportions","grain id
         data[sheet_name] = sheet_data
     end
 
+    @assert allequal([size(sheet) for sheet in values(data)])
+
     # Collect all sheets into a single 3-tensor (Array{T, 3})
     data_tensor = cat(values(data)...,dims=3)
     n_grains, n_sinks, n_measurements = size(data_tensor)

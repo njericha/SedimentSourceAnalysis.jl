@@ -1,8 +1,10 @@
 #=
-Use data from /data/lee2021
+Use data from /data/TREE_Data
 =#
 
 using XLSX
+using XLSX: readxlsx, sheetnames #
+using OrderedCollections: OrderedDict #
 using NamedArrays
 using Plots
 using MatrixTensorFactor
@@ -21,7 +23,7 @@ default(legendfontsize=plotfontsize, plot_titlefontsize=plotfontsize+1, titlefon
 Random.seed!(314159265)
 
 # Import data from excel file
-filename = "./data/lee2021/Lee et al 2021 All Measurements.xlsx"
+filename = "./data/saylor2024/TREE_Data.xlsx"
 sinks = read_raw_data(filename)::Vector{Sink}
 
 ## Look at a sink and grain
@@ -85,19 +87,19 @@ display(densitytensor[1:1, :, 1:1]) #just the first sample
 
 # Visualize the data in the tensor by plotting the densities for the first measurement
 measurement_names = getmeasurements(densitytensor) # ["Ages", ...]
-p = plot_densities(densitytensor, "Age");
+p = plot_densities(densitytensor, measurement_names[1]);
 display(p)
 
 # Perform the nonnegative decomposition Y=CF
 Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
 ranks = 1:size(Y)[1]
-maxiter = 5000
+maxiter = 8000
 tol = 1e-6
 Cs, Fs, all_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:5)
 
 println("rank | n_iterations | relative error")
 for rank in ranks
-    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; projection=:simplex, maxiter, tol, rescale_Y=false);
+    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; projection=:nnscale, maxiter, tol, rescale_Y=false);
     push!.(
         (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
         (C, F, rel_errors, norm_grad, dist_Ncone)
@@ -115,7 +117,7 @@ p = plot((map(x -> x[end],all_rel_errors)); ylabel="relative error", options...)
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
-best_rank = argmax(standard_curvature(map(x -> x[end],all_rel_errors)))
+best_rank = 2#argmax(standard_curvature(map(x -> x[end],all_rel_errors)))
 @show best_rank
 C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
@@ -159,7 +161,7 @@ source_indexes, source_likelihoods = zip(
 
 ## Sort the likelihoods, and find the log of the max/2nd highest likelihood
 sort!.(source_likelihoods, rev=true)
-loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
+loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps(s_likelihoods[2]))) for s_likelihoods in source_likelihoods]
 
 p = plot_source_index(
     collect(source_indexes), loglikelihood_ratios;

@@ -22,7 +22,7 @@ function source_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when
     for (name, source) in zip(names(D, 1), eachsource(D))
         full_title = title * "$(dimnames(D)[1]) $name"
         h = heatmap(
-            array(source);
+            collect(source);
             yticks=(eachindex(measurements), measurements),
             xticks=([1, domain_length],["min", "max"]),
             xlabel="Typical Range of Values",
