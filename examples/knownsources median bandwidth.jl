@@ -206,7 +206,7 @@ Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones = ([] for _ in 1:6
 
 println("rank | n_iterations | final loss")
 for rank in ranks
-    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; maxiter, tol, rescale_Y=false);
+    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; projection=:nnscale, maxiter, tol, rescale_Y=false);
     final_error = norm(Y - C*F) #rel_errors[end]
     push!.(
         (Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones),
@@ -543,3 +543,38 @@ true_source_n_correct_eachsink, _, true_source_accuracy = label_accuracy(true_so
 ## Can see similar accuracy which implies it is not the learned densities that are
 ## innaccurate, but about 10% of the grains are simply "unlikely" to be from the source they
 ## came from.
+
+# Compare learned lable proportions, to the proportion/coefficient matrix
+
+## Created learned proportion matrix C_label_proportions
+sinki = 1
+C_label_proportions = similar(C)
+for (i, learned_source_proportions) in enumerate(eachrow(C))
+    learned_gain_label_proportions_i =
+        [count(source_labels[i] .== r) for r in 1:length(learned_source_proportions)] / 75 #number of grains in each sink
+    C_label_proportions[i, :] = learned_gain_label_proportions_i
+end
+
+## Plot comparison between learned proportions and labeled proportions
+heatmap(C) |> display
+heatmap(C_label_proportions) |> display
+p = scatter(C[:], C_label_proportions[:];
+    xlabel="learned proportion matrix entries",
+    ylabel="learned grain label proportions",
+    label="(matrix entries, grain proportions)",)
+plot!([0,1], [0,1]; label="y=x line")
+display(p)
+
+## Plot comparison between true proportions and labeled proportions
+p = scatter(C_true[:], C_label_proportions[:];
+    xlabel="true proportions",
+    ylabel="learned grain label proportions",
+    label="(true, grain proportions)",)
+plot!([0,1], [0,1]; label="y=x line")
+display(p)
+
+## Calculate MAE
+mean_abs(learned, truth) = mean(abs.(learned - truth))
+
+@show mean_abs(C_label_proportions, C)
+@show mean_abs(C_label_proportions, C_true)

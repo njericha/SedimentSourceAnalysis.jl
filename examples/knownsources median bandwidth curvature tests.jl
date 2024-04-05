@@ -271,7 +271,7 @@ for rank in ranks
     @printf("%4i | %12i | %3.3g\n",
         rank, length(rel_errors), final_error)
 end
-final_rel_errors = convert(Vector{Float64}, final_errors)
+final_rel_errors = v#convert(Vector{Float64}, final_errors)
 length.(all_rel_errors)
 ## The optimal rank is the maximum curvature i.e. largest 2d derivative of the error
 options = (:label => false, :xlabel => "rank")
@@ -283,7 +283,7 @@ p = plot(d_dx(final_rel_errors;order); ylabel="derivative of final loss", option
 display(p)
 p = plot(d2_dx2(final_rel_errors;order=5); ylabel="2nd derivative of final loss", options...)
 display(p)
-p = plot(standard_curvature(final_rel_errors[1:4]; order); ylabel="standard curvature\nof final loss", options...)
+p = plot(standard_curvature(final_rel_errors[1:20]; order); ylabel="standard curvature\nof final loss", options...)
 plot!(standard_curvature(final_rel_errors[1:4]; order); label="4", options...)
 plot!(standard_curvature(final_rel_errors[1:5]; order); label="5", options...)
 plot!(standard_curvature(final_rel_errors[1:6]; order); label="6", options...)
@@ -299,7 +299,7 @@ p = plot(d2_dx2(final_rel_errors .^ 2  |> smooth;order=3); ylabel="standard curv
 p = plot(standard_curvature2(final_rel_errors |> smooth;order=3); ylabel="derivative of final loss", options...)
 display(p)
 
-function smooth(y;α=0.5) # α=0 is no smoothing, α=1 is as three way average
+function smooth(y;α=1) # α=0 is no smoothing, α=1 is as three way average
     z = copy(y)
     b = 3 - 2*α
     for i in eachindex(z)[begin+1:end-1]
