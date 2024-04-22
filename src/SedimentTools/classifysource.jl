@@ -188,3 +188,24 @@ function _labels_from(integers::AbstractVector{T}) where T <: Integer
     end
     return v
 end
+
+"""
+    confidence_score(source_likelihoods; sorted=false)
+
+Scores each grain between [0, 1] on how confident it came from the most likely source.
+
+The likelihoods should be sorted in desending order. If they are presorted, use the
+keyword `sorted=true`.
+
+Input
+-----
+`source_likelihoods`: A list-of-lists or NTuple of Vectors of the likelihood each grain came
+from each source.
+"""
+function confidence_score(source_likelihoods; sorted=false)
+    if sorted
+        return [log10(p[1] / (max(p[2], eps(p[1])))) for p in source_likelihoods]
+    else
+        return confidence_score(sort.(source_likelihoods, rev=true); sorted=true)
+    end
+end

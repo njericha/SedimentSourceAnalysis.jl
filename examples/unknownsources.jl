@@ -91,13 +91,13 @@ display(p)
 # Perform the nonnegative decomposition Y=CF
 Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
 ranks = 1:size(Y)[1]
-maxiter = 5000
-tol = 1e-6
+maxiter = 6000
+tol = 1e-5
 Cs, Fs, all_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:5)
 
 println("rank | n_iterations | relative error")
 for rank in ranks
-    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; projection=:simplex, maxiter, tol, rescale_Y=false);
+    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; projection=:nnscale, maxiter, tol, rescale_Y=false);
     push!.(
         (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
         (C, F, rel_errors, norm_grad, dist_Ncone)
@@ -115,7 +115,7 @@ p = plot((map(x -> x[end],all_rel_errors)); ylabel="relative error", options...)
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
-best_rank = argmax(standard_curvature(map(x -> x[end],all_rel_errors)))
+best_rank = 2 #argmax(standard_curvature(map(x -> x[end],all_rel_errors)))
 @show best_rank
 C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
@@ -158,8 +158,7 @@ source_indexes, source_likelihoods = zip(
     map(g -> estimate_which_source(g, F, all_likelihoods=true), sinks[1])...)
 
 ## Sort the likelihoods, and find the log of the max/2nd highest likelihood
-sort!.(source_likelihoods, rev=true)
-loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
+loglikelihood_ratios = confidence_score(source_likelihoods)
 
 p = plot_source_index(
     collect(source_indexes), loglikelihood_ratios;

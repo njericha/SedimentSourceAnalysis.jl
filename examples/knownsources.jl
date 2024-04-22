@@ -273,8 +273,7 @@ source_labels, source_likelihoods = zip(
     map(g -> estimate_which_source(g, factortensor; domains, stepsizes, all_likelihoods=true), sinks[1])...)
 
 ## Sort the likelihoods, and find the log of the max/2nd highest likelihood
-sort!.(source_likelihoods, rev=true) # descending order
-loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
+loglikelihood_ratios = confidence_score(source_likelihoods)
 
 p = plot_source_index(
     collect(source_labels), loglikelihood_ratios;

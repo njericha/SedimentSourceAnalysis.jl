@@ -201,7 +201,7 @@ Y_lateral_slices .*= getstepsizes(densitytensor)
 maxiter = 7000
 tol = 1e-5
 
-ranks = 1:size(Y)[1]
+ranks = 1:5#size(Y)[1]
 Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
 
 println("rank | n_iterations | final loss")
@@ -506,9 +506,9 @@ display(p)
 source_labels, source_likelihoods = zip(
     map(g -> estimate_which_source(g, factortensor_true; domains, stepsizes, all_likelihoods=true), sinks[1])...)
 
-## Sort the likelihoods, and find the log of the max/2nd highest likelihood
-sort!.(source_likelihoods, rev=true) # descending order
-loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
+## Sort the likelihoods (does not mutate source_likelihoods)
+## and find the log of the max/2nd highest likelihood
+loglikelihood_ratios = confidence_score(source_likelihoods)
 
 p = plot_source_index(
     collect(source_labels), loglikelihood_ratios;
