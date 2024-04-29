@@ -1,0 +1,40 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: SedimentAnalysis.jl
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Nicholas
+    family-names: Richardson
+    email: njericha@math.ubc.ca
+    affiliation: University of British Columbia
+    orcid: 'https://orcid.org/0009-0006-9382-7227'
+  - given-names: Naomi
+    family-names: Graham
+    affiliation: University of British Columbia
+    email: naomigra@cs.ubc.ca
+  - given-names: Michael P.
+    family-names: Friedlander
+    email: mpf@cs.ubc.ca
+    affiliation: University of British Columbia
+    orcid: 'https://orcid.org/0000-0003-0222-5222'
+  - orcid: 'https://orcid.org/0000-0001-7746-862X'
+    given-names: Joel
+    family-names: Saylor
+    email: jsaylor@eoas.ubc.ca
+    affiliation: University of British Columbia
+repository-code: 'https://github.com/njericha/Sediment-Source-Analysis.jl'
+abstract: >-
+  Decomposes sediment data into unknown sources and
+  proportions with kernel density estimation and
+  matrix-tensor factorization.
+keywords:
+  - tensor
+  - factorization
+  - decomposition
+  - NMF
+  - sediment
