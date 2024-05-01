@@ -16,6 +16,13 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://njericha.github.io/Sediment-Source-Analysis.jl/dev/)
 
+## Summary of Features
+- Import grain data from Excel files
+- Perform kernel density estimation on grain data by sinks and features
+- Decompose sink distributions into weighted combination of sources
+- Label grains based on learned sources
+- Plot kernel densities, sink, and source distributions
+
 ## Repo organization
 
 Our main numerical experiment can be found in `knownsources median bandwidth.jl` under the `examples` folder.
