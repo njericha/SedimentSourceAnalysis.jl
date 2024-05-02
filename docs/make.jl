@@ -1,8 +1,7 @@
 using Documenter
 
 push!(LOAD_PATH,"../src/")
-using Pkg
-Pkg.dev(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git")
+#using Pkg
 using MatrixTensorFactor
 using SedimentAnalysis
 #using SedimentAnalysis.MTF
