@@ -1,9 +1,9 @@
 """
     match_sources!(C, F, C_true, F_true)
 
-Permute sources in C and F to match the ground truth C\_true and F\_true.
+Permute sources in C and F to match the ground truth C\\_true and F\\_true.
 
-Similarity is checked by finding the source that minimizes norm(c - c\_true) where c is the
+Similarity is checked by finding the source that minimizes norm(c - c\\_true) where c is the
 column of C.
 
 # Parameters
