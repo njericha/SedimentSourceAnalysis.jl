@@ -13,7 +13,7 @@ Depth = 3
 
 **OR**
 ### In Browser
-1. Go to https://github.com/njericha/Sediment-Source-Analysis.jl
+1. Go to <https://github.com/njericha/Sediment-Source-Analysis.jl>
 2. Click "<> Code" and press "+" to "Create a codespace on main". It make take a few moments to set up.
 3. Open the command palett with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
 4. Enter `>Julia: Start REPL`
@@ -23,7 +23,7 @@ Run one of the example files by opening the file and pressing the triangular "ru
 
 **OR**
 ### On your own device
-1. Clone the repo at https://github.com/njericha/Sediment-Source-Analysis.jl
+1. Clone the repo at <https://github.com/njericha/Sediment-Source-Analysis.jl>
 2. Navigate to the root of the repository in a terminal and run `julia`
 3. Activate the project with `pkg> activate .` (use `julia> ]` to get to the package manager)
 4. resolve any dependency issues with `pkg> resolve`
@@ -43,7 +43,7 @@ The main submodule is SedimentTools. SedimentAnalysis also builds off of MatrixT
 Defines the main factorization function and related mathematical functions. See the full documentation here [Matrix Tensor Factorization](@ref).
 
 ### SedimentTools
-Holds various types at the [`Grain`], and [`Sink`] level, importing ([`read_raw_data`]) and processing data ([`make_densities`]) functions, and additional methods of some [Plots.jl](https://docs.juliaplots.org/stable/) functions for visualization with these custom types.
+Holds various types at the [`Grain`](@ref), and [`Sink`](@ref) level, importing ([`read_raw_data`](@ref)) and processing data ([`make_densities`](@ref)) functions, and additional methods of some [Plots.jl](https://docs.juliaplots.org/stable/) functions for visualization with these custom types.
 
 ## Index
 
