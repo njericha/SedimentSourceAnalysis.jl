@@ -1,6 +1,6 @@
 using Documenter
 
-#push!(LOAD_PATH,"../src/")
+push!(LOAD_PATH,"../src/")
 using Pkg
 Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git")
 using MatrixTensorFactor
