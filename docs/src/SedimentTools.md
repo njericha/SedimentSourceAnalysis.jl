@@ -1,4 +1,7 @@
 # Sediment Analysis Tools
+```@docs
+SedimentAnalysis.SedimentTools
+```
 
 ## Types
 ```@docs
@@ -14,7 +17,7 @@ Source
 getindex(::Sink, ::String)
 names(::NamedArray, ::Union{String,Symbol})
 heatmap(::NamedMatrix)
-SedimentAnalysis.make_densities(::Sink)
+SedimentAnalysis.SedimentTools.make_densities(::Sink)
 ```
 
 ## Functions
@@ -43,6 +46,14 @@ getsource
 normalize_density_sums!
 normalize_density_sums
 setsourcename!
+match_sources!
+```
+
+### Grain Labeling
+```@docs
+confidence_score
+label_accuracy
+estimate_which_source
 ```
 
 ### Iterators
