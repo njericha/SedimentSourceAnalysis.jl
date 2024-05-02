@@ -1,5 +1,12 @@
 # Sediment Source Analysis
 
+## Summary of Features
+- Import grain data from Excel files
+- Perform kernel density estimation on grain data by sinks and features
+- Decompose sink distributions into weighted combination of sources
+- Label grains based on learned sources
+- Plot kernel densities, sink, and source distributions
+
 ```@contents
 Depth = 3
 ```
@@ -8,7 +15,7 @@ Depth = 3
 1. Run `julia`
 2. Add the package with `pkg> add https://github.com/njericha/Sediment-Source-Analysis.jl.git`
 (use `julia> ]` to get to the package manager)
-3. Resolve dependency issues with `pkg> resolve` and check it works with `pkg> precompile`
+3. Resolve dependency issues with `pkg> resolve` and check it works with `pkg> precompile` (if you have an error with dependencies not downloading, try `pkg> instantiate`)
 3. Import with `using SedimentAnalysis`
 
 **OR**
