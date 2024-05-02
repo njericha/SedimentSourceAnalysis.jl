@@ -1,9 +1,9 @@
 """
     match_sources!(C, F, C_true, F_true)
 
-Permute sources in C and F to match the ground truth C_true and F_true.
+Permute sources in C and F to match the ground truth C\_true and F\_true.
 
-Similarity is checked by finding the source that minimizes norm(c - c_true) where c is the
+Similarity is checked by finding the source that minimizes norm(c - c\_true) where c is the
 column of C.
 
 # Parameters
@@ -140,14 +140,14 @@ Calculates the number of correctly labeled grains and percentage of correct labe
 
 Arguments
 ---------
-- `labels`: Iterable of iterables with the labels for each grain (Vector{Vector{T}} or Tuple{Tuple})
+- `labels`: Iterable of iterables with the labels for each grain (`Vector{Vector{T}}` or `Tuple{Tuple}`)
 - `true_amounts`: Number of grains from each source for every sink
 
 Outputs
 -------
 - `n_correct_eachsink::Integer`
 - `n_total_labels::Integer`
-- `accuracy::Real``
+- `accuracy::Real`
 """
 function label_accuracy(labels, true_amounts::AbstractMatrix{T}) where T <: Integer
     # Check valid arguments

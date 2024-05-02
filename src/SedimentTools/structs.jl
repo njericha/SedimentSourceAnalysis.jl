@@ -35,9 +35,9 @@ end
     Sink(grain1, grain2, ...)
     Sink([grain1, grain2, ...])
 
-Collects a list of Grains into a Rock/Sink.
+Collects a list of [`Grain`](@ref)`s` into a [`Rock`](@ref)/[`Sink`](@ref).
 
-Ensures all Grains have the same names and are in the same order.
+Ensures all [`Grain`](@ref)`s` have the same names and are in the same order.
 Struct to hold sink level data
 """
 const Sink = Vector{Grain}
@@ -49,22 +49,34 @@ function Base.show(io::IO, x::MIME"text/plain", S::Sink)
     show(io::IO, x::MIME"text/plain", S_named)
 end
 
-"""Gets the names of measurements from a Sink"""
+"""
+    getmeasurements(s::Sink)
+
+Gets the names of measurements from a Sink
+"""
 getmeasurements(s::Sink) = iszero(length(s)) ? String[] : getmeasurements(s[1])
 
-"""Gets all values of the measurement `k` in the Sink."""
+"""
+    Base.getindex(s::Sink, k::String)
+
+Gets all values of the measurement `k` in the [`Sink`](@ref).
+"""
 Base.getindex(s::Sink, k::String) = collect(g[k] for g ∈ s)
 
-"""Iterator for a list of values of each measurement"""
+"""
+    eachmeasurement(s::Sink)
+
+Iterator for a list of values of each measurement
+"""
 eachmeasurement(s::Sink) = (s[m] for m in getmeasurements(s))
 
 """
     Sink(grain1, grain2, ...)
     Sink([grain1, grain2, ...])
 
-Collects a list of Grains into a Rock/Sink.
+Collects a list of [`Grain`](@ref)`s` into a [`Rock`](@ref)/[`Sink`](@ref).
 
-Ensures all Grains have the same names and are in the same order.
+Ensures all [`Grain`](@ref)`s` have the same names and are in the same order.
 """
 function (::Type{S})(vec_of_grains::AbstractVector{Grain}) where S <: Sink # each element is a grain
     @assert allequal(getmeasurements.(vec_of_grains))
@@ -100,7 +112,7 @@ const Source = Sink
 
 An order 3 array to hold the density distributions for multiple sinks.
 
-KDEs is a Vector{Vector{Vector{T}}} like type whereas array is an Array{T,3} like type.
+KDEs is a `Vector{Vector{Vector{T}}}` like type whereas `array` is an `Array{T,3}` like type.
 
 Call [`setsourcename!`](@ref) to set the source name (name of first dimention).
 """
@@ -245,7 +257,7 @@ end
     getsource(D::DensityTensor, i::Integer)
     getsink(D::DensityTensor, i::Integer)
 
-Gets source/sink i from D. See [`eachsource`](@ref).
+Gets source/sink i from `D`. See [`eachsource`](@ref).
 """
 getsource(D::DensityTensor, i::Integer) = D[i, :, :] # TODO see if @view is better
 
@@ -313,7 +325,7 @@ end
     eachdensity(D::DensityTensor)
     eachdensity(D::DensityTensor, measurement::String)
 
-Iterates D over each density vector. These are the 3 fibers of D.
+Iterates `D` over each density vector. These are the 3 fibers of `D`.
 If a measurement is given, iterates over the densities for that measurement.
 """
 eachdensity(D::DensityTensor) = eachslice(D, dims=(1,2))
@@ -322,7 +334,7 @@ eachdensity(D::DensityTensor, measurement::String) = eachrow(D[:, measurement, :
 """
     eachmeasurement(D::DensityTensor)
 
-Iterates D over each measurement slice. These are the lateral slices.
+Iterates `D` over each measurement slice. These are the lateral slices.
 """
 eachmeasurement(D::DensityTensor) = eachslice(D, dims=2)
 
@@ -330,7 +342,7 @@ eachmeasurement(D::DensityTensor) = eachslice(D, dims=2)
     eachsource(D::DensityTensor)
     eachsink(D::DensityTensor)
 
-Iterates D over each source/sink slice. These are the horizontal slices.
+Iterates `D` over each source/sink slice. These are the horizontal slices.
 See [`getsource`](@ref).
 """
 eachsource(D::DensityTensor) = eachslice(D, dims=1)

@@ -10,7 +10,7 @@ end
 """
     source_heatmaps(D::DensityTensor; title="", kw...)
 
-Returns heatmaps for each source (horizontal slices) of D.
+Returns heatmaps for each source (horizontal slices) of `D`.
 
 The source name/index for each source will be appended to title.
 """
@@ -38,7 +38,7 @@ end
 """
     measurement_heatmaps(D::DensityTensor; kw...)
 
-Returns heatmaps for each measurement (lateral slices) of D.
+Returns heatmaps for each measurement (lateral slices) of `D`.
 """
 function measurement_heatmaps(D::DensityTensor; title="", kwargs...) # may clash when looking at a subarray of a DensityTensor
     plots = []
@@ -62,7 +62,7 @@ end
 """
     distributions_plot(D::DensityTensor, measurement::String; kw...)
 
-Returns one plot will all distributions for a given measurement (lateral slice) of D.
+Returns one plot will all distributions for a given measurement (lateral slice) of `D`.
 """
 function plot_densities(D::DensityTensor, measurement::String; kwargs...) # may clash when looking at a subarray of a DensityTensor
     # No need to normalize since every distribution on the same plot has the same scale
