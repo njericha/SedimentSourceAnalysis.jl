@@ -10,7 +10,7 @@ using NamedArrays: NamedArray, NamedMatrix, NamedVector, setnames!, setdimnames!
 #using ReusePatterns: @forward, forward # need to add the regular function `forward` because it is called by the macro @forward
 using KernelDensity: UnivariateKDE, kde, pdf
 using Plots: plot, plot!, scatter
-using Base: AbstractVecOrTuple
+using Base: AbstractVecOrTuple, Generator
 
 #using Pkg
 #Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git")

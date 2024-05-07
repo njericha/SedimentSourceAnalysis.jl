@@ -57,11 +57,12 @@ Gets the names of measurements from a Sink
 getmeasurements(s::Sink) = iszero(length(s)) ? String[] : getmeasurements(s[1])
 
 """
-    Base.getindex(s::Sink, k::String)
+    Base.getindex(s::Sink, k::Union{String, AbstractVector{String}})
 
 Gets all values of the measurement `k` in the [`Sink`](@ref).
 """
-Base.getindex(s::Sink, k::String) = collect(g[k] for g ∈ s)
+Base.getindex(s::Sink, ks::AbstractVector{String}) = Sink(g[ks] for g ∈ s) # g[ks] is still of type Grain, keep the data as a Sink
+Base.getindex(s::Sink, k::String) = collect(g[k] for g ∈ s) # g[k] is now a single Real value, so collect the values into a single Vector{T} where T <: Real
 
 """
     eachmeasurement(s::Sink)
@@ -83,6 +84,7 @@ function (::Type{S})(vec_of_grains::AbstractVector{Grain}) where S <: Sink # eac
     return collect(vec_of_grains)::Sink
 end
 (::Type{S})(vec_of_grains::AbstractVector{Grain}...) where S <: Sink = Sink(vec_of_grains)
+(::Type{S})(vec_of_grains::Base.Generator{T}) where {S <: Sink, T} = Sink(collect(vec_of_grains))
 
 # Define aliases so Rock or Source can be used in place of Sink when those terms make more
 # sense in those contexts.
