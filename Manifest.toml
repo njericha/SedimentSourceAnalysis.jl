@@ -2,7 +2,7 @@
 
 julia_version = "1.10.0"
 manifest_format = "2.0"
-project_hash = "db3d69cce37dc4722fc76c6bc7ebf642b5a0ce8d"
+project_hash = "56b21b701ef2b2da1c807e3a99ee18fee1eb11e5"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -266,12 +266,6 @@ deps = ["Calculus", "NaNMath", "SpecialFunctions"]
 git-tree-sha1 = "5837a837389fccf076445fce071c8ddaea35a566"
 uuid = "fa6b7ba4-c1ee-5f82-b5fc-ecf0adba8f74"
 version = "0.6.8"
-
-[[deps.Einsum]]
-deps = ["Compat"]
-git-tree-sha1 = "4a6b3eee0161c89700b6c1949feae8b851da5494"
-uuid = "b7d42ee7-0b51-5a75-98ca-779d3107e4c0"
-version = "0.4.1"
 
 [[deps.EpollShim_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -732,8 +726,8 @@ uuid = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 version = "1.29.0"
 
 [[deps.MatrixTensorFactor]]
-deps = ["Distances", "Distributions", "Einsum", "HDF5", "KernelDensity", "LinearAlgebra", "OptimalTransport", "Plots", "Random", "ReverseDiff", "SparseArrays", "Statistics"]
-git-tree-sha1 = "24f112c79b2c3ad6bd1e534c739fd192c4f71385"
+deps = ["Distances", "Distributions", "HDF5", "KernelDensity", "LinearAlgebra", "OptimalTransport", "Plots", "Random", "ReverseDiff", "SparseArrays", "Statistics", "TSVD", "Tullio"]
+git-tree-sha1 = "098be5695da2910b2937348621631f1431661e4a"
 repo-rev = "main"
 repo-url = "https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git"
 uuid = "b7339fc4-c5a0-4c8f-934d-9fd05475ae37"
@@ -1178,6 +1172,12 @@ deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 version = "1.0.3"
 
+[[deps.TSVD]]
+deps = ["Adapt", "LinearAlgebra"]
+git-tree-sha1 = "c39caef6bae501e5607a6caf68dd9ac6e8addbcb"
+uuid = "9449cd9e-2762-5aa3-a617-5413e99d722e"
+version = "0.4.4"
+
 [[deps.TableOperations]]
 deps = ["SentinelArrays", "Tables", "Test"]
 git-tree-sha1 = "e383c87cf2a1dc41fa30c093b2a19877c83e1bc1"
@@ -1219,6 +1219,24 @@ weakdeps = ["Random", "Test"]
 
     [deps.TranscodingStreams.extensions]
     TestExt = ["Test", "Random"]
+
+[[deps.Tullio]]
+deps = ["DiffRules", "LinearAlgebra", "Requires"]
+git-tree-sha1 = "6d476962ba4e435d7f4101a403b1d3d72afe72f3"
+uuid = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
+version = "0.3.7"
+
+    [deps.Tullio.extensions]
+    TullioCUDAExt = "CUDA"
+    TullioChainRulesCoreExt = "ChainRulesCore"
+    TullioFillArraysExt = "FillArrays"
+    TullioTrackerExt = "Tracker"
+
+    [deps.Tullio.weakdeps]
+    CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    FillArrays = "1a297f60-69ca-5386-bcde-b61e274b549b"
+    Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
 
 [[deps.URIs]]
 git-tree-sha1 = "67db6cc7b3821e19ebe75791a9dd19c9b1188f2b"

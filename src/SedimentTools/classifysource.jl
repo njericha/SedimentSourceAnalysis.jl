@@ -92,6 +92,22 @@ function _estimate_prob(grain::Grain, source, domains, stepsizes)
     return prod(measurement_probabilities)
 end
 
+function _estimate_2d_prob(grain::Grain, source, (x_domain, y_domain))
+    xleft, xright = _find_subinterval(x_domain, grain[1])
+    yleft, yright = _find_subinterval(y_domain, grain[2])
+    # Perform a 4 point average of the 2d density function
+    prob = 0.25 * sum(source[idx...] for idx in [[xleft, yleft], [xright, yleft], [xleft, yright], [xright, yright]])
+    #measurement_probabilities = zeros(n_measurements)
+    #for (j, (grain_value, density, domain, stepsize)) ∈ enumerate(zip(grain, eachrow(source), domains, stepsizes))
+    #    left, right = _find_subinterval(domain, grain_value)
+    #    density_k = (density[left] + density[right])/2 # Get the density for observing a measurement on that intervel
+    #    measurement_probabilities[j] = density_k * stepsize # estimate the probability by 0th order area
+    #end
+    ## Multiply the probabilities to get the overall probability of
+    ## observing the data in that volume
+    return prob::T where T <: Real #prod(measurement_probabilities)
+end
+
 """
     estimate_which_source(grain::Grain, F::DensityTensor; kwargs...)
 
@@ -119,6 +135,50 @@ function estimate_which_source(
 
     for (i, source) ∈ enumerate(sources)
         prob = _estimate_prob(grain, source, domains, stepsizes)
+        likelihoods[i] = prob
+    end
+
+    if max_likelihoods && all_likelihoods
+        return findmax(likelihoods), likelihoods
+    elseif max_likelihoods
+        return findmax(likelihoods)
+    elseif all_likelihoods
+        return findmax(likelihoods)[2], likelihoods
+    else
+        return findmax(likelihoods)[2]
+    end
+end
+
+"""
+    estimate_which_2d_source(grain::Grain, F; kwargs...)
+
+Returns the likelihood and source index of the mostly likely factor
+the grain vector came from.
+
+Works on densities F where each horizontal slice is a discretized 2D KDE.
+
+See [`estimate_which_source`](@ref).
+
+# Returns
+- (Default) `source_index::Integer`: The index of the most likely source
+- (when `max_likelihoods==true`) `(maxlikelihood, source_index)`: The most likely source and its likelihood
+- (when `all_likelihoods==true`) `likelihoods::Vector{Real}`: Likelihood grain came from each source
+- (when both are true) `((maxlikelihood, source_index), likelihoods)`
+"""
+function estimate_which_2d_source(
+    grain::Grain,
+    F;
+    max_likelihoods=false,
+    all_likelihoods=false,
+    domains,
+ )
+    getmeasurements(grain) == 2 ||
+        ArgumentError("Grain and F don't have matching measurements")
+    sources = eachslice(F; dims=1) #eachsource(F)
+    likelihoods = zeros(length(sources))
+
+    for (i, source) ∈ enumerate(sources)
+        prob = _estimate_2d_prob(grain, source, domains)
         likelihoods[i] = prob
     end
 

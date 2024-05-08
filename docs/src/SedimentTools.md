@@ -18,6 +18,7 @@ getindex(::Sink, ::String)
 names(::NamedArray, ::Union{String,Symbol})
 heatmap(::NamedMatrix)
 SedimentAnalysis.SedimentTools.make_densities(::Sink)
+SedimentAnalysis.SedimentTools.make_densities2d(::Sink)
 ```
 
 ## Functions
@@ -54,6 +55,7 @@ match_sources!
 confidence_score
 label_accuracy
 estimate_which_source
+estimate_which_2d_source
 ```
 
 ### Iterators
