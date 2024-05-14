@@ -42,6 +42,8 @@ display(grain1)
 
 ## Only take Eu_anomaly and Ti_temp
 selected_measurements = ["Eu_anomaly","Ti_temp"]
+#selected_measurements = ["Eu_anomaly","Th_U"]
+#selected_measurements = ["Th_U","Ti_temp"]
 sinks = [sink[selected_measurements] for sink in sinks]::Vector{Sink}
 sink1 = sinks[1]
 
@@ -68,8 +70,9 @@ bandwidths = dropdims(median(bandwidth_matrix, dims=1), dims=1) # column-wise me
 ## The same measurement could (and likely!) have different supports for different sinks...
 #raw_densities = make_densities.(sinks; bandwidths, inner_percentile)
 raw_densities = make_densities2d.(sinks; bandwidths=bandwidths, inner_percentile)
-f = raw_densities[1]
-heatmap(f.x, f.y, f.density') |> display
+for (i,f) in enumerate(raw_densities)
+    heatmap(f.x, f.y, f.density';title="sink $i") |> display
+end
 
 ## ...so we standardize them by resampling the densities on the same domain,
 ## which is the union of all intervels.
@@ -88,7 +91,7 @@ Y .*= grid_volume
 
 @assert all(abs.(sum.(eachslice(Y, dims=1)) .- 1) .< 1e-5) # all horizontal slices should be within 1e-5 of 1.0
 
-maxiter = 7000
+maxiter = 500
 tol = 1e-5
 
 ranks = 1:5#size(Y)[1]

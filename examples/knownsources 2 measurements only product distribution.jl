@@ -41,7 +41,9 @@ display(grain1)
 @show getmeasurements(grain1)
 
 ## Only take Eu_anomaly and Ti_temp
+# ["Age", "Eu_anomaly", "Ti_temp", "Th_U", "LREE_HREE", "Dy_Yb", "(Ce_Nd)_Y"]
 selected_measurements = ["Eu_anomaly","Ti_temp"]
+#selected_measurements = ["Ti_temp","Th_U"]
 sinks = [sink[selected_measurements] for sink in sinks]::Vector{Sink}
 
 # Estimate the densities of each sink
