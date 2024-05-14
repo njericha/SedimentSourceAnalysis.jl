@@ -57,12 +57,13 @@ Gets the names of measurements from a Sink
 getmeasurements(s::Sink) = iszero(length(s)) ? String[] : getmeasurements(s[1])
 
 """
-    Base.getindex(s::Sink, k::Union{String, AbstractVector{String}})
+    Base.getindex(s::Sink, k::String)
+    Base.getindex(s::Sink, ks::AbstractVector{String})
 
 Gets all values of the measurement `k` in the [`Sink`](@ref).
 """
-Base.getindex(s::Sink, ks::AbstractVector{String}) = Sink(g[ks] for g ∈ s) # g[ks] is still of type Grain, keep the data as a Sink
 Base.getindex(s::Sink, k::String) = collect(g[k] for g ∈ s) # g[k] is now a single Real value, so collect the values into a single Vector{T} where T <: Real
+Base.getindex(s::Sink, ks::AbstractVector{String}) = Sink(g[ks] for g ∈ s) # g[ks] is still of type Grain, keep the data as a Sink
 
 """
     eachmeasurement(s::Sink)
