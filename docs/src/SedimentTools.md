@@ -53,9 +53,10 @@ match_sources!
 ### Grain Labeling
 ```@docs
 confidence_score
-label_accuracy
 estimate_which_source
 estimate_which_2d_source
+estimate_which_nd_source
+label_accuracy
 ```
 
 ### Iterators

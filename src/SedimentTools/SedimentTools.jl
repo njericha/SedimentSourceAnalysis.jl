@@ -36,7 +36,7 @@ include("importing.jl")
 #export make_densities # Method extention to Sink
 include("densityestimation.jl")
 
-export estimate_which_source, estimate_which_2d_source, label_accuracy, match_sources!, confidence_score
+export estimate_which_source, estimate_which_2d_source, estimate_which_nd_source, label_accuracy, match_sources!, confidence_score
 include("classifysource.jl")
 
 export measurement_heatmaps, plot_densities, source_heatmaps, plot_convergence, plot_source_index

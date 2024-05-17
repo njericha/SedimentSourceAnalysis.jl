@@ -26,7 +26,7 @@ export read_raw_data
 #export DEFAULT_ALPHA, DEFAULT_N_SAMPLES # Constants
 #export default_bandwidth, make_densities, standardize_KDEs # Functions
 
-export estimate_which_source, estimate_which_2d_source, label_accuracy, match_sources!, confidence_score
+export estimate_which_source, estimate_which_2d_source, estimate_which_nd_source, label_accuracy, match_sources!, confidence_score
 
 export measurement_heatmaps, plot_densities, source_heatmaps, plot_convergence, plot_source_index
 

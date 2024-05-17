@@ -108,6 +108,18 @@ function _estimate_2d_prob(grain::Grain, source, (x_domain, y_domain))
     return prob::T where T <: Real #prod(measurement_probabilities)
 end
 
+function _estimate_nd_prob(grain::Grain, source, domains)
+    #n = length(size(source)) # order of the source array
+    endpoints = (_find_subinterval(domain, feature) for (domain, feature) in zip(domains, grain))
+    # Perform a 2^n point average of the nd density function?
+    # this is exponentialy many points for high dimentions...
+    #prob = 2^(-n) * sum(source[idx...] for idx in combinations(enpoints))
+    # two point "diagonal" estimate
+    left_idxs, right_idxs = zip(endpoints...)
+    prob = 0.5 * (source[left_idxs...] + source[right_idxs...])
+    return prob::T where T <: Real
+end
+
 """
     estimate_which_source(grain::Grain, F::DensityTensor; kwargs...)
 
@@ -179,6 +191,51 @@ function estimate_which_2d_source(
 
     for (i, source) ∈ enumerate(sources)
         prob = _estimate_2d_prob(grain, source, domains)
+        likelihoods[i] = prob
+    end
+
+    if max_likelihoods && all_likelihoods
+        return findmax(likelihoods), likelihoods
+    elseif max_likelihoods
+        return findmax(likelihoods)
+    elseif all_likelihoods
+        return findmax(likelihoods)[2], likelihoods
+    else
+        return findmax(likelihoods)[2]
+    end
+end
+
+# TODO combine estimate_which_source functions together
+
+"""
+    estimate_which_nd_source(grain::Grain, F; kwargs...)
+
+Returns the likelihood and source index of the mostly likely factor
+the grain vector came from.
+
+Works on densities F where each first order slice is a discretized n-Dimentional KDE.
+
+See [`estimate_which_source`](@ref) and [`estimate_which_2d_source`](@ref).
+
+# Returns
+- (Default) `source_index::Integer`: The index of the most likely source
+- (when `max_likelihoods==true`) `(maxlikelihood, source_index)`: The most likely source and its likelihood
+- (when `all_likelihoods==true`) `likelihoods::Vector{Real}`: Likelihood grain came from each source
+- (when both are true) `((maxlikelihood, source_index), likelihoods)`
+"""
+function estimate_which_nd_source(
+    grain::Grain,
+    F;
+    max_likelihoods=false,
+    all_likelihoods=false,
+    domains,
+ )
+
+    sources = eachslice(F; dims=1) #eachsource(F)
+    likelihoods = zeros(length(sources))
+
+    for (i, source) ∈ enumerate(sources)
+        prob = _estimate_nd_prob(grain, source, domains)
         likelihoods[i] = prob
     end
 
