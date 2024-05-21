@@ -95,7 +95,7 @@ pdf = reversedims(PDF.values) #numpy uses row major ordering whereas julia uses 
 x_coord, y_coord, z_coord = coords
 XXX, YYY, ZZZ = mgrid(x_coord, y_coord, z_coord)
 # plot 3d KDE
-function plot3d(pdf3d; isomin=1e-3)
+function plot3d(pdf3d; isomin=1e-5)
     PlotlyJS.plot(isosurface(
         x=XXX[:], # isosurface wants all entries in a single list
         y=YYY[:],
@@ -110,7 +110,7 @@ function plot3d(pdf3d; isomin=1e-3)
     )) |> display
 end
 
-plot3d(pdf)
+plot3d(pdf;isomin=1e-5)
 
 # Now do it for every sink
 
