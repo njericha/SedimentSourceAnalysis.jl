@@ -11,11 +11,11 @@ column of C.
 """
 function match_sources!(
     C::AbstractMatrix,
-    F::AbstractArray{T, 3},
+    F::AbstractArray{T, N},
     C_true::AbstractMatrix,
-    F_true::AbstractArray{T, 3};
+    F_true::AbstractArray{T, N};
     double_check=false,
-    ) where T <: Real
+    ) where {T <: Real, N}
     # make list to store which true source the columns of C match
     n_factors = size(C_true)[2]
     true_ordering = zeros(Integer, n_factors)
@@ -38,7 +38,7 @@ function match_sources!(
 
     # Swap columns of C and horizontal slices of F to the new ordering
     C .= @view C[:,true_ordering]
-    F .= @view F[true_ordering,:,:]
+    F .= @view F[true_ordering, ((:) for _ in 1:(N-1))...]
     return true_ordering
 end
 
