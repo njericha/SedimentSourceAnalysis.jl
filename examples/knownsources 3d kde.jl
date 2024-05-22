@@ -220,41 +220,8 @@ source_amounts = XLSX.readdata(source_filename,"Source proportions","B2:D21")
 C_true = source_amounts / 75 # 75 Grains in each sink
 coefficientmatrix_true = NamedArray(C_true, dimnames=("sink", "true source"))
 
-function match_sources4d!(
-    C::AbstractMatrix,
-    F::AbstractArray{T, 4},
-    C_true::AbstractMatrix,
-    F_true::AbstractArray{T, 4};
-    double_check=false,
-    ) where T <: Real
-    # make list to store which true source the columns of C match
-    n_factors = size(C_true)[2]
-    true_ordering = zeros(Integer, n_factors)
-
-    # loop over every column of C and find the best matching column of C_true
-    for (i, c_true) ∈ enumerate(eachcol(C_true))
-        _, i_true = findmin(c -> norm(c - c_true), eachcol(C))
-        true_ordering[i] = i_true
-    end
-    @assert allunique(true_ordering)
-
-    if double_check #repeat for F
-        true_ordering2 = zeros(Integer, n_factors)
-        for (i, slice_true) ∈ enumerate(eachslice(F_true, dims=1))
-            _, i_true = findmin(s -> norm(s - slice_true), eachslice(F, dims=1))
-            true_ordering2[i] = i_true
-        end
-        @assert true_ordering == true_ordering2
-    end
-
-    # Swap columns of C and horizontal slices of F to the new ordering
-    C .= @view C[:,true_ordering]
-    F .= @view F[true_ordering,:,:,:] # TODO Generalize this step to arbitrary order
-    return true_ordering
-end
-
 # Ensure the factors in C and F are in the same order as the true densities
-match_sources4d!(C, F, coefficientmatrix_true, factortensor_true)
+match_sources!(C, F, coefficientmatrix_true, factortensor_true)
 
 
 for (r, density) in enumerate(eachslice(factortensor; dims=1))
