@@ -12,6 +12,7 @@ using Printf
 using Random
 using Statistics: mean, median
 using LinearAlgebra: norm
+using Logging; disable_logging(Warn)
 
 using MatrixTensorFactor
 using SedimentAnalysis
@@ -290,14 +291,7 @@ plot!(standard_curvature(final_rel_errors[1:6]; order); label="6", options...)
 plot!(standard_curvature(final_rel_errors[1:20]; order); label="7", options...)
 display(p)
 p = plot(final_rel_errors; ylabel="standard curvature\nof final loss", options...)
-p = plot(smooth(final_rel_errors); ylabel="standard curvature\nof final loss", options...)
 
-display(p)
-p = plot(d_dx(final_rel_errors |> smooth); ylabel="standard curvature\nof final loss", options...)
-p = plot(d2_dx2(final_rel_errors .^ 2  |> smooth;order=3); ylabel="standard curvature\nof final loss", options...)
-
-p = plot(standard_curvature2(final_rel_errors |> smooth;order=3); ylabel="derivative of final loss", options...)
-display(p)
 
 function smooth(y;α=1) # α=0 is no smoothing, α=1 is as three way average
     z = copy(y)
@@ -307,6 +301,30 @@ function smooth(y;α=1) # α=0 is no smoothing, α=1 is as three way average
     end
     return z
 end
+
+
+function curvature2(y; Δx=1, kwargs...)
+    dy_dx = d_dx(y; kwargs...) ./ Δx
+    dy2_dx2 = d2_dx2(y; kwargs...) ./ Δx^2
+    return @. dy2_dx2 / (1 + dy_dx^2)^1.5
+end
+
+function standard_curvature2(y; kwargs...)
+    Δx = 1 / (length(y) - 1) # An interval 0:10 has length(0:10) = 11, but measure 10-0 = 10
+    y_max = maximum(y)
+    dy_dx = d_dx(y; kwargs...) / (Δx * y_max)
+    dy2_dx2 = d2_dx2(y; kwargs...) / (Δx^2 * y_max)
+    return @. dy2_dx2 / (1 + dy_dx^2)^1.5
+end
+
+p = plot(smooth(final_rel_errors); ylabel="standard curvature\nof final loss", options...)
+
+display(p)
+p = plot(d_dx(final_rel_errors |> smooth); ylabel="standard curvature\nof final loss", options...)
+p = plot(d2_dx2(final_rel_errors .^ 2  |> smooth;order=3); ylabel="standard curvature\nof final loss", options...)
+
+p = plot(standard_curvature2(final_rel_errors |> smooth;order=3); ylabel="derivative of final loss", options...)
+display(p)
 
 x = 0:10
 Δx = x[2]-x[1]
@@ -323,20 +341,6 @@ plot(x, curvature2(y; Δx))
 
 plot(x, standard_curvature(y))
 plot(x, standard_curvature2(y))
-
-function curvature2(y; Δx=1, kwargs...)
-    dy_dx = d_dx(y; kwargs...) ./ Δx
-    dy2_dx2 = d2_dx2(y; kwargs...) ./ Δx^2
-    return @. dy2_dx2 / (1 + dy_dx^2)^1.5
-end
-
-function standard_curvature2(y; kwargs...)
-    Δx = 1 / (length(y) - 1) # An interval 0:10 has length(0:10) = 11, but measure 10-0 = 10
-    y_max = maximum(y)
-    dy_dx = d_dx(y; kwargs...) / (Δx * y_max)
-    dy2_dx2 = d2_dx2(y; kwargs...) / (Δx^2 * y_max)
-    return @. dy2_dx2 / (1 + dy_dx^2)^1.5
-end
 
 ## Extract the variables corresponding to the optimal rank
 best_rank = 3 # argmax(standard_curvature(final_rel_errors))

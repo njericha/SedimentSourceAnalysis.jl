@@ -12,6 +12,7 @@ using Printf
 using Random
 using Statistics: mean, median
 using LinearAlgebra: norm
+using Logging; disable_logging(Warn)
 
 using PyCall
 using PlotlyJS: PlotlyJS, mgrid, isosurface, attr
@@ -103,7 +104,7 @@ function plot3d(pdf3d; isomin=1e-5)
         x=XXX[:], # isosurface wants all entries in a single list
         y=YYY[:],
         z=ZZZ[:],
-        value=pdf3d[:,:,:,M//2][:],
+        value=pdf3d[:,:,:,M÷2][:],
         opacity=0.6,
         isomin=isomin,
         isomax=maximum(pdf3d)*0.9,

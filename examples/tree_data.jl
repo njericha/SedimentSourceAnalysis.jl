@@ -11,6 +11,7 @@ using MatrixTensorFactor
 using SedimentAnalysis
 using Printf
 using Random
+using Logging; disable_logging(Warn)
 
 # Plot settings
 Plots.resetfontsizes(); Plots.scalefontsizes(1.5)

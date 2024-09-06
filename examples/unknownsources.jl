@@ -9,6 +9,7 @@ using MatrixTensorFactor
 using SedimentAnalysis
 using Printf
 using Random
+using Logging; disable_logging(Warn)
 
 # Plot settings
 Plots.resetfontsizes(); Plots.scalefontsizes(1.5)
@@ -22,6 +23,7 @@ Random.seed!(314159265)
 
 # Import data from excel file
 filename = "./data/lee2021/Lee et al 2021 All Measurements.xlsx"
+#filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
 sinks = read_raw_data(filename)::Vector{Sink}
 
 ## Look at a sink and grain
@@ -89,8 +91,14 @@ p = plot_densities(densitytensor, "Age");
 display(p)
 
 # Perform the nonnegative decomposition Y=CF
-Y = array(densitytensor); # plain Array{T, 3} type for faster factorization
-ranks = 1:size(Y)[1]
+Y = copy(array(densitytensor)); # plain Array{T, 3} type for faster factorization
+
+#Y_lateral_slices = eachslice(Y, dims=2)
+#Y_lateral_slices .*= getstepsizes(densitytensor)
+Y_fibres = eachslice(Y, dims=(1,2))
+Y_fibres ./= sum.(Y_fibres)
+
+ranks = 1:5#size(Y)[1]
 maxiter = 6000
 tol = 1e-5
 Cs, Fs, all_rel_errors, norm_grads, dist_Ncones = ([] for _ in 1:5)
@@ -115,7 +123,7 @@ p = plot((map(x -> x[end],all_rel_errors)); ylabel="relative error", options...)
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
-best_rank = 2 #argmax(standard_curvature(map(x -> x[end],all_rel_errors)))
+best_rank = 3 #argmax(standard_curvature(map(x -> x[end],all_rel_errors)))
 @show best_rank
 C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
@@ -142,7 +150,7 @@ display.(learned_source_plots)
 plots = measurement_heatmaps(F; title="Learned Densities for ");
 display.(plots);
 
-@show rel_error(C * F, densitytensor)
+@show rel_error(C * F, Y)
 
 # Now go back and classify each grain as source 1, 2, or 3 based on the learned sources
 
@@ -165,3 +173,15 @@ p = plot_source_index(
     title="Grains' Estimated Source and Log Likelihood Ratio"
 )
 display(p)
+
+all(sum.(eachslice(F, dims=(1,2))) .≈ 1)
+sum.(eachslice(C, dims=(1)))
+
+source_identification_per_sink = []
+    for (sink_number, sink) in zip(eachindex(sinks), sinks)
+        source_indexes, source_likelihoods = zip(
+            map(g -> estimate_which_source(g, F, all_likelihoods=true), sink)...)
+        loglikelihood_ratios = confidence_score(source_likelihoods)
+        source_identification = Dict("sources" => collect(source_indexes), "loglikelihood_ratios" => loglikelihood_ratios)
+        push!(source_identification_per_sink, Dict("name" => "sink $sink_number", "data" => source_identification))
+    end

@@ -8,6 +8,7 @@ using Plots
 using Printf
 using Random
 using Statistics: mean
+using Logging; disable_logging(Warn)
 
 #using Pkg
 #Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git")

@@ -12,6 +12,7 @@ using Printf
 using Random
 using Statistics: mean, median
 using LinearAlgebra: norm
+using Logging; disable_logging(Warn)
 
 using MatrixTensorFactor
 using SedimentAnalysis

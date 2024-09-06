@@ -8,6 +8,7 @@ using MatrixTensorFactor
 using SedimentAnalysis
 using Plots
 using Printf
+using Logging; disable_logging(Warn)
 
 # Plot settings
 Plots.resetfontsizes(); Plots.scalefontsizes(1.5)
