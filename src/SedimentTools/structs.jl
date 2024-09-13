@@ -327,12 +327,15 @@ end
 """
     eachdensity(D::DensityTensor)
     eachdensity(D::DensityTensor, measurement::String)
+    eachdensity(...; sink::Integer)
 
 Iterates `D` over each density vector. These are the 3 fibers of `D`.
 If a measurement is given, iterates over the densities for that measurement.
+If the keyword `sink` is given, only show densities from that sink.
 """
 eachdensity(D::DensityTensor) = eachslice(D, dims=(1,2))
 eachdensity(D::DensityTensor, measurement::String) = eachrow(D[:, measurement, :])
+eachdensity(D::DensityTensor, vararg...; sink::Integer) = eachdensity(D[sink:sink, :, :], vararg...)
 
 """
     eachmeasurement(D::DensityTensor)
