@@ -193,6 +193,66 @@ end
 
 display(p)
 
+######### Plot input distributions #######
+function all_slice_heatmaps(D::DensityTensor; kwargs...)
+    plots = []
+    D = normalize_density_sums(D)
+    measurements = getmeasurements(D)
+    #domain_length = length(getdomains(D)[begin])
+    for source in eachsource(D)
+        h = heatmap(
+            array(source);
+            yticks=(eachindex(measurements), measurements),
+            #xticks=([1, domain_length],["1", "$(size(array(source))[2])"]),
+            xlabel="sample index k",
+            yflip=true,
+            #clims = (0, max_density),
+            kwargs...
+            )
+        push!(plots, h)
+    end
+    return plots
+end
+
+ps = all_slice_heatmaps(densitytensor)
+for (i,p) in enumerate(ps)
+    display(p)
+    #savefig(p, "knownsource-input-densities-sink-$i.svg")
+end
+
+for (j,(c, m)) in enumerate(zip([:Oranges, :Greens, :Purples], getmeasurements(densitytensor)))
+    # K by 1 matrix/heatmap
+    density = reshape(array(eachdensity(densitytensor;sink=1)[j]), :, 1)
+    p = heatmap(density; c, legend=nothing,axis=nothing)
+    display(p)
+    #savefig(p, "knownsource-input-densities-sink1-$m-heatmap.svg")
+
+    # Bar chart
+    domain = getdomain(densitytensor, m)
+    p = plot(bar(domain, density[:]; fill_z=density[:], axis=nothing, c,legend=nothing, bar_width=diff(domain)))
+    display(p)
+    #savefig(p, "knownsource-input-densities-sink1-$m-bars.svg")
+end
+
+for m in measurement_names
+    p = plot_densities(densitytensor, m;
+    legendtitle = "Sink",
+    legend_columns=2,)
+    display(p)
+end
+
+for (density, m) in zip(eachdensity(densitytensor;sink=1),getmeasurements(densitytensor))
+    domain = getdomain(densitytensor, m)
+    p = plot(domain, density; xlabel=m, ylabel="density", legend=false)
+    scatter!(domain, density; color=:blue)
+    display(p)
+    #savefig(p, "knownsource-input-densities-feature-$m.svg")
+end
+
+
+
+####################
+
 # Find the best rank and perform the nonnegative decomposition Y=CF
 Y = copy(array(densitytensor)); # plain Array{T, 3} type for faster factorization
 
@@ -200,9 +260,9 @@ Y_lateral_slices = eachslice(Y, dims=2)
 Y_lateral_slices .*= getstepsizes(densitytensor)
 
 maxiter = 7000
-tol = 1e-5
+tol = 1e-6
 
-ranks = 1:5#size(Y)[1]
+ranks = 1:size(Y)[1]
 Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
 
 println("rank | n_iterations | final loss")
@@ -223,16 +283,18 @@ options = (:label => false, :xlabel => "rank")
 p = plot(final_rel_errors; ylabel="final loss", options...)
 #plot(final_rel_errors; ylabel="relative error", linewidth=5, markershape=:circle, markersize=8, options...)
 display(p)
-order = 4
+#order = 4
 p = plot(d_dx(final_rel_errors;order); ylabel="derivative of final loss", options...)
 display(p)
 p = plot(d2_dx2(final_rel_errors;order); ylabel="2nd derivative of final loss", options...)
+display(p)
+p = plot(curvature(final_rel_errors; order); ylabel="curvature\nof final loss", options...)
 display(p)
 p = plot(standard_curvature(final_rel_errors; order); ylabel="standard curvature\nof final loss", options...)
 display(p)
 
 ## Extract the variables corresponding to the optimal rank
-best_rank = 3 # argmax(standard_curvature(final_rel_errors))
+best_rank = 3 # argmax(curvature(final_rel_errors))
 @show best_rank
 C, F, rel_errors, norm_grad, dist_Ncone = getindex.(
     (Cs, Fs, all_rel_errors, norm_grads, dist_Ncones),
@@ -386,27 +448,9 @@ display.(plots);
 
 D = normalize_density_sums(factortensor_true)
 max_density = maximum(D)
-function all_source_heatmaps(D::DensityTensor; kwargs...)
-    plots = []
-    D = normalize_density_sums(D)
-    measurements = getmeasurements(D)
-    #domain_length = length(getdomains(D)[begin])
-    for source in eachsource(D)
-        h = heatmap(
-            array(source);
-            yticks=(eachindex(measurements), measurements),
-            #xticks=([1, domain_length],["1", "$(size(array(source))[2])"]),
-            xlabel="sample index k",
-            yflip=true,
-            clims = (0, max_density),
-            kwargs...
-            )
-        push!(plots, h)
-    end
-    return plots
-end
-p_learned = all_source_heatmaps(factortensor)
-p_true = all_source_heatmaps(factortensor_true)
+
+p_learned = all_slice_heatmaps(factortensor)
+p_true = all_slice_heatmaps(factortensor_true)
 for (l, t) in zip(p_learned, p_true)
     display(l)
     display(t)
