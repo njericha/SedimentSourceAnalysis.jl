@@ -187,3 +187,65 @@ F_lateral_slices ./= getstepsizes(densitytensor)
 # Plot Convergence
 plots = plot_convergence(rel_errors, norm_grad, dist_Ncone)
 display.(plots)
+
+# Reorder sources
+reorder = [3, 2, 4, 1] # Hand selected to keep as many grains
+
+C = C[:, reorder]
+F = F[reorder, :, :]
+
+## Package C into a NamedArray to label the dimentions
+coefficientmatrix = NamedArray(C, dimnames=("sink", "learned source"))
+
+# Visualize and compare the coefficientmatrix and factortensor
+# Note display should be called after all plots have been finalized
+options = (:xlabel => "source", :ylabel => "sink")
+p = heatmap(coefficientmatrix; clims = (0,1), options...);#title="Learned Proportions",
+display(p)
+
+## Package F into a DensityTensor with the same domain and measurements as Y
+## Each collection of measurements is no longer a sink and is now a "factor"
+factortensor = DensityTensor(F, domains, getmeasurements(densitytensor))
+setsourcename!(factortensor, "learned source")
+
+## For each grain, get the source index estimate, and the list of likelihoods for each source
+## Start with just the first sink
+domains = getdomains(factortensor) # extract domains and stepsizes once to speed up code
+stepsizes = getstepsizes(factortensor)
+sink_number = 19
+source_labels, source_likelihoods = zip(
+    map(g -> estimate_which_source(g, factortensor; domains, stepsizes, all_likelihoods=true), sinks[sink_number])...)
+
+## Sort the likelihoods, and find the log of the max/2nd highest likelihood
+sort!.(source_likelihoods, rev=true) # descending order
+loglikelihood_ratios = [log10(s_likelihoods[1] / (s_likelihoods[2] + eps())) for s_likelihoods in source_likelihoods]
+
+p = plot_source_index(
+    collect(source_labels), loglikelihood_ratios;
+    title="Grains' Estimated Source and Log Likelihood Ratio"
+)
+
+# Add vertical lines to mark each true collection of grains
+source_filename = "./data/sundell2022/20sinks from 3Sources from Sundell et al 2022.xlsx"
+source_amounts = XLSX.readdata(source_filename,"Source proportions","B2:D21")
+grain_index = 0
+for n_grains in source_amounts[sink_number,:][1:end-1]
+    grain_index += n_grains
+    plot!([grain_index+0.5, grain_index+0.5], [1, size(C)[2]];color=:black,legend=false)
+end
+
+plot!(title="",
+xlabel="grain index n",
+ylabel="estimated source r",)
+display(p)
+
+# Label every grain in every sink
+## Use the learned distributions first
+label_grains(factortensor) = [map(g -> estimate_which_source(g, factortensor; domains, stepsizes), sink) for sink in sinks]
+source_labels = label_grains(factortensor)
+n_correct_eachsink, n_total_labels, accuracy = label_accuracy(source_labels, source_amounts)
+
+@show accuracy
+
+n_bad_labels = count.(x -> x==4, source_labels) |> sum
+@show n_bad_labels, n_total_labels, n_bad_labels/n_total_labels*100
