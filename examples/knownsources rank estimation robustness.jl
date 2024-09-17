@@ -31,7 +31,7 @@ Random.seed!(314159265)
 # Tuple extracting
 compute_final_loss_curve((scale_bandwidth, grains_per_sink)) = compute_final_loss_curve(scale_bandwidth, grains_per_sink)
 
-function compute_final_loss_curve(scale_bandwidth, proportion_of_grains)
+function compute_final_loss_curve(scale_bandwidth, proportion_of_grains, n_features=7, n_sinks=20, discretization_size=64) # 7 features and 20 sinks in the dataset
     skip_grain = (1 / proportion_of_grains) |> round |> Int
 
         # Import data from excel file
@@ -39,6 +39,7 @@ function compute_final_loss_curve(scale_bandwidth, proportion_of_grains)
     sinks = read_raw_data(filename)::Vector{Sink}
 
     sinks = [sink[begin:skip_grain:end] for sink in sinks]::Vector{Sink}
+    sinks = sinks[1:n_sinks]
 
     # Estimate the densities of each sink
 
@@ -65,7 +66,7 @@ function compute_final_loss_curve(scale_bandwidth, proportion_of_grains)
 
     ## ...so we standardize them by resampling the densities on the same domain,
     ## which is the union of all intervels.
-    densities, domains = standardize_KDEs(raw_densities) #Made it to here so far
+    densities, domains = standardize_KDEs(raw_densities; n_samples=discretization_size) #Made it to here so far
 
     ## We now have a list of densities and domain xs they are sampled at.
     ## Here, densities[i] are the densities for the ith sink (sinks[i]),
@@ -90,6 +91,8 @@ function compute_final_loss_curve(scale_bandwidth, proportion_of_grains)
 
     Y_lateral_slices = eachslice(Y, dims=2)
     Y_lateral_slices .*= getstepsizes(densitytensor)
+
+    Y = Y[:,1:n_features,:] # Only look at the first n_features features
 
     maxiter = 8000
     tol = 1e-5
@@ -147,3 +150,77 @@ display(p)
 # Show that we get rank = 3 each time
 @show argmax.(standard_curvature.(final_errors_10; order))
 @show all(x -> x == 3, argmax.(standard_curvature.(final_errors_10; order)) )
+
+###############
+
+# What happens if we use fewer features?
+
+final_errors = compute_final_loss_curve.(1,1,1:7)
+final_errors_10 = map(f->f[1:10], final_errors)
+
+p = plot(; legend_title="# features")
+labels = string.(1:7)
+options = (:xlabel => "rank", legend_columns=3)#, linestyle=:dashdot, :color=>:blue, :linewidth=>2.5)
+for (f, J) in zip(final_errors_10, labels)
+    plot!(f; ylabel="final loss", label=J, options...)
+end
+display(p)
+
+# Curvature for all 9 tests
+p = plot(;leg=:bottomleft, legend_title="# features")
+order = 4 # order to do the curature estimation
+for (f, J) in zip(final_errors_10, labels)
+    plot!(standard_curvature(f; order); ylabel="standard curvature",label=J, options...)
+end
+display(p)
+
+@show argmax.(standard_curvature.(final_errors_10; order))
+
+###############
+
+# What happens if we use fewer sinks?
+
+final_errors = compute_final_loss_curve.(1,1,7,3:20)
+#final_errors_10 = map(f -> f[1:10], final_errors)
+
+p = plot(; legend_title="# sinks")
+labels = string.(3:20)
+options = (:xlabel => "rank", legend_columns=3)#, linestyle=:dashdot, :color=>:blue, :linewidth=>2.5)
+for (f, I) in zip(final_errors, labels)
+    plot!(f; ylabel="final loss", label=I, options...)
+end
+display(p)
+
+# Curvature for all 9 tests
+p = plot(;leg=:bottomleft, legend_title="# sinks")
+order = 3 # order to do the curature estimation
+for (f, I) in zip(final_errors, labels)
+    plot!(standard_curvature(f; order); ylabel="standard curvature",label=I, options...)
+end
+display(p)
+
+@show argmax.(standard_curvature.(final_errors; order))
+
+################
+
+
+# What happens if we use fewer discretization sizes?
+discretization_sizes = [16, 32, 64, 128]
+final_errors = compute_final_loss_curve.(1,1,7,20,discretization_sizes)
+final_errors_10 = map(f->f[1:10], final_errors)
+
+p = plot(; legend_title="\$K\$")
+labels = string.(discretization_sizes)
+options = (:xlabel => "rank", legend_columns=3)#, linestyle=:dashdot, :color=>:blue, :linewidth=>2.5)
+for (f, K) in zip(final_errors_10, labels)
+    plot!(f; ylabel="final loss", label=K, options...)
+end
+display(p)
+
+# Curvature for all 9 tests
+p = plot(;leg=:bottomleft, legend_title="\$K\$")
+order = 3 # order to do the curature estimation
+for (f, K) in zip(final_errors_10, labels)
+    plot!(standard_curvature(f; order); ylabel="standard curvature",label=K, options...)
+end
+display(p)
