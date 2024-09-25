@@ -23,9 +23,9 @@ makedocs(
     sitename="Sediment Source Analysis",
     modules = [SedimentSourceAnalysis, SedimentTools], #MTF
     checkdocs = :exports,
-    repo = Documenter.Remotes.GitHub("njericha", "Sediment-Source-Analysis.jl")
+    repo = Documenter.Remotes.GitHub("njericha", "SedimentSourceAnalysis.jl")
 )
 
 deploydocs( # TODO either use SedimentSourceAnalysis or SedimentSourceAnalysis
-    repo = "github.com/njericha/Sediment-Source-Analysis.jl.git",
+    repo = "github.com/njericha/SedimentSourceAnalysis.jl.git",
 )

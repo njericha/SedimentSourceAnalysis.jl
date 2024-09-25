@@ -6,7 +6,7 @@ comment text
 
 
 
-GitHub Actions : [![Build Status](https://github.com/JuliaLang/Example.jl/workflows/CI/badge.svg)](https://github.com/njericha/Sediment-Source-Analysis/actions?query=workflow%3ACI+branch%3Amaster)
+GitHub Actions : [![Build Status](https://github.com/JuliaLang/Example.jl/workflows/CI/badge.svg)](https://github.com/njericha/SedimentSourceAnalysis/actions?query=workflow%3ACI+branch%3Amaster)
 
 AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/JuliaLang/Example.jl?branch=master&svg=true)](https://ci.appveyor.com/project/tkelman/example-jl/branch/master)
 
@@ -14,7 +14,7 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 [![codecov.io](http://codecov.io/github/JuliaLang/Example.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaLang/Example.jl?branch=master)
 --->
 
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://njericha.github.io/Sediment-Source-Analysis.jl/dev/)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://njericha.github.io/SedimentSourceAnalysis.jl/dev/)
 
 ## Summary of Features
 - Import grain data from Excel files
@@ -89,7 +89,6 @@ If you find this repo helpful, please cite the associated paper:
   month = may,
   year = {2024},
 }
-
 ```
 
 or feel free to reach out to us with an email to njericha at math.ubc.ca.
