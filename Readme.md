@@ -82,10 +82,14 @@ Defines the main factorization function [`nnmtf`](@ref) and related mathematical
 If you find this repo helpful, please cite the associated paper:
 
 ```
-@article{Richardson2024,
-  title = {Non-negative Matrix-Tensor Factorization for Sediment Source Analysis},
-  author = {Richardson, Nicholas and Graham, Naomi and Friedlander, Michael P. and Saylor, Joel},
+@misc{graham_tracing_2024,
+  title = {Tracing {Sedimentary} {Origins} in {Multivariate} {Geochronology} via {Constrained} {Tensor} {Factorization}},
+  url = {https://friedlander.io/publications/2024-sediment-source-analysis/},
+  author = {Graham, Naomi and Richardson, Nicholas and Friedlander, Michael P. and Saylor, Joel},
+  month = may,
+  year = {2024},
 }
+
 ```
 
 or feel free to reach out to us with an email to njericha at math.ubc.ca.
