@@ -11,7 +11,7 @@ using Pkg
 Pkg.add("OrderedCollections")
 
 # ╔═╡ 282462fe-060c-44e5-b573-78d8c6f70188
-Pkg.add(url="https://github.com/njericha/Sediment-Source-Analysis.jl")
+Pkg.add(url="https://github.com/njericha/SedimentSourceAnalysis.jl")
 
 # ╔═╡ c1cc215b-adbc-4ab5-8153-ce1b4aa2b1e3
 using SedimentSourceAnalysis

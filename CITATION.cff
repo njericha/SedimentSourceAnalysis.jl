@@ -27,7 +27,7 @@ authors:
     family-names: Saylor
     email: jsaylor@eoas.ubc.ca
     affiliation: University of British Columbia
-repository-code: 'https://github.com/njericha/Sediment-Source-Analysis.jl'
+repository-code: 'https://github.com/njericha/SedimentSourceAnalysis.jl'
 abstract: >-
   Decomposes sediment data into unknown sources and
   proportions with kernel density estimation and

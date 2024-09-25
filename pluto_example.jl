@@ -8,7 +8,7 @@ using InteractiveUtils
 using Pkg
 
 # ╔═╡ 97c93b24-f145-4814-a733-92cca1e9d142
-Pkg.add(url="https://github.com/njericha/Sediment-Source-Analysis.jl")
+Pkg.add(url="https://github.com/njericha/SedimentSourceAnalysis.jl")
 
 # ╔═╡ f7acb584-bdbc-4fa7-a96a-e5e217454af7
 begin

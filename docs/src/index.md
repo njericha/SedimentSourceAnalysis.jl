@@ -13,14 +13,14 @@ Depth = 3
 ## How setup the environment
 ## Prefered Method
 1. Run `julia`
-2. Add the package with `pkg> add https://github.com/njericha/Sediment-Source-Analysis.jl.git`
+2. Add the package with `pkg> add https://github.com/njericha/SedimentSourceAnalysis.jl.git`
 (use `julia> ]` to get to the package manager)
 3. Resolve dependency issues with `pkg> resolve` and check it works with `pkg> precompile` (if you have an error with dependencies not downloading, try `pkg> instantiate`)
 3. Import with `using SedimentSourceAnalysis`
 
 **OR**
 ### In Browser
-1. Go to <https://github.com/njericha/Sediment-Source-Analysis.jl>
+1. Go to <https://github.com/njericha/SedimentSourceAnalysis.jl>
 2. Click "<> Code" and press "+" to "Create a codespace on main". It make take a few moments to set up.
 3. Open the command palett with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
 4. Enter `>Julia: Start REPL`
@@ -30,7 +30,7 @@ Run one of the example files by opening the file and pressing the triangular "ru
 
 **OR**
 ### On your own device
-1. Clone the repo at <https://github.com/njericha/Sediment-Source-Analysis.jl>
+1. Clone the repo at <https://github.com/njericha/SedimentSourceAnalysis.jl>
 2. Navigate to the root of the repository in a terminal and run `julia`
 3. Activate the project with `pkg> activate .` (use `julia> ]` to get to the package manager)
 4. resolve any dependency issues with `pkg> resolve`

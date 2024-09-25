@@ -27,7 +27,7 @@ AppVeyor: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Ju
 
 Our main numerical experiment can be found in `knownsources median bandwidth.jl` under the `examples` folder.
 
-The data used in our main numerical experiment `knownsources median bandwidth.jl` can be found [here](https://github.com/njericha/Sediment-Source-Analysis.jl/tree/main/data/sundell2022) under `data/sundell2022`. The exact grains selected and number of grains from each sink can be found in `data/20sinks from 3Sources from Sundell et al 2022.xlsx`.
+The data used in our main numerical experiment `knownsources median bandwidth.jl` can be found [here](https://github.com/njericha/SedimentSourceAnalysis.jl/tree/main/data/sundell2022) under `data/sundell2022`. The exact grains selected and number of grains from each sink can be found in `data/20sinks from 3Sources from Sundell et al 2022.xlsx`.
 
 The data handling and backend functions can be found in `src/SedimentTools`.
 
@@ -37,7 +37,7 @@ Our main decomposition algorithm can be found in the more general repo [MatrixTe
 ## How to run the code
 
 ### In Browser
-1. Go to https://github.com/njericha/Sediment-Source-Analysis.jl
+1. Go to https://github.com/njericha/SedimentSourceAnalysis.jl
 2. Click "<> Code" and press "+" to "Create a codespace on main". It make take a few moments to set up.
 3. Open the command palett with `Ctrl+Shift+P` (Windows) or `Cmd+Shift+P` (Mac)
 4. Enter `>Julia: Start REPL`
@@ -47,7 +47,7 @@ Run one of the example files by opening the file and pressing the triangular "ru
 
 **OR**
 ### On your own device
-1. Clone the repo at https://github.com/njericha/Sediment-Source-Analysis.jl
+1. Clone the repo at https://github.com/njericha/SedimentSourceAnalysis.jl
 2. Navigate to the root of the repository in a terminal and run `julia`
 3. Activate the project with `pkg> activate .` (use `julia> ]` to get to the package manager)
 4. resolve any dependency issues with `pkg> resolve`
