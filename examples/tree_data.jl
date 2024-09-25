@@ -8,7 +8,7 @@ using OrderedCollections: OrderedDict #
 using NamedArrays
 using Plots
 using MatrixTensorFactor
-using SedimentAnalysis
+using SedimentSourceAnalysis
 using Printf
 using Random
 using Logging; disable_logging(Warn)

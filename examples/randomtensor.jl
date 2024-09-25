@@ -5,7 +5,7 @@ example decomposition on a random tensor
 using Random
 using Statistics: mean
 using MatrixTensorFactor
-using SedimentAnalysis
+using SedimentSourceAnalysis
 using Plots
 using Printf
 using Logging; disable_logging(Warn)

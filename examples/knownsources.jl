@@ -14,7 +14,7 @@ using Logging; disable_logging(Warn)
 #Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git")
 using MatrixTensorFactor
 
-using SedimentAnalysis
+using SedimentSourceAnalysis
 
 # Plot settings
 Plots.resetfontsizes(); Plots.scalefontsizes(1.5)

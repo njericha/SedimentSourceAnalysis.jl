@@ -18,7 +18,7 @@ using PyCall
 using PlotlyJS: PlotlyJS, mgrid, isosurface, attr
 
 using MatrixTensorFactor
-using SedimentAnalysis
+using SedimentSourceAnalysis
 
 # Plot settings
 Plots.resetfontsizes(); Plots.scalefontsizes(1.5)

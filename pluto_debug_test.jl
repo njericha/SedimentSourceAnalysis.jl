@@ -14,7 +14,7 @@ Pkg.add("OrderedCollections")
 Pkg.add(url="https://github.com/njericha/Sediment-Source-Analysis.jl")
 
 # ╔═╡ c1cc215b-adbc-4ab5-8153-ce1b4aa2b1e3
-using SedimentAnalysis
+using SedimentSourceAnalysis
 
 # ╔═╡ 3b65ee86-594a-4bd4-8301-993a4265bd15
 using OrderedCollections: OrderedDict

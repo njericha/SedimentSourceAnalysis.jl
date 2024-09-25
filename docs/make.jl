@@ -3,17 +3,17 @@ using Documenter
 push!(LOAD_PATH,"../src/")
 #using Pkg
 using MatrixTensorFactor
-using SedimentAnalysis
-#using SedimentAnalysis.MTF
-using SedimentAnalysis.SedimentTools
+using SedimentSourceAnalysis
+#using SedimentSourceAnalysis.MTF
+using SedimentSourceAnalysis.SedimentTools
 using NamedArrays
 using Plots
 
 DocMeta.setdocmeta!(
-    SedimentAnalysis,
+    SedimentSourceAnalysis,
     :DocTestSetup,
-    :(using SedimentAnalysis;
-    # using SedimentAnalysis.SedimentTools;
+    :(using SedimentSourceAnalysis;
+    # using SedimentSourceAnalysis.SedimentTools;
     using Pkg; Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git");
     using MatrixTensorFactor: make_densities; using NamedArrays: NamedArray; using Plots: heatmap);
     recursive=true
@@ -21,11 +21,11 @@ DocMeta.setdocmeta!(
 
 makedocs(
     sitename="Sediment Source Analysis",
-    modules = [SedimentAnalysis, SedimentTools], #MTF
+    modules = [SedimentSourceAnalysis, SedimentTools], #MTF
     checkdocs = :exports,
     repo = Documenter.Remotes.GitHub("njericha", "Sediment-Source-Analysis.jl")
 )
 
-deploydocs( # TODO either use SedimentSourceAnalysis or SedimentAnalysis
+deploydocs( # TODO either use SedimentSourceAnalysis or SedimentSourceAnalysis
     repo = "github.com/njericha/Sediment-Source-Analysis.jl.git",
 )

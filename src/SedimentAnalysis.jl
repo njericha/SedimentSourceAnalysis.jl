@@ -1,7 +1,7 @@
 #= Single module that combines the
 factorization and data handling modules =#
 
-module SedimentAnalysis #TODO check if these files should be included or imported instead
+module SedimentSourceAnalysis #TODO check if these files should be included or imported instead
 
 #include("MTF/MTF.jl")
 
@@ -30,4 +30,4 @@ export estimate_which_source, estimate_which_2d_source, estimate_which_nd_source
 
 export measurement_heatmaps, plot_densities, source_heatmaps, plot_convergence, plot_source_index
 
-end # module SedimentAnalysis
+end # module SedimentSourceAnalysis

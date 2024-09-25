@@ -104,7 +104,7 @@ const Source = Sink
 # since Julia can only subtype abstract types...
 
 # Attempted to use the @forward macro from ReusePatterns, but it is having issues with
-# 1) packages that NamedArray extends methods but SedimentAnalysis does not and
+# 1) packages that NamedArray extends methods but SedimentSourceAnalysis does not and
 # 2) breaks when the scope changes (something to do with where @eval is run)
 
 # SO we will use a plain NamedArray where we hide the domains in the 3rd axis names

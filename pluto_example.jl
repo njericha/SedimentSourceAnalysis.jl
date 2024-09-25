@@ -21,7 +21,7 @@ begin
 end
 
 # ╔═╡ da27d62e-84e9-499d-afe1-90ccd61ae5f8
-using SedimentAnalysis
+using SedimentSourceAnalysis
 
 # ╔═╡ 0d218304-0758-41d7-8f2f-580c46553769
 # note: depending on the environment that Pluto links to (and what packages are already installed there) you may need to also run Pkg.add("package_name") before running this cell.

@@ -15,7 +15,7 @@ using LinearAlgebra: norm
 using Logging; disable_logging(Warn)
 
 using MatrixTensorFactor
-using SedimentAnalysis
+using SedimentSourceAnalysis
 
 # Plot settings
 Plots.resetfontsizes(); Plots.scalefontsizes(1.5)

@@ -1,7 +1,7 @@
-name = "SedimentAnalysis"
+name = "SedimentSourceAnalysis"
 uuid = "ec7d977d-20c2-4b4d-b160-abe0d9e86f32"
 authors = ["Nicholas Richardson <njericha@math.ubc.ca>"]
-version = "0.2.0"
+version = "1.0.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"

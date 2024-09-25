@@ -10,7 +10,7 @@ using StatsPlots
 gr(size = (1000, 1000)) # need large figure size to fit correlation plot
 
 using MatrixTensorFactor
-using SedimentAnalysis
+using SedimentSourceAnalysis
 
 # Load source data
 filename = "./data/sundell2022/3Sources from Sundell et al 2022.xlsx"

@@ -16,7 +16,7 @@ Depth = 3
 2. Add the package with `pkg> add https://github.com/njericha/Sediment-Source-Analysis.jl.git`
 (use `julia> ]` to get to the package manager)
 3. Resolve dependency issues with `pkg> resolve` and check it works with `pkg> precompile` (if you have an error with dependencies not downloading, try `pkg> instantiate`)
-3. Import with `using SedimentAnalysis`
+3. Import with `using SedimentSourceAnalysis`
 
 **OR**
 ### In Browser
@@ -36,7 +36,7 @@ Run one of the example files by opening the file and pressing the triangular "ru
 4. resolve any dependency issues with `pkg> resolve`
 
 ### Importing the package
-Type `julia> using SedimentAnalysis` to load all submodules (currently only `SedimentTools`), or if only one of the modules is desired, type `using SedimentAnalysis.XXX`.
+Type `julia> using SedimentSourceAnalysis` to load all submodules (currently only `SedimentTools`), or if only one of the modules is desired, type `using SedimentSourceAnalysis.XXX`.
 
 ## Examples
 `knownsources.jl`: Uses data from Sundel et al where we know the sources of each Grain. Use this to see how well the factorization performs with realistic data.
@@ -44,7 +44,7 @@ Type `julia> using SedimentAnalysis` to load all submodules (currently only `Sed
 `randomtensor`: Factorizes a random 50x50x50 tensor. See how the factorization performs in theory when a perfect factorization exists.
 
 ## Submodules
-The main submodule is SedimentTools. SedimentAnalysis also builds off of MatrixTensorFactor.jl.
+The main submodule is SedimentTools. SedimentSourceAnalysis also builds off of MatrixTensorFactor.jl.
 
 ### MatrixTensorFactor
 Defines the main factorization function and related mathematical functions. See the full documentation here [Matrix Tensor Factorization](@ref).

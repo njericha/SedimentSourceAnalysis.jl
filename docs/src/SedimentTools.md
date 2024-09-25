@@ -1,6 +1,6 @@
 # Sediment Analysis Tools
 ```@docs
-SedimentAnalysis.SedimentTools
+SedimentSourceAnalysis.SedimentTools
 ```
 
 ## Types
@@ -17,8 +17,8 @@ Source
 getindex(::Sink, ::String)
 names(::NamedArray, ::Union{String,Symbol})
 heatmap(::NamedMatrix)
-SedimentAnalysis.SedimentTools.make_densities(::Sink)
-SedimentAnalysis.SedimentTools.make_densities2d(::Sink)
+SedimentSourceAnalysis.SedimentTools.make_densities(::Sink)
+SedimentSourceAnalysis.SedimentTools.make_densities2d(::Sink)
 ```
 
 ## Functions

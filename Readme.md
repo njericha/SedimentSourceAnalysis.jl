@@ -2,7 +2,7 @@
 
 <!---
 comment text
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://njericha.github.io/SedimentAnalysis.jl/stable)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://njericha.github.io/SedimentSourceAnalysis.jl/stable)
 
 
 
@@ -53,7 +53,7 @@ Run one of the example files by opening the file and pressing the triangular "ru
 4. resolve any dependency issues with `pkg> resolve`
 
 ### Importing the package
-Type `julia> using SedimentAnalysis` load the package, or `using SedimentAnalysis.SedimentTools` to load the submodule directly.
+Type `julia> using SedimentSourceAnalysis` load the package, or `using SedimentSourceAnalysis.SedimentTools` to load the submodule directly.
 
 ## Examples
 See the `examples` folder for the following files.
