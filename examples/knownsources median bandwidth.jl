@@ -283,7 +283,7 @@ options = (:label => false, :xlabel => "rank")
 p = plot(final_rel_errors; ylabel="final loss", options...)
 #plot(final_rel_errors; ylabel="relative error", linewidth=5, markershape=:circle, markersize=8, options...)
 display(p)
-#order = 4
+order = 4
 p = plot(d_dx(final_rel_errors;order); ylabel="derivative of final loss", options...)
 display(p)
 p = plot(d2_dx2(final_rel_errors;order); ylabel="2nd derivative of final loss", options...)
