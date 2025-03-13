@@ -30,7 +30,7 @@ jobs:
         with:
           version: '1.9'
       - name: Install dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git"); Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        run: julia --project=docs/ -e 'using Pkg; Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/BlockTensorDecomposition.jl.git"); Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Build and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If authenticating with GitHub Actions token

@@ -626,9 +626,9 @@ git-tree-sha1 = "465a70f0fc7d443a00dcdc3267a497397b8a3899"
 uuid = "d0879d2d-cac2-40c8-9cee-1863dc0c7391"
 version = "0.1.2"
 
-[[deps.MatrixTensorFactor]]
+[[deps.BlockTensorDecomposition]]
 deps = ["KernelDensity", "LinearAlgebra", "Random", "Statistics", "Tullio"]
-path = "C:\\Users\\Nicholas\\.julia\\dev\\MatrixTensorFactor"
+path = "C:\\Users\\Nicholas\\.julia\\dev\\BlockTensorDecomposition"
 uuid = "b7339fc4-c5a0-4c8f-934d-9fd05475ae37"
 version = "0.1.0"
 

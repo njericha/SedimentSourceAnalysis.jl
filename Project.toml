@@ -4,11 +4,11 @@ authors = ["Nicholas Richardson <njericha@math.ubc.ca>"]
 version = "1.0.0"
 
 [deps]
+BlockTensorDecomposition = "07b766a1-0096-4e53-b687-1cd07becaccb"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 KernelDensity = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
-MatrixTensorFactor = "b7339fc4-c5a0-4c8f-934d-9fd05475ae37"
 NamedArrays = "86f7a689-2022-50b4-a561-43c23ac3c673"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"

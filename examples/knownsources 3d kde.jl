@@ -17,7 +17,7 @@ using Logging; disable_logging(Warn)
 using PyCall
 using PlotlyJS: PlotlyJS, mgrid, isosurface, attr
 
-using MatrixTensorFactor
+using BlockTensorDecomposition
 using SedimentSourceAnalysis
 
 # Plot settings

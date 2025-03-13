@@ -14,8 +14,30 @@ using Statistics: mean, median
 using LinearAlgebra: norm
 using Logging; disable_logging(Warn)
 
-using MatrixTensorFactor
+using BlockTensorDecomposition
 using SedimentSourceAnalysis
+
+array = SedimentSourceAnalysis.array
+
+using Base: *
+
+function Base.:*(A::AbstractMatrix, B::AbstractArray)
+    sizeB = size(B)
+    Bmat = reshape(B, sizeB[1], :)
+    Cmat = A * Bmat
+    C = reshape(Cmat, size(A)[1], sizeB[2:end]...)
+    return C
+end
+
+function rel_error(xhat, x)
+    return norm(xhat - x) / norm(x)
+end
+
+function mean_rel_error(Xhat, X; dims=(1,2))
+    hatslices = eachslice(Xhat; dims)
+    slices = eachslice(X; dims)
+    return mean(@. norm(hatslices - slices) / (norm(slices)))
+end
 
 # Plot settings
 Plots.resetfontsizes(); Plots.scalefontsizes(1.5)
@@ -262,12 +284,22 @@ Y_lateral_slices .*= getstepsizes(densitytensor)
 maxiter = 7000
 tol = 1e-6
 
-ranks = 1:size(Y)[1]
+ranks = 1:10#size(Y)[1]
 Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones = ([] for _ in 1:6)
 
 println("rank | n_iterations | final loss")
 for rank in ranks
-    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank; projection=:nnscale, maxiter, tol, rescale_Y=false);
+    C, F, rel_errors, norm_grad, dist_Ncone = nnmtf(Y, rank;
+        projection=:nnscale,
+        #criterion=:relativeerror,
+        maxiter,
+        tol=tol,#*sqrt(rank*(size(Y,1) + prod(size(Y)[2:end]))),
+        #constrain_final=false,
+        rescale_Y=false,
+        metric=:L2,
+        metricA=:L1,
+        metricB=:L1,
+        );
     final_error = norm(Y - C*F) #rel_errors[end]
     push!.(
         (Cs, Fs, all_rel_errors, final_errors, norm_grads, dist_Ncones),

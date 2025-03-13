@@ -1,3 +1,3 @@
 # Matrix Tensor Factorization
 
-See <https://mpf-optimization-laboratory.github.io/MatrixTensorFactor.jl/dev/>.
+See <https://mpf-optimization-laboratory.github.io/BlockTensorDecomposition.jl/dev/>.

@@ -2,7 +2,7 @@ using Documenter
 
 push!(LOAD_PATH,"../src/")
 #using Pkg
-using MatrixTensorFactor
+using BlockTensorDecomposition
 using SedimentSourceAnalysis
 #using SedimentSourceAnalysis.MTF
 using SedimentSourceAnalysis.SedimentTools
@@ -14,8 +14,8 @@ DocMeta.setdocmeta!(
     :DocTestSetup,
     :(using SedimentSourceAnalysis;
     # using SedimentSourceAnalysis.SedimentTools;
-    using Pkg; Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git");
-    using MatrixTensorFactor: make_densities; using NamedArrays: NamedArray; using Plots: heatmap);
+    using Pkg; Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/BlockTensorDecomposition.jl.git");
+    using BlockTensorDecomposition: make_densities; using NamedArrays: NamedArray; using Plots: heatmap);
     recursive=true
 )
 

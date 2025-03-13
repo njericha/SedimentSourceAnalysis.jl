@@ -31,7 +31,7 @@ The data used in our main numerical experiment `knownsources median bandwidth.jl
 
 The data handling and backend functions can be found in `src/SedimentTools`.
 
-Our main decomposition algorithm can be found in the more general repo [MatrixTensorFactor.jl](https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl).
+Our main decomposition algorithm can be found in the more general repo [BlockTensorDecomposition.jl](https://github.com/MPF-Optimization-Laboratory/BlockTensorDecomposition.jl).
 
 
 ## How to run the code
@@ -69,13 +69,13 @@ See the `examples` folder for the following files.
 `randomtensor.jl`: Factorizes a random 50x50x50 tensor. See how the factorization performs in theory when a perfect factorization exists.
 
 ## Submodules
-The main submodule of this repo is SedimentTools. The submodule MTF has been moved to a separate repo [MatrixTensorFactor](https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl).
+The main submodule of this repo is SedimentTools. The submodule MTF has been moved to a separate repo [BlockTensorDecomposition](https://github.com/MPF-Optimization-Laboratory/BlockTensorDecomposition.jl).
 
 ### SedimentTools
 Holds various types at the [`Grain`], and [`Sink`] level, importing ([`read_raw_data`]) and processing data ([`make_densities`]) functions, and additional methods of some [Plots.jl](https://docs.juliaplots.org/stable/) functions for visualization with these custom types.
 
-### MatrixTensorFactor
-Defines the main factorization function [`nnmtf`](@ref) and related mathematical functions. See the repo here [MatrixTensorFactor.jl](https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl).
+### BlockTensorDecomposition
+Defines the main factorization function [`nnmtf`](@ref) and related mathematical functions. See the repo here [BlockTensorDecomposition.jl](https://github.com/MPF-Optimization-Laboratory/BlockTensorDecomposition.jl).
 
 # Citation
 

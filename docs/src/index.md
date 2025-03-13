@@ -44,9 +44,9 @@ Type `julia> using SedimentSourceAnalysis` to load all submodules (currently onl
 `randomtensor`: Factorizes a random 50x50x50 tensor. See how the factorization performs in theory when a perfect factorization exists.
 
 ## Submodules
-The main submodule is SedimentTools. SedimentSourceAnalysis also builds off of MatrixTensorFactor.jl.
+The main submodule is SedimentTools. SedimentSourceAnalysis also builds off of BlockTensorDecomposition.jl.
 
-### MatrixTensorFactor
+### BlockTensorDecomposition
 Defines the main factorization function and related mathematical functions. See the full documentation here [Matrix Tensor Factorization](@ref).
 
 ### SedimentTools

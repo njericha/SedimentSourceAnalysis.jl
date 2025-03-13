@@ -9,7 +9,7 @@ using StatsPlots
 
 gr(size = (1000, 1000)) # need large figure size to fit correlation plot
 
-using MatrixTensorFactor
+using BlockTensorDecomposition
 using SedimentSourceAnalysis
 
 # Load source data

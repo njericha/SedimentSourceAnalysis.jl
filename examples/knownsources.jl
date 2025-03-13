@@ -11,8 +11,8 @@ using Statistics: mean
 using Logging; disable_logging(Warn)
 
 #using Pkg
-#Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git")
-using MatrixTensorFactor
+#Pkg.add(url="https://github.com/MPF-Optimization-Laboratory/BlockTensorDecomposition.jl.git")
+using BlockTensorDecomposition
 
 using SedimentSourceAnalysis
 

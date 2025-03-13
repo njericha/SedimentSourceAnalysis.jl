@@ -17,7 +17,7 @@ bulk of the data is.
 # Returns
 - `density_estimates::Vector{UnivariateKDE}`
 """
-function MatrixTensorFactor.make_densities(
+function BlockTensorDecomposition.make_densities(
     s::Sink;
     inner_percentile::Integer=100,
     bandwidths::AbstractVector{<:Real}=default_bandwidth.(
@@ -41,12 +41,12 @@ function MatrixTensorFactor.make_densities(
     return density_estimates
 end
 
-function MatrixTensorFactor.make_densities(
+function BlockTensorDecomposition.make_densities(
     sink::Sink,
     domains::AbstractVector{<:AbstractVector};
     kwargs...
     )
-    KDEs = MatrixTensorFactor.make_densities(sink; kwargs...)
+    KDEs = BlockTensorDecomposition.make_densities(sink; kwargs...)
     KDEs_new = pdf.(KDEs, domains)
     return KDEs_new
 end
@@ -57,7 +57,7 @@ end
 
 Similar to [`make_densities`](@ref) but performs the KDE on 2 measurements jointly.
 """
-function MatrixTensorFactor.make_densities2d(
+function BlockTensorDecomposition.make_densities2d(
     s::Sink;
     inner_percentile::Integer=100,
     bandwidths::AbstractVector{<:Real}=default_bandwidth.(
@@ -76,7 +76,7 @@ function MatrixTensorFactor.make_densities2d(
     return KDE
 end
 
-function MatrixTensorFactor.make_densities2d(
+function BlockTensorDecomposition.make_densities2d(
     sink::Sink,
     domains::AbstractVector{<:AbstractVector};
     kwargs...

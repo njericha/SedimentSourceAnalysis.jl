@@ -14,7 +14,7 @@ using Statistics: mean, median
 using LinearAlgebra: norm
 using Logging; disable_logging(Warn)
 
-using MatrixTensorFactor
+using BlockTensorDecomposition
 using SedimentSourceAnalysis
 
 # Plot settings

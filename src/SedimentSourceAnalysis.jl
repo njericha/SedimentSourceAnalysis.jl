@@ -10,7 +10,7 @@ include("SedimentTools/SedimentTools.jl")
 #using .MTF
 using .SedimentTools
 
-# re-exported from MatrixTensorFactor
+# re-exported from BlockTensorDecomposition
 export combined_norm, dist_to_Ncone, nnmtf, plot_factors, rel_error, mean_rel_error
 export d_dx, d2_dx2, curvature, standard_curvature # Approximations
 #export make_densities, make_densities2d # method extention
