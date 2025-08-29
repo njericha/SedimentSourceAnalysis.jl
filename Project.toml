@@ -6,6 +6,7 @@ version = "1.0.0"
 [deps]
 BlockTensorDecomposition = "07b766a1-0096-4e53-b687-1cd07becaccb"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 KernelDensity = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -22,4 +23,5 @@ StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 XLSX = "fdbf4ff8-1666-58a4-91e7-1b58723a45e0"
 
 [compat]
+HDF5 = "0.17.2"
 julia = "1.9"

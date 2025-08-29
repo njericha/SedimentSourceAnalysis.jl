@@ -1,0 +1,11 @@
+By collapsing the individual measurements into distributions as we described we do lose some information. Specifically we lose the relationship between individual measurements and the grain ages. For example, if we have two grains, one with an age of 10 million years and a Hafnium concentration of 1000 and another with an age of 1000 million years and a Hafnium concentration of 10000, we lose the relationship between those ages and concentrations if we collapse them into distributions. In that case all we can say is that the rock has these ages (10 and 1000 Ma) and these Hf concentrations (1000 and 10000). But we don't know which bit of data came from which grain. I am not sure if this is a problem, or if we can avoid it, but it something to keep in mind. 
+
+
+With that in mind, I was wondering if we could try factorizing distributions, where each distribution sums to one and all of the weights (coefficients) sum to one. That should be a well-constrained problem and I imagine we will be successful. I was also wondering if we could try factorizing the raw data from which the distributions are built. In this case the only constraint would be that the coefficients must sum to one. I am not certain whether this would work out, but if it did it would probably be better than using the distributions (for the reasons laid out above). 
+
+
+To that end I am attaching two things here. 
+
+1) The excel file is the distributions for a set of samples. Columns B-M are the probabilities for each of the intervals shown in column A. So if you want to visualize these distributions, plot A vs B, A vs C, A vs D etc. These are the n-by-p matrices that make up the 3-way tensor
+
+2) The zip folder has excel files with the raw data that was used to build the distributions. So if you want to try the second approach above, these are the files to use. You will probably have to zero pad the data since not all of the rock samples have the same number of grains analyzed from each one. 
