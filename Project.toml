@@ -1,7 +1,7 @@
 name = "SedimentSourceAnalysis"
 uuid = "ec7d977d-20c2-4b4d-b160-abe0d9e86f32"
 authors = ["Nicholas Richardson <njericha@math.ubc.ca>"]
-version = "1.0.0"
+version = "1.1.0"
 
 [deps]
 BlockTensorDecomposition = "07b766a1-0096-4e53-b687-1cd07becaccb"
