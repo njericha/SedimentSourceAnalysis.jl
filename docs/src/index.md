@@ -11,6 +11,13 @@
 Depth = 3
 ```
 ## How setup the environment
+## Temporary method
+
+For v1.1.1, MatrixTensorFactor must be installed separatly first.
+
+`add https://github.com/MPF-Optimization-Laboratory/MatrixTensorFactor.jl.git/#e92375d`
+`add https://github.com/njericha/SedimentSourceAnalysis.jl/tree/v1.1.1`
+
 ## Prefered Method
 1. Run `julia`
 2. Add the package with `pkg> add https://github.com/njericha/SedimentSourceAnalysis.jl.git`
